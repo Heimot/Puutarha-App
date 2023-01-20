@@ -11,6 +11,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AddIcon from '@mui/icons-material/Add';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -149,12 +150,12 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
             role="presentation"
         >
             <List>
-                {['Keräykseen', 'Kalenteri', 'Tilanne', 'Paikka', 'Päivä'].map((text) => (
+                {['Keräykseen', 'Kalenteri', 'Tilanne', 'Paikka', 'Päivä', 'Lisää'].map((text) => (
                     <ListItem key={text} disablePadding>
                         {text !== "Tilanne" && text !== "Paikka" && text !== "Päivä" ?
                             <ListItemButton onClick={(e: any) => { goToPage(text); toggleDrawer(e); }} onKeyDown={toggleDrawer}>
                                 <ListItemIcon>
-                                    {text === "Kalenteri" ? <CalendarMonthIcon /> : <WorkIcon />}
+                                    {text === "Kalenteri" ? <CalendarMonthIcon /> : text === "Keräykseen" ? <WorkIcon /> : <AddIcon />}
                                 </ListItemIcon>
                                 <ListItemText primary={text} />
                             </ListItemButton>
