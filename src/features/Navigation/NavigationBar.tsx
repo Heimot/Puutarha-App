@@ -69,7 +69,7 @@ const NavigationBar = () => {
         <Box sx={{ flexGrow: 1 }}>
             <ThemeProvider theme={darkTheme}>
                 <div>
-                    <AppBar position="static" color="primary">
+                    <AppBar position="fixed" color="primary">
                         <Toolbar>
                             <IconButton
                                 size="large"
