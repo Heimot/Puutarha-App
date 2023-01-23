@@ -1,0 +1,24 @@
+Table {
+    border-collapse: separate !important;
+    border: solid black 1px;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    font-size: 20px;
+    background-color: white;
+}
+
+Td, Th {
+    border-left: solid black 1px;
+    border-top: solid black 1px;
+}
+
+Th {
+    border-top: none;
+    height: 40px;
+    background-color: black;
+    color: white;
+}
+
+Td:first-child, Th:first-child {
+    border-left: none;
+}
