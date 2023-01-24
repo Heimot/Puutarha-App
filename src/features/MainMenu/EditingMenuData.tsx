@@ -1,31 +1,50 @@
 import React from 'react'
-import { Products } from './Model'
+import { Flower, Products } from './Model'
 import { Tr, Td } from 'react-super-responsive-table'
-import { Button, TextField, Select, MenuItem, Box } from '@mui/material';
+import { Button, TextField, Select, MenuItem, Box, Autocomplete } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
 import Grid from '@mui/material/Unstable_Grid2';
 
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Props {
     product: Products;
+    updateProducts: (value: any, name: string, productId: string) => void;
+    deleteProduct: (productId: string) => void;
 }
 
+const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProduct }) => {
+    const { locationSettings, flowerSettings } = useSelector((state: State) => state.data);
 
-const EditingMenuData: React.FC<Props> = ({ product }) => {
-    const { locationSettings } = useSelector((state: State) => state.data);
+    const valueChosen = (e: any, value: any) => {
+        updateProducts(value, 'flower', product._id);
+    }
 
     return (
         <Tr>
             <Td>
-                <TextField sx={{ width: "100%" }} value={product.flower.name} />
+                <Autocomplete
+                    value={product?.flower}
+                    onChange={valueChosen}
+                    id="flower-auto"
+                    options={flowerSettings}
+                    getOptionLabel={(option: Flower) => option.name}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => console.log("AAAAAAAAAA")}>Create new?</Button>}
+                    includeInputInList
+                    disableClearable
+                    renderInput={(params) => (
+                        <TextField {...params} />
+                    )}
+                />
             </Td>
             <Td>
-                <TextField type="number" sx={{ width: "100%" }} value={product.amount} />
+                <TextField name='amount' type="number" sx={{ width: "100%" }} value={product.amount} onChange={(e) => updateProducts(e.target.value, e.target.name, product._id)} />
             </Td>
             <Td>
-                <Select sx={{ width: "100%" }} value={product.location._id}>
+                <Select name='location' sx={{ width: "100%" }} value={product.location._id} onChange={(e) => updateProducts(e.target.value, e.target.name, product._id)}>
                     {locationSettings.map((location: any) =>
                         <MenuItem key={location._id} value={location._id}>{location.location}</MenuItem>
                     )}
@@ -33,15 +52,14 @@ const EditingMenuData: React.FC<Props> = ({ product }) => {
             </Td>
             <Td>
                 <Box>
-                    <Grid xs={12} container>
-                        <Grid xs={10.5}>
-                            <TextField fullWidth value={product.information} />
-                        </Grid>
-                        <Grid xs={1.5}>
-                            <Button style={{ width: "10%", maxHeight: "200px", minHeight: "56px", minWidth: "56px", padding: 0 }}>
+                    <Grid container xs={12}>
+                        <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
+                            <TextField name='information' fullWidth value={product.information} onChange={(e) => updateProducts(e.target.value, e.target.name, product._id)} />
+                            <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteProduct(product._id)}>
                                 <DeleteIcon fontSize='large' />
                             </Button>
-                        </Grid>
+                        </Box>
+
                     </Grid>
                 </Box>
             </Td>
