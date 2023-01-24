@@ -17,7 +17,7 @@ const App = () => {
   const { userData } = useSelector((state: State) => state.data);
 
   const dispatch = useDispatch();
-  const { setUserData, setStatus, setState, setLocation, setPDF, setChosenDate } = bindActionCreators(actionCreators, dispatch);
+  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenDate } = bindActionCreators(actionCreators, dispatch);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,6 +36,8 @@ const App = () => {
         setStatus(applicationSettings.status);
         setState(applicationSettings.state);
         setLocation(applicationSettings.location);
+        setFlowers(applicationSettings.flowers);
+        setStores(applicationSettings.stores);
         setPDF(applicationSettings.pdf);
 
         setChosenDate(dayjs().toString())
