@@ -9,8 +9,6 @@ import { Order } from './Model';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
-import { bindActionCreators } from '@reduxjs/toolkit';
-import * as actionCreators from '../../app/redux/actions';
 
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
@@ -86,6 +84,15 @@ const Main = () => {
         setOrders(data);
     }
 
+    const updateOrder = () => {
+        let data = orders.map((order) => {
+            return order._id === editData?._id
+                ? editData
+                : order;
+        })
+        setOrders(data);
+        setEditData(null);
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -155,7 +162,7 @@ const Main = () => {
                     ))}
                 </Grid>
             </Box>
-            <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} />
+            <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={() => updateOrder()} />
         </ThemeProvider>
     )
 }
