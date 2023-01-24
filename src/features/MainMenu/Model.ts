@@ -1,4 +1,5 @@
 export interface Order {
+    [key:string]: any;
     _id: string;
     store: Store;
     information: string;
@@ -12,6 +13,7 @@ export interface Order {
 }
 
 export interface Products {
+    [key:string]: any;
     _id: string;
     flower: Flower;
     state: State;
@@ -20,8 +22,8 @@ export interface Products {
     amountToDeliver: number;
     information: string;
     status: Status;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface Store {
