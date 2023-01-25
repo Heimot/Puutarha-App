@@ -1,5 +1,5 @@
 export interface Order {
-    [key:string]: any;
+    [key: string]: any;
     _id: string;
     store: Store;
     information: string;
@@ -13,13 +13,13 @@ export interface Order {
 }
 
 export interface Products {
-    [key:string]: any;
+    [key: string]: any;
     _id: string;
     flower: Flower;
     state: State;
     location: Location;
-    amount: number;
-    amountToDeliver: number;
+    amount: number | string;
+    amountToDeliver: number | string;
     information: string;
     status: Status;
     createdAt?: Date;
