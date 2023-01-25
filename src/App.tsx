@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Routes, Route, useNavigate } from 'react-router';
 import Login from './features/Login/Login';
 import Main from './features/MainMenu/Main';
 import NavigationBar from './features/Navigation/NavigationBar';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import CssBaseline from '@mui/material/CssBaseline';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from './app/redux/store';
@@ -12,13 +14,77 @@ import * as actionCreators from './app/redux/actions';
 import dayjs from 'dayjs';
 import Settings from './features/Settings/Settings';
 import Calendar from './features/Calendar/Calendar';
+import { orange } from '@mui/material/colors';
+
+declare module '@mui/material/styles' {
+  interface Theme {
+    table: {
+      light: string;
+      dark: string;
+    };
+  }
+  // allow configuration using `createTheme`
+  interface ThemeOptions {
+    table?: {
+      light?: string;
+      dark?: string;
+    };
+  }
+}
 
 const App = () => {
-  const { userData } = useSelector((state: State) => state.data);
+  const { userData, chosenMode } = useSelector((state: State) => state.data);
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
 
   const dispatch = useDispatch();
-  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenDate } = bindActionCreators(actionCreators, dispatch);
+  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenDate, setChosenMode } = bindActionCreators(actionCreators, dispatch);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let modeTheme = localStorage.getItem('theme');
+    console.log(modeTheme)
+    if (modeTheme === 'dark' || modeTheme === 'light') {
+      setMode(modeTheme)
+      setChosenMode(modeTheme);
+    } else {
+      setMode(chosenMode)
+    }
+  }, [chosenMode])
+
+  useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+      },
+    }),
+    [],
+  );
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        breakpoints: {
+          values: {
+            xs: 0,
+            sm: 600,
+            md: 1500,
+            lg: 2250,
+            xl: 3000
+          },
+        },
+        palette: {
+          mode,
+          primary: {
+            main: '#1976d2',
+          }
+        },
+        table: {
+          light: 'black',
+          dark: 'white',
+        }
+      }),
+    [mode],
+  );
 
   useEffect(() => {
     let auth = localStorage.getItem('token');
@@ -53,19 +119,22 @@ const App = () => {
   }, [window.location.pathname])
 
   return (
-    <div>
-      {window.location.pathname.includes('/dashboard')
-        ?
-        <NavigationBar />
-        :
-        null}
-      <Routes>
-        <Route path='/' element={<Login />} />
-        <Route path='/dashboard' element={<Main />} />
-        <Route path='/dashboard/settings' element={<Settings />} />
-        <Route path='/dashboard/calendar' element={<Calendar />} />
-      </Routes>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div>
+        {window.location.pathname.includes('/dashboard')
+          ?
+          <NavigationBar />
+          :
+          null}
+        <Routes>
+          <Route path='/' element={<Login />} />
+          <Route path='/dashboard' element={<Main />} />
+          <Route path='/dashboard/settings' element={<Settings />} />
+          <Route path='/dashboard/calendar' element={<Calendar />} />
+        </Routes>
+      </div>
+    </ThemeProvider>
   );
 }
 

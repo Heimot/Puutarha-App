@@ -70,3 +70,10 @@ export const setChosenDate = (chosenDate: any) => (dispatch: Dispatch<Action>) =
     payload: chosenDate
   });
 };
+
+export const setChosenMode = (chosenMode: any) => (dispatch: Dispatch<Action>) => {
+  dispatch({
+    type: ActionType.ChosenMode,
+    payload: chosenMode
+  });
+};

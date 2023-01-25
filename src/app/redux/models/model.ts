@@ -9,6 +9,7 @@ export enum ActionType {
     ChosenStatus = "SET_CHOSEN_STATUS",
     ChosenLocation = "SET_CHOSEN_LOCATION",
     ChosenDate = "SET_CHOSEN_DATE",
+    ChosenMode = "SET_CHOSEN_MODE"
 }
 
 interface UserDataAction {
@@ -62,4 +63,9 @@ interface ChosenDate {
     payload?: string;
 }
 
-export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction | StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate;
+interface ChosenMode {
+    type: ActionType.ChosenMode,
+    payload?: string;
+}
+
+export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction | StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode;

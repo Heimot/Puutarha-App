@@ -10,7 +10,8 @@ const initialState = {
     pdfSettings: null,
     chosenStatus: "",
     chosenLocation: "",
-    chosenDate: null
+    chosenDate: null,
+    chosenMode: 'light'
 }
 
 const dataReducer = (state: any = initialState, action: Action) => {
@@ -35,6 +36,8 @@ const dataReducer = (state: any = initialState, action: Action) => {
             return { ...state, chosenLocation: action.payload };
         case ActionType.ChosenDate:
             return { ...state, chosenDate: action.payload };
+        case ActionType.ChosenMode:
+            return { ...state, chosenMode: action.payload };
         default:
             return state;
     }
