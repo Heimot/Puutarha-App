@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import NavigationDrawer from './NavigationDrawer';
 
 const Search = styled('div')(({ theme }) => ({
@@ -53,56 +52,45 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#1976d2',
-        },
-    },
-});
-
 const NavigationBar = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <ThemeProvider theme={darkTheme}>
-                <div>
-                    <AppBar position="fixed" color="primary">
-                        <Toolbar>
-                            <IconButton
-                                size="large"
-                                edge="start"
-                                color="inherit"
-                                aria-label="open drawer"
-                                sx={{ mr: 2 }}
-                                onClick={() => setIsOpen(prevState => !prevState)}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography
-                                variant="h6"
-                                noWrap
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                            >
-                                Heimosen Puutarha
-                            </Typography>
-                            <Search>
-                                <SearchIconWrapper>
-                                    <SearchIcon />
-                                </SearchIconWrapper>
-                                <StyledInputBase
-                                    placeholder="Search…"
-                                    inputProps={{ 'aria-label': 'search' }}
-                                />
-                            </Search>
-                        </Toolbar>
-                    </AppBar>
-                    <NavigationDrawer drawerOpen={isOpen} drawerClose={() => setIsOpen(prevState => !prevState)} />
-                </div>
-            </ThemeProvider>
+            <div>
+                <AppBar position="fixed" color="primary">
+                    <Toolbar>
+                        <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            sx={{ mr: 2 }}
+                            onClick={() => setIsOpen(prevState => !prevState)}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="div"
+                            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                        >
+                            Heimosen Puutarha
+                        </Typography>
+                        <Search>
+                            <SearchIconWrapper>
+                                <SearchIcon />
+                            </SearchIconWrapper>
+                            <StyledInputBase
+                                placeholder="Search…"
+                                inputProps={{ 'aria-label': 'search' }}
+                            />
+                        </Search>
+                    </Toolbar>
+                </AppBar>
+                <NavigationDrawer drawerOpen={isOpen} drawerClose={() => setIsOpen(prevState => !prevState)} />
+            </div>
         </Box>
     );
 }
