@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, TextField, Box, Autocomplete } from '@mui/material';
+import React, { useEffect, useState } from 'react'
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, TextField, Box, Autocomplete, createFilterOptions, FilterOptionsState } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
@@ -12,13 +15,14 @@ import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import { Flower, Location, Order, Products, Store } from './Model';
 import EditingMenuData from './EditingMenuData';
 import FetchData from '../Components/Fetch';
+import dayjs from 'dayjs';
 
 interface Props {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     editData: Order | null;
     setEditData: (value: Order) => void;
-    dataSaved: () => void;
+    dataSaved: (id: string) => void;
 }
 
 interface Acc {
@@ -32,28 +36,42 @@ interface PropData {
 }
 
 const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData, dataSaved }) => {
-    const { locationSettings, stateSettings, statusSettings, flowerSettings, storeSettings } = useSelector((state: State) => state.data);
+    const [information, setInformation] = useState<string | undefined>('');
+    const [orderCode, setOrderCode] = useState<string | undefined>('');
+    const { locationSettings, stateSettings, statusSettings, storeSettings } = useSelector((state: State) => state.data);
 
-    const storeProps = {
-        options: storeSettings,
-        getOptionLabel: (option: Store) => option.name,
-    };
+    const defaultFilterOptions = createFilterOptions<Store>();
+    const filterOptions = (options: Store[], state: FilterOptionsState<Store>) => {
+        return defaultFilterOptions(options, state).slice(0, 15);
+    }
+
+    useEffect(() => {
+        setInformation(editData?.information);
+        setOrderCode(editData?.ordercode);
+    }, [editData])
+
+    useEffect(() => {
+        handleOrderChange(information, 'information');
+    }, [information])
+
+    useEffect(() => {
+        handleOrderChange(orderCode, 'ordercode');
+    }, [orderCode])
 
     const handleClick = () => {
         if (!editData) return;
         let defaultCheck = editData.products.filter((product) => {
-            console.log(product)
             return product.flower._id === ''
         })
-
-        if (defaultCheck.length > 0) return alert('You cannot have empty flower names. Please change them before you save!');
+        if (editData.store._id === '') return alert('You cannot have empty store names. Please change it before you save!');
+        if (defaultCheck.length > 0) return alert('You cannot have empty flower names. Please change them or delete them before you save!');
 
         setIsOpen(!isOpen);
         sendUpdate();
     }
 
     const handleClose = (event: any, reason: string) => {
-        if (reason && reason == "backdropClick")
+        if (reason && reason === "backdropClick")
             return;
         setIsOpen(!isOpen);
     }
@@ -88,10 +106,11 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
         }
     }
 
-    const handleOrderChange = (e: any) => {
+    const handleOrderChange = (value: any, name: string) => {
+
         if (editData) {
             let newData = {
-                ...editData, [e.target.name]: e.target.value
+                ...editData, [name]: value
             }
             setEditData(newData);
         }
@@ -134,7 +153,7 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         await FetchData({ urlHost: url, urlPath: '/orders/edit_order', urlQuery: `?currentUserId=${userId}&currentOrderId=${editData._id}`, urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: updateBody });
-        dataSaved();
+        dataSaved(editData._id);
     }
 
     const addProduct = () => {
@@ -201,21 +220,49 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
                 <Grid container xs={12}>
                     <Grid container direction="column" xs={12} sm={6}>
                         <Box>
-                            date pickers keräyspvm toimituspvm + name
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <Grid xs={12}>
+                                    <MobileDatePicker
+                                        label="Keräyspäivä"
+                                        value={dayjs(editData?.pickingdate)}
+                                        inputFormat='DD.MM.YYYY'
+                                        closeOnSelect={true}
+                                        onChange={(newValue) => {
+                                            handleOrderChange(dayjs(newValue), 'pickingdate');
+                                        }}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                </Grid>
+                                <Grid sx={{ marginTop: '10px' }} xs={12}>
+                                    <MobileDatePicker
+                                        label="Toimituspäivä"
+                                        value={dayjs(editData?.deliverydate)}
+                                        inputFormat='DD.MM.YYYY'
+                                        closeOnSelect={true}
+                                        onChange={(newValue) => {
+                                            handleOrderChange(dayjs(newValue), 'deliverydate');
+                                        }}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                </Grid>
+                            </LocalizationProvider>
                         </Box>
                         <Box sx={{ margin: '10px 0 10px 0' }}>
                             {
                                 storeSettings !== null
                                     ?
                                     <Autocomplete
-
                                         id="store-auto"
+                                        value={editData?.store}
+                                        filterOptions={filterOptions}
+                                        onChange={(e, value) => handleOrderChange(value, 'store')}
                                         options={storeSettings}
-                                        defaultValue={editData?.store}
                                         getOptionLabel={(option: Store) => option.name}
                                         isOptionEqualToValue={(option, value) => option._id === value._id}
-                                        sx={{ width: 300 }}
+                                        sx={{ maxWidth: 300 }}
+                                        noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => console.log("AAAAAAAAAA")}>Create new?</Button>}
                                         includeInputInList
+                                        disableClearable
                                         renderInput={(params) => (
                                             <TextField {...params} label="Kauppa" />
                                         )}
@@ -227,10 +274,10 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
                     </Grid>
                     <Grid container direction="column" xs={12} sm={6} sx={{ padding: 0 }}>
                         <Grid style={{ display: "flex", justifyContent: "flex-end" }} xs={12} >
-                            <TextField name='information' label="Lisätietoa" value={editData?.information} multiline onChange={handleOrderChange}></TextField>
+                            <TextField name='information' label="Lisätietoa" value={information} multiline onChange={(e) => setInformation(e.target.value)}></TextField>
                         </Grid>
                         <Grid style={{ display: "flex", justifyContent: "flex-end", margin: '10px 0 10px 0' }} xs={12}>
-                            <TextField name='ordercode' label="Order code" value={editData?.ordercode} multiline onChange={handleOrderChange}></TextField>
+                            <TextField name='ordercode' label="Order code" value={orderCode} multiline onChange={(e) => setOrderCode(e.target.value)}></TextField>
                         </Grid>
                     </Grid>
                 </Grid>
