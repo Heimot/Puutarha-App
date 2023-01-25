@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Box, List, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Select, MenuItem, InputLabel, FormControl, TextField } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -12,6 +13,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -44,14 +47,13 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const [statusOrder, setStatusOrder] = useState<Status[] | null>(null);
     const [locationOrder, setLocationOrder] = useState<Location[] | null>(null);
 
-    const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate } = useSelector((state: State) => state.data);
+    const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate, chosenMode } = useSelector((state: State) => state.data);
 
     const dispatch = useDispatch();
-    const { setChosenStatus, setChosenLocation, setChosenDate, setUserData } = bindActionCreators(actionCreators, dispatch);
+    const { setChosenStatus, setChosenLocation, setChosenDate, setUserData, setChosenMode } = bindActionCreators(actionCreators, dispatch);
 
     const navigate = useNavigate();
-
-
+    const theme = useTheme();
     useEffect(() => {
         let statusSettingsOrder = [];
         let defaultStatus;
@@ -218,13 +220,26 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
             </List>
             <Divider />
             <List>
-                {['Asetukset', 'Kirjaudu ulos'].map((text) => (
+                {['Light theme', 'Asetukset', 'Kirjaudu ulos'].map((text) => (
                     <ListItem key={text} disablePadding>
-                        <ListItemButton onClick={(e: any) => { goToPage(text); toggleDrawer(e); }}>
+                        <ListItemButton onClick={(e: any) => {
+                            if (text === 'Light theme') {
+                                if (theme.palette.mode === 'light') {
+                                    localStorage.setItem('theme', 'dark');
+                                    setChosenMode('dark')
+                                } else {
+                                    localStorage.setItem('theme', 'light');
+                                    setChosenMode('light')
+                                }
+                            } else {
+                                goToPage(text);
+                                toggleDrawer(e);
+                            }
+                        }}>
                             <ListItemIcon>
-                                {text === "Asetukset" ? <SettingsIcon /> : <LogoutIcon />}
+                                {text === "Asetukset" ? <SettingsIcon /> : text === 'Light theme' ? theme.palette.mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon /> : <LogoutIcon />}
                             </ListItemIcon>
-                            <ListItemText primary={text} />
+                            <ListItemText primary={text === 'Light theme' ? theme.palette.mode === 'light' ? 'Light theme' : 'Dark theme' : text} />
                         </ListItemButton>
                     </ListItem>
                 ))}
