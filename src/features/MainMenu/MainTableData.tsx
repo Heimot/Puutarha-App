@@ -6,11 +6,11 @@ import FetchData from '../Components/Fetch';
 
 interface Props {
     product: Products;
-    updateOrder: (nextState: string, pickedAmount: number) => void;
+    updateOrder: (nextState: string, pickedAmount: number | string) => void;
 }
 
 const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
-    const [pickedAmount, setPickedAmount] = useState<number>(product.amountToDeliver);
+    const [pickedAmount, setPickedAmount] = useState<number | string>(product.amountToDeliver);
 
     const nextState = async () => {
         let userId = localStorage.getItem('userId');
@@ -23,6 +23,12 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
         }
         await FetchData({ urlHost: url, urlPath: '/products/change_products_state', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
         updateOrder(product.state.nextState, pickedAmount);
+    }
+
+    const isEmpty = () => {
+        if (pickedAmount === '') {
+            setPickedAmount(product.amountToDeliver);
+        }
     }
 
     return (
@@ -48,6 +54,7 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
                     inputProps={{ style: { textAlign: 'center' } }}
                     type="number"
                     value={pickedAmount}
+                    onBlur={isEmpty}
                     onChange={(e: any) => setPickedAmount(e.target.value)}
                 />
             </Td>
