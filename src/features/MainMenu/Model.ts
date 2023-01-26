@@ -62,3 +62,13 @@ export interface Status {
     default: boolean;
     nextStatus: string;
 }
+
+export interface Acc {
+    propName: string;
+    value: any;
+}
+
+export interface PropData {
+    _id: string;
+    data: Acc[];
+}
