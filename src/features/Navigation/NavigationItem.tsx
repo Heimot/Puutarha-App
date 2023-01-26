@@ -22,6 +22,7 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import * as actionCreators from '../../app/redux/actions';
 import { useNavigate } from 'react-router';
 import FetchData from '../Components/Fetch';
+import AddDialog from '../NavAdd/AddDialog';
 
 interface Props {
     toggleDrawer: (event: any) => void;
@@ -46,6 +47,7 @@ interface Location {
 const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const [statusOrder, setStatusOrder] = useState<Status[] | null>(null);
     const [locationOrder, setLocationOrder] = useState<Location[] | null>(null);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate, chosenMode } = useSelector((state: State) => state.data);
 
@@ -141,6 +143,8 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
             navigate('/dashboard/settings');
         } else if (value === "Kalenteri") {
             navigate('/dashboard/calendar');
+        } else if (value === "Lisää") {
+            setIsOpen(true);
         } else {
             navigate('/dashboard');
         }
@@ -244,6 +248,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                     </ListItem>
                 ))}
             </List>
+            <AddDialog setIsOpen={(value) => setIsOpen(value)} isOpen={isOpen} />
         </Box>
     )
 }
