@@ -9,7 +9,8 @@ export enum ActionType {
     ChosenStatus = "SET_CHOSEN_STATUS",
     ChosenLocation = "SET_CHOSEN_LOCATION",
     ChosenDate = "SET_CHOSEN_DATE",
-    ChosenMode = "SET_CHOSEN_MODE"
+    ChosenMode = "SET_CHOSEN_MODE",
+    UpdatePacket = "SET_UPDATE_PACKET"
 }
 
 interface UserDataAction {
@@ -18,54 +19,59 @@ interface UserDataAction {
 }
 
 interface StatusSettingsAction {
-    type: ActionType.StatusSettings,
+    type: ActionType.StatusSettings;
     payload?: any;
 }
 
 interface StateSettingsAction {
-    type: ActionType.StateSettings,
+    type: ActionType.StateSettings;
     payload?: any;
 }
 
 interface LocationSettingsAction {
-    type: ActionType.LocationSettings,
+    type: ActionType.LocationSettings;
     payload?: any;
 }
 
 interface FlowerSettingsAction {
-    type: ActionType.FlowerSettings,
+    type: ActionType.FlowerSettings;
     payload?: any;
 }
 
 interface StoreSettingsAction {
-    type: ActionType.StoreSettings,
+    type: ActionType.StoreSettings;
     payload?: any;
 }
 
 
 interface PDFSettingsAction {
-    type: ActionType.PDFSettings,
+    type: ActionType.PDFSettings;
     payload?: any;
 }
 
 interface ChosenStatus {
-    type: ActionType.ChosenStatus,
+    type: ActionType.ChosenStatus;
     payload?: string;
 }
 
 interface ChosenLocation {
-    type: ActionType.ChosenLocation,
+    type: ActionType.ChosenLocation;
     payload?: string;
 }
 
 interface ChosenDate {
-    type: ActionType.ChosenDate,
+    type: ActionType.ChosenDate;
     payload?: string;
 }
 
 interface ChosenMode {
-    type: ActionType.ChosenMode,
+    type: ActionType.ChosenMode;
     payload?: string;
 }
 
-export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction | StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode;
+interface UpdatePacket {
+    type: ActionType.UpdatePacket;
+    payload?: string;
+}
+
+export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction | StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket;
