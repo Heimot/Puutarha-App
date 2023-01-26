@@ -14,7 +14,6 @@ import * as actionCreators from './app/redux/actions';
 import dayjs from 'dayjs';
 import Settings from './features/Settings/Settings';
 import Calendar from './features/Calendar/Calendar';
-import { orange } from '@mui/material/colors';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -42,7 +41,6 @@ const App = () => {
 
   useEffect(() => {
     let modeTheme = localStorage.getItem('theme');
-    console.log(modeTheme)
     if (modeTheme === 'dark' || modeTheme === 'light') {
       setMode(modeTheme)
       setChosenMode(modeTheme);
