@@ -3,6 +3,7 @@ import { Order, Products } from './Model'
 import { Tr, Td } from 'react-super-responsive-table'
 import { Button, TextField } from '@mui/material';
 import FetchData from '../Components/Fetch';
+import { useTheme } from '@mui/material/styles';
 
 interface Props {
     product: Products;
@@ -11,6 +12,13 @@ interface Props {
 
 const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
     const [pickedAmount, setPickedAmount] = useState<number | string>(product.amountToDeliver);
+
+    const theme = useTheme();
+
+    const borderStyle = {
+        borderLeft: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
+        borderTop: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
+    }
 
     const nextState = async () => {
         let userId = localStorage.getItem('userId');
@@ -33,11 +41,11 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
 
     return (
         <Tr>
-            <Td>{product.flower.name}</Td>
-            <Td>{product.amount}</Td>
-            <Td>{product.location.location}</Td>
-            <Td>{product.information}</Td>
-            <Td style={{ padding: '5px' }}>
+            <Td style={borderStyle}>{product.flower.name}</Td>
+            <Td style={borderStyle}>{product.amount}</Td>
+            <Td style={borderStyle}>{product.location.location}</Td>
+            <Td style={borderStyle}>{product.information}</Td>
+            <Td style={{ padding: '5px', ...borderStyle }}>
                 <Button
                     variant="contained"
                     size='small'
@@ -48,7 +56,7 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
                     {product.state.state}
                 </Button>
             </Td>
-            <Td>
+            <Td style={borderStyle}>
                 <TextField
                     sx={{ padding: '5px' }}
                     inputProps={{ style: { textAlign: 'center' } }}
