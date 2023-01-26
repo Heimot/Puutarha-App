@@ -39,7 +39,7 @@ export const setFlowers = (flowerSettings: any) => (dispatch: Dispatch<Action>) 
 export const setStores = (storeSettings: any) => (dispatch: Dispatch<Action>) => {
   dispatch({
     type: ActionType.StoreSettings,
-    payload:storeSettings
+    payload: storeSettings
   });
 };
 
@@ -75,5 +75,12 @@ export const setChosenMode = (chosenMode: any) => (dispatch: Dispatch<Action>) =
   dispatch({
     type: ActionType.ChosenMode,
     payload: chosenMode
+  });
+};
+
+export const setUpdatePacket = (updatePacket: any) => (dispatch: Dispatch<Action>) => {
+  dispatch({
+    type: ActionType.UpdatePacket,
+    payload: updatePacket
   });
 };

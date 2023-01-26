@@ -11,7 +11,8 @@ const initialState = {
     chosenStatus: "",
     chosenLocation: "",
     chosenDate: null,
-    chosenMode: 'light'
+    chosenMode: 'light',
+    updatePacket: ''
 }
 
 const dataReducer = (state: any = initialState, action: Action) => {
@@ -38,6 +39,8 @@ const dataReducer = (state: any = initialState, action: Action) => {
             return { ...state, chosenDate: action.payload };
         case ActionType.ChosenMode:
             return { ...state, chosenMode: action.payload };
+        case ActionType.UpdatePacket:
+            return { ...state, updatePacket: action.payload };
         default:
             return state;
     }
