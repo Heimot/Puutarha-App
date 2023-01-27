@@ -14,6 +14,7 @@ import * as actionCreators from './app/redux/actions';
 import dayjs from 'dayjs';
 import Settings from './features/Settings/Settings';
 import Calendar from './features/Calendar/Calendar';
+import { SocketProvider } from './app/contexts/SocketProvider';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -119,6 +120,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
       <div>
         {window.location.pathname.includes('/dashboard')
           ?
@@ -127,7 +129,7 @@ const App = () => {
           null}
         <Routes>
           <Route path='/' element={<Login />} />
-          <Route path='/dashboard' element={<Main />} />
+          <Route path='/dashboard' element={<SocketProvider><Main /></SocketProvider>} />
           <Route path='/dashboard/settings' element={<Settings />} />
           <Route path='/dashboard/calendar' element={<Calendar />} />
         </Routes>
