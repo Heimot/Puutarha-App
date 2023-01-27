@@ -51,7 +51,7 @@ const Main = () => {
             console.log(value)
             // Chosen date might randomly be null here please find a better way to do this WIP
             //if (dayjs(value.pickingDate).format('YYYY-MM-DD') === dayjs(chosenDate).format('YYYY-MM-DD')) {
-                updateOrder(value.orderId, false);
+            updateOrder(value.orderId, false);
             //}
             return;
         }
@@ -164,7 +164,6 @@ const Main = () => {
     }
 
     return (
-
         <Box sx={{ flexGrow: 1, padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh' }}>
             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
                 {orders.map((order) => (
@@ -237,7 +236,6 @@ const Main = () => {
             </MenuDialog>
             <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean) => updateSocket(id, isCreator)} />
         </Box>
-
     )
 }
 
