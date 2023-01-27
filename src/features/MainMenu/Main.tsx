@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -49,20 +49,22 @@ const Main = () => {
     useEffect(() => {
         const appendMessage = (value: any) => {
             console.log(value)
+            // Chosen date might randomly be null here please find a better way to do this WIP
+            //if (dayjs(value.pickingDate).format('YYYY-MM-DD') === dayjs(chosenDate).format('YYYY-MM-DD')) {
+                updateOrder(value.orderId, false);
+            //}
+            return;
         }
         if (!socket) return;
-        socket.on('order-updates-sent', appendMessage)
-        socket.on('order-updates', appendMessage)
-
+        socket.on('send-order-update', appendMessage)
         return () => {
-            socket.off('order-updates-sent', appendMessage)
-            socket.off('order-updates', appendMessage)
+            socket.off('send-order-update', appendMessage)
         };
-    }, [])
+    }, [socket])
 
     useEffect(() => {
         if (updatePacket === '') return;
-        updateOrder(updatePacket, false);
+        updateSocket(updatePacket, false);
         setUpdatePacket('');
     }, [updatePacket])
 
@@ -109,7 +111,16 @@ const Main = () => {
             _id: orderId
         };
         await FetchData({ urlHost: url, urlPath: '/orders/delete_order', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: bodyData });
-        updateOrder(orderId, false);
+        updateSocket(orderId, false);
+    }
+
+    const updateSocket = (id: string | undefined, isCreator: boolean) => {
+        if (!socket) return;
+        socket.emit('update-order', {
+            orderId: id,
+            pickingDate: chosenDate
+        })
+        updateOrder(id, isCreator);
     }
 
     /**
@@ -123,21 +134,21 @@ const Main = () => {
     const updateOrder = async (id: string | undefined, isCreator: boolean) => {
         if (!id) return;
         let userId = localStorage.getItem('userId');
-        if (!socket) return;
-        socket.emit('get-order-updates', {
-            sender: userId,
-            orderId: id,
-            msg: 'hello'
-        })
         let url = process.env.REACT_APP_API_URL;
+        console.log(chosenDate)
         let newData = await FetchData({ urlHost: url, urlPath: '/orders/get_order_with_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&_id=${id}&date=${chosenDate}` });
         let data;
+
+        // If the order does not exist anymore please delete it!
         if (newData.result.length <= 0) {
             data = orders.filter((order) => {
                 return order._id !== id;
             })
+            // If the creator didnt edit it please add it as a new one
         } else if (!isCreator) {
+            console.log('oof')
             data = [...orders, newData.result[0]];
+            // If the order has been edited please find it and edit the order to the new one
         } else {
             data = orders.map((order) => {
                 return order._id === id
@@ -153,80 +164,80 @@ const Main = () => {
     }
 
     return (
-        <SocketProvider>
-            <Box sx={{ flexGrow: 1, padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh' }}>
-                <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-                    {orders.map((order) => (
-                        <Grid xs={12} sm={12} md={6} lg={4} xl={3} key={order._id}>
-                            <Item>
-                                <Grid container xs={12}>
-                                    <Grid xs={6}>
-                                        <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Keräyspäivämäärä: {dayjs(order.pickingdate).format('DD-MM-YYYY')}</Typography>
-                                        <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Toimituspäivämäärä: {dayjs(order.deliverydate).format('DD-MM-YYYY')}</Typography>
-                                        <Typography sx={{ fontSize: 20, paddingTop: 1, paddingBottom: 1 }} align="left" variant='h1'>{order.store.name}</Typography>
-                                        <Typography sx={{ fontSize: 15 }} align="left" variant='h1'>{order._id}</Typography>
-                                    </Grid>
-                                    <Grid xs={6} sx={{ padding: 0 }}>
-                                        <Grid xs={12} >
-                                            <Typography align='right'>{order.information}</Typography>
-                                        </Grid>
-                                        <Grid xs={12}>
-                                            <Typography align='right'>{order.ordercode}</Typography>
-                                        </Grid>
-                                    </Grid>
-                                    <Grid xs={6}>
-                                        <Typography align='left'>Location order status here with .map</Typography>
-                                    </Grid>
-                                    <Grid xs={6}>
-                                        <Typography align='right'>Maybe some buttons here</Typography>
+
+        <Box sx={{ flexGrow: 1, padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh' }}>
+            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+                {orders.map((order) => (
+                    <Grid xs={12} sm={12} md={6} lg={4} xl={3} key={order._id}>
+                        <Item>
+                            <Grid container xs={12}>
+                                <Grid xs={6}>
+                                    <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Keräyspäivämäärä: {dayjs(order.pickingdate).format('DD-MM-YYYY')}</Typography>
+                                    <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Toimituspäivämäärä: {dayjs(order.deliverydate).format('DD-MM-YYYY')}</Typography>
+                                    <Typography sx={{ fontSize: 20, paddingTop: 1, paddingBottom: 1 }} align="left" variant='h1'>{order.store.name}</Typography>
+                                    <Typography sx={{ fontSize: 15 }} align="left" variant='h1'>{order._id}</Typography>
+                                </Grid>
+                                <Grid xs={6} sx={{ padding: 0 }}>
+                                    <Grid xs={12} >
+                                        <Typography align='right'>{order.information}</Typography>
                                     </Grid>
                                     <Grid xs={12}>
-                                        Amount done meters here mby?
+                                        <Typography align='right'>{order.ordercode}</Typography>
                                     </Grid>
                                 </Grid>
-                                <Table style={{
-                                    color: theme.palette.mode === 'dark' ? 'white' : 'black',
-                                    border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
-                                }}>
-                                    <Thead>
-                                        <Tr>
-                                            <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Tuote</Th>
-                                            <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Kerätään</Th>
-                                            <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Keräyspiste</Th>
-                                            <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Lisätietoa</Th>
-                                            <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Keräämässä</Th>
-                                            <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Kerättymäärä</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {
-                                            order?.products.map((product) => (
-                                                <MainTableData
-                                                    key={product._id}
-                                                    product={product}
-                                                    updateOrder={(nextState, pickedAmount) => updatedData(nextState, pickedAmount, order._id, product._id)}
-                                                />
-                                            ))
-                                        }
-                                    </Tbody>
-                                </Table>
-                                <Grid container xs={12}>
-                                    <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }}>Valmis</Button>
-                                    <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none' }}>Muokkaa</Button>
-                                    <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none' }}>Poista</Button>
-                                    <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none' }}>Vie Exceliin</Button>
-                                    <Button variant="contained" size='small' color='warning' sx={{ fontSize: 15, textTransform: 'none' }}>Tulosta taulukko</Button>
+                                <Grid xs={6}>
+                                    <Typography align='left'>Location order status here with .map</Typography>
                                 </Grid>
-                            </Item>
-                        </Grid>
-                    ))}
-                </Grid>
-                <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
-                    {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
-                </MenuDialog>
-                <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean) => updateOrder(id, isCreator)} />
-            </Box>
-        </SocketProvider>
+                                <Grid xs={6}>
+                                    <Typography align='right'>Maybe some buttons here</Typography>
+                                </Grid>
+                                <Grid xs={12}>
+                                    Amount done meters here mby?
+                                </Grid>
+                            </Grid>
+                            <Table style={{
+                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
+                            }}>
+                                <Thead>
+                                    <Tr>
+                                        <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Tuote</Th>
+                                        <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Kerätään</Th>
+                                        <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Keräyspiste</Th>
+                                        <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Lisätietoa</Th>
+                                        <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Keräämässä</Th>
+                                        <Th style={{ color: theme.palette.mode === 'dark' ? 'white' : 'black' }}>Kerättymäärä</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {
+                                        order?.products.map((product) => (
+                                            <MainTableData
+                                                key={product._id}
+                                                product={product}
+                                                updateOrder={(nextState, pickedAmount) => updatedData(nextState, pickedAmount, order._id, product._id)}
+                                            />
+                                        ))
+                                    }
+                                </Tbody>
+                            </Table>
+                            <Grid container xs={12}>
+                                <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }} onClick={() => console.log(socket)}>Valmis</Button>
+                                <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none' }}>Muokkaa</Button>
+                                <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none' }}>Poista</Button>
+                                <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none' }}>Vie Exceliin</Button>
+                                <Button variant="contained" size='small' color='warning' sx={{ fontSize: 15, textTransform: 'none' }}>Tulosta taulukko</Button>
+                            </Grid>
+                        </Item>
+                    </Grid>
+                ))}
+            </Grid>
+            <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
+                {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
+            </MenuDialog>
+            <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean) => updateSocket(id, isCreator)} />
+        </Box>
+
     )
 }
 
