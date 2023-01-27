@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
-import io from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 
-const SocketContext = React.createContext(null);
+const SocketContext = React.createContext<Socket | undefined>(undefined);
 
-export function useSocket() {
+export const useSocket = () => {
     return useContext(SocketContext)
 }
 
-export function SocketProvider({ children }: any) {
-    const [socket, setSocket] = useState<any>()
+export const SocketProvider = ({ children }: any) => {
+    const [socket, setSocket] = useState<Socket | undefined>()
 
     useEffect(() => {
         let url = process.env.REACT_APP_API_URL;
         const newSocket: any = io(url + '/', {
-            query: {
+            auth: {
                 userid: localStorage.getItem('userId'),
                 token: localStorage.getItem('token')
             }
