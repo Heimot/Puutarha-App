@@ -6,6 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
+import { SocketProvider } from './app/contexts/SocketProvider';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -13,9 +14,11 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={Store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <SocketProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </SocketProvider>
     </Provider>
   </React.StrictMode>
 );

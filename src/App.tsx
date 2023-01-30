@@ -129,7 +129,7 @@ const App = () => {
           null}
         <Routes>
           <Route path='/' element={<Login />} />
-          <Route path='/dashboard' element={<SocketProvider><Main /></SocketProvider>} />
+          <Route path='/dashboard' element={<Main />} />
           <Route path='/dashboard/settings' element={<Settings />} />
           <Route path='/dashboard/calendar' element={<Calendar />} />
         </Routes>
