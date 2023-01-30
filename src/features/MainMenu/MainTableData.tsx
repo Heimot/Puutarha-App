@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Order, Products } from './Model'
 import { Tr, Td } from 'react-super-responsive-table'
 import { Button, TextField } from '@mui/material';
@@ -11,9 +11,14 @@ interface Props {
 }
 
 const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
-    const [pickedAmount, setPickedAmount] = useState<number | string>(product.amountToDeliver);
+    const [pickedAmount, setPickedAmount] = useState<number | string>('');
 
     const theme = useTheme();
+
+    useEffect(() => {
+        setPickedAmount(product.amountToDeliver)
+    }, [product])
+
 
     const borderStyle = {
         borderLeft: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
@@ -21,6 +26,7 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
     }
 
     const nextState = async () => {
+        // Add rfid cards here when you're adding them
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         let body = {
