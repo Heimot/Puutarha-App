@@ -17,7 +17,7 @@ interface Props {
     setIsOpen: (value: boolean) => void;
     editData: Order | any;
     setEditData: (value: Order) => void;
-    dataSaved: (id: string, isEditor: boolean) => void;
+    dataSaved: (id: string, isEditor: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => void;
 }
 
 const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData, dataSaved }) => {
@@ -53,7 +53,7 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
                     let productData: PropData[] = [];
                     editData[keyValue].map(async (product: Products) => {
                         let data = await Object.keys(product).reduce((accT: Acc[], curr) => {
-                            if (curr !== 'createdAt' && curr !== 'updatedAt' && curr !== '_id') {
+                            if (curr !== 'createdAt' && curr !== 'updatedAt' && curr !== '_id' && curr !== 'state' && curr !== 'status' && curr !== 'amountToDeliver') {
                                 const keyValue: keyof Products = curr;
                                 if (curr === 'flower' || curr === 'state' || curr === 'location' || curr === 'status') {
                                     accT.push({ 'propName': keyValue, 'value': product[keyValue]._id });
@@ -78,7 +78,7 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         await FetchData({ urlHost: url, urlPath: '/orders/edit_order', urlQuery: `?currentUserId=${userId}&currentOrderId=${editData._id}`, urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: updateBody });
-        dataSaved(editData._id, true);
+        dataSaved(editData._id, true, 'PATCH', editData.pickingdate);
     }
 
     const addProduct = () => {
