@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { Action, ActionType } from './models/model';
 
 const initialState = {
@@ -10,9 +11,9 @@ const initialState = {
     pdfSettings: null,
     chosenStatus: "",
     chosenLocation: "",
-    chosenDate: null,
+    chosenDate: dayjs().toString(),
     chosenMode: 'light',
-    updatePacket: ''
+    updatePacket: { _id: null, date: null }
 }
 
 const dataReducer = (state: any = initialState, action: Action) => {
