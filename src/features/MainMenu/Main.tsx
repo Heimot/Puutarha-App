@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Unstable_Grid2';
 import { styled, useTheme } from "@mui/material/styles";
 import FetchData from '../Components/Fetch';
 import dayjs from 'dayjs';
-import { Order } from './Model';
+import { Order, Products } from './Model';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -14,14 +14,39 @@ import * as actionCreators from '../../app/redux/actions';
 
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import './Main.css';
 import MainTableData from './MainTableData';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Fab } from '@mui/material';
 import EditingMenu from './EditingMenu';
 import MenuDialog from '../Components/MenuDialog';
-import { SocketProvider } from '../../app/contexts/SocketProvider';
 import { useSocket } from '../../app/contexts/SocketProvider';
 
+import PrintIcon from '@mui/icons-material/Print';
+
+import './Main.css';
+
+interface OrderUpdate {
+    orderId: string;
+    pickingDate: Date;
+    method: 'DELETE' | 'POST' | 'PATCH';
+}
+
+interface ProductUpdate {
+    orderId: string;
+    productId: string;
+    nextState: string;
+    pickedAmount: string | number;
+    date: Date;
+}
+
+interface OrderEditing {
+    orderId: string;
+    userId: string;
+}
+
+interface Editing {
+    orderId: string;
+    userId: string;
+}
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -38,6 +63,7 @@ const Main = () => {
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
     const [deleteOrderData, setDeleteOrderData] = useState<Order>();
     const [editData, setEditData] = useState<Order | null>(null);
+    const [stickers, setStickers] = useState<Products[]>([]);
     const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket } = useSelector((state: State) => state.data);
 
 
@@ -47,24 +73,31 @@ const Main = () => {
     const socket = useSocket()
 
     useEffect(() => {
-        const appendMessage = (value: any) => {
-            console.log(value)
-            // Chosen date might randomly be null here please find a better way to do this WIP
-            //if (dayjs(value.pickingDate).format('YYYY-MM-DD') === dayjs(chosenDate).format('YYYY-MM-DD')) {
-            updateOrder(value.orderId, false);
-            //}
-            return;
+        const orderUpdate = (value: OrderUpdate) => {
+            updateOrder(value.orderId, false, value.method, value.pickingDate);
         }
+
+        const productUpdate = (value: ProductUpdate) => {
+            updatedData(value.nextState, value.pickedAmount, value.orderId, value.productId, value.date);
+        }
+
         if (!socket) return;
-        socket.on('send-order-update', appendMessage)
+        socket.on('send-order-update', orderUpdate);
+        socket.on('send-product-update', productUpdate);
         return () => {
-            socket.off('send-order-update', appendMessage)
+            socket.off('send-order-update', orderUpdate);
+            socket.off('send-product-update', productUpdate);
         };
+    }, [socket, orders])
+
+    useEffect(() => {
+        if (!socket) return;
+        socket.emit('get-current-edits')
     }, [socket])
 
     useEffect(() => {
-        if (updatePacket === '') return;
-        updateSocket(updatePacket, false);
+        if (updatePacket.date === null && updatePacket._id === null) return;
+        updateSocket(updatePacket._id, false, 'POST', updatePacket.date);
         setUpdatePacket('');
     }, [updatePacket])
 
@@ -81,7 +114,28 @@ const Main = () => {
         return () => { setOrders([]); userId = null; url = ''; }
     }, [chosenStatus, chosenLocation, chosenDate])
 
-    const updatedData = (nextState: string, pickedAmount: number | string, orderId: string, productId: string) => {
+    const updatedSocketProduct = (nextState: string, pickedAmount: number | string, orderId: string, product: Products) => {
+        if (!socket) return;
+        // Get nextState for checking if stickerPoint is true.
+        let next = stateSettings.filter((state: any) => {
+            return state._id === nextState;
+        })[0];
+        socket.emit('update-product', {
+            orderId: orderId,
+            productId: product._id,
+            nextState: nextState,
+            pickedAmount: Number(pickedAmount),
+            date: chosenDate,
+        })
+        // If stickerPoint is true put the sticker in the printing list.
+        if (next.stickerPoint) {
+            setStickers(prevState => [...prevState, product]);
+        }
+        updatedData(nextState, pickedAmount, orderId, product._id, chosenDate);
+    }
+
+    const updatedData = (nextState: string, pickedAmount: number | string, orderId: string, productId: string, date: Date) => {
+        if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) return;
         let next = stateSettings.filter((state: any) => {
             return state._id === nextState;
         })
@@ -111,16 +165,17 @@ const Main = () => {
             _id: orderId
         };
         await FetchData({ urlHost: url, urlPath: '/orders/delete_order', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: bodyData });
-        updateSocket(orderId, false);
+        updateSocket(orderId, false, 'DELETE', chosenDate);
     }
 
-    const updateSocket = (id: string | undefined, isCreator: boolean) => {
+    const updateSocket = (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => {
         if (!socket) return;
         socket.emit('update-order', {
             orderId: id,
-            pickingDate: chosenDate
+            pickingDate: date,
+            method: method
         })
-        updateOrder(id, isCreator);
+        updateOrder(id, isCreator, method, date);
     }
 
     /**
@@ -128,33 +183,39 @@ const Main = () => {
      * 
      * @param {string} id This is the id of the edited order
      * @param {boolean} isCreator This is false if you created a order or if someone else created or edited a order when using socket, when you edit it has a value of true
+     * @param {string} method This tells the updateOrder what you have done.
+     * @param {Date} date This tells the date you've edited the order in.
      * @returns Returns new edited/added/removed order data
      */
 
-    const updateOrder = async (id: string | undefined, isCreator: boolean) => {
+    const updateOrder = async (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => {
         if (!id) return;
+        if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) return;
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
-        console.log(chosenDate)
         let newData = await FetchData({ urlHost: url, urlPath: '/orders/get_order_with_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&_id=${id}&date=${chosenDate}` });
         let data;
 
-        // If the order does not exist anymore please delete it!
-        if (newData.result.length <= 0) {
-            data = orders.filter((order) => {
-                return order._id !== id;
-            })
-            // If the creator didnt edit it please add it as a new one
-        } else if (!isCreator) {
-            console.log('oof')
-            data = [...orders, newData.result[0]];
-            // If the order has been edited please find it and edit the order to the new one
-        } else {
-            data = orders.map((order) => {
-                return order._id === id
-                    ? newData.result[0]
-                    : order;
-            })
+        // Switch case for all methods.
+        switch (method) {
+            case 'DELETE':
+                data = orders.filter((order) => {
+                    return order._id !== id;
+                })
+                break;
+            case 'POST':
+                data = [...orders, newData.result[0]];
+                break;
+            case 'PATCH':
+                data = orders.map((order) => {
+                    return order._id === id
+                        ? newData.result[0]
+                        : order;
+                })
+                break;
+            default:
+                console.log('No method chosen');
+                break;
         }
         if (!data) return;
         setOrders(data);
@@ -170,13 +231,13 @@ const Main = () => {
                     <Grid xs={12} sm={12} md={6} lg={4} xl={3} key={order._id}>
                         <Item>
                             <Grid container xs={12}>
-                                <Grid xs={6}>
+                                <Grid xs={12} sm={6}>
                                     <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Keräyspäivämäärä: {dayjs(order.pickingdate).format('DD-MM-YYYY')}</Typography>
                                     <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Toimituspäivämäärä: {dayjs(order.deliverydate).format('DD-MM-YYYY')}</Typography>
                                     <Typography sx={{ fontSize: 20, paddingTop: 1, paddingBottom: 1 }} align="left" variant='h1'>{order.store.name}</Typography>
                                     <Typography sx={{ fontSize: 15 }} align="left" variant='h1'>{order._id}</Typography>
                                 </Grid>
-                                <Grid xs={6} sx={{ padding: 0 }}>
+                                <Grid xs={12} sm={6} sx={{ padding: 0 }}>
                                     <Grid xs={12} >
                                         <Typography align='right'>{order.information}</Typography>
                                     </Grid>
@@ -184,10 +245,10 @@ const Main = () => {
                                         <Typography align='right'>{order.ordercode}</Typography>
                                     </Grid>
                                 </Grid>
-                                <Grid xs={6}>
+                                <Grid xs={12} sm={6}>
                                     <Typography align='left'>Location order status here with .map</Typography>
                                 </Grid>
-                                <Grid xs={6}>
+                                <Grid xs={12} sm={6}>
                                     <Typography align='right'>Maybe some buttons here</Typography>
                                 </Grid>
                                 <Grid xs={12}>
@@ -214,7 +275,7 @@ const Main = () => {
                                             <MainTableData
                                                 key={product._id}
                                                 product={product}
-                                                updateOrder={(nextState, pickedAmount) => updatedData(nextState, pickedAmount, order._id, product._id)}
+                                                updateOrder={(nextState, pickedAmount) => updatedSocketProduct(nextState, pickedAmount, order._id, product)}
                                             />
                                         ))
                                     }
@@ -231,10 +292,20 @@ const Main = () => {
                     </Grid>
                 ))}
             </Grid>
+            <Fab sx={{ position: 'fixed', bottom: 16, right: 16 }} color="secondary" aria-label="add">
+                <PrintIcon />
+                <Typography sx={{ fontWeight: 'bold' }}>{stickers.length}</Typography>
+            </Fab>
             <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
                 {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
             </MenuDialog>
-            <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean) => updateSocket(id, isCreator)} />
+            {
+                isOpen
+                    ?
+                    <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => updateSocket(id, isCreator, method, date)} />
+                    :
+                    null
+            }
         </Box>
     )
 }
