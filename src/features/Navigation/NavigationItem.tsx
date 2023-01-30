@@ -23,6 +23,7 @@ import * as actionCreators from '../../app/redux/actions';
 import { useNavigate } from 'react-router';
 import FetchData from '../Components/Fetch';
 import AddDialog from '../NavAdd/AddDialog';
+import { useSocket } from '../../app/contexts/SocketProvider';
 
 interface Props {
     toggleDrawer: (event: any) => void;
@@ -54,6 +55,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const dispatch = useDispatch();
     const { setChosenStatus, setChosenLocation, setChosenDate, setUserData, setChosenMode } = bindActionCreators(actionCreators, dispatch);
 
+    const socket = useSocket();
     const navigate = useNavigate();
     const theme = useTheme();
     useEffect(() => {
@@ -133,6 +135,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const goToPage = async (value: string) => {
         if (value === "Kirjaudu ulos") {
             let url = process.env.REACT_APP_API_URL;
+            socket?.close()
             let data = await FetchData({ urlHost: url, urlPath: '/auth/log_out', urlMethod: 'DELETE', urlHeaders: 'Auth' });
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
