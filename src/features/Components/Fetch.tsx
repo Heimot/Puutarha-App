@@ -32,12 +32,7 @@ const FetchData = async ({ urlHost, urlPath, urlQuery, urlMethod, urlHeaders, ur
         headers: headersData,
         body
     })
-    if(!data.ok) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        window.location.href = '/'
-        return;
-    }
+
     return data.json();
 }
 
