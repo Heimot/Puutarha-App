@@ -67,7 +67,7 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
         }
 
         const orderCreated = await FetchData({ urlHost: url, urlPath: '/orders/create_order_with_products', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: updateBody });
-        setUpdatePacket(orderCreated.result._id);
+        setUpdatePacket({ _id: orderCreated.result._id, date: orderCreated.result.pickingdate });
         setNewOrder({
             _id: Date.now().toString(),
             store: {
