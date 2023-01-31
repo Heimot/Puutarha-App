@@ -1,14 +1,8 @@
 Table {
     border-collapse: separate !important;
-    border: solid white 1px;
     border-radius: 6px;
     -moz-border-radius: 6px;
     font-family: sans-serif;
-}
-
-Td {
-    border-left: solid white 1px;
-    border-top: solid white 1px;
 }
 
 Th {
