@@ -63,6 +63,22 @@ export interface Status {
     nextStatus: string;
 }
 
+export interface Stickers {
+    store: Store
+    pickingdate: Date;
+    deliverydate: Date;
+    _id: string;
+    flower: Flower;
+    state: State;
+    location: Location;
+    amount: number | string;
+    amountToDeliver: number | string;
+    information: string;
+    status: Status;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
 export interface Acc {
     propName: string;
     value: any;
