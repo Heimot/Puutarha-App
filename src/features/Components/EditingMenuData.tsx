@@ -4,7 +4,6 @@ import { Tr, Td } from 'react-super-responsive-table'
 import { Button, TextField, Select, MenuItem, Box, Autocomplete, createFilterOptions, FilterOptionsState } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
-import Grid from '@mui/material/Unstable_Grid2';
 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -75,26 +74,22 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
                     )}
                 />
             </Td>
-            <Td  style={borderStyle}>
+            <Td style={borderStyle}>
                 <TextField name='amount' type="number" sx={{ width: "100%" }} value={amount} onBlur={isEmpty} onChange={(e) => setAmount(e.target.value)} />
             </Td>
-            <Td  style={borderStyle}>
+            <Td style={borderStyle}>
                 <Select name='location' sx={{ width: "100%" }} value={product.location._id} onChange={(e) => updateProducts(e.target.value, e.target.name, product._id)}>
                     {locationSettings.map((location: any) =>
                         <MenuItem key={location._id} value={location._id}>{location.location}</MenuItem>
                     )}
                 </Select>
             </Td>
-            <Td  style={borderStyle}>
-                <Box>
-                    <Grid container xs={12}>
-                        <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
-                            <TextField name='information' fullWidth value={information} onChange={(e) => setInformation(e.target.value)} />
-                            <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteProduct(product._id)}>
-                                <DeleteIcon fontSize='large' />
-                            </Button>
-                        </Box>
-                    </Grid>
+            <Td style={borderStyle}>
+                <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
+                    <TextField name='information' fullWidth value={information} onChange={(e) => setInformation(e.target.value)} />
+                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteProduct(product._id)}>
+                        <DeleteIcon fontSize='large' />
+                    </Button>
                 </Box>
             </Td>
         </Tr>
