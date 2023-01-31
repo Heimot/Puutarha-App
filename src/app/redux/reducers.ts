@@ -11,7 +11,7 @@ const initialState = {
     pdfSettings: null,
     chosenStatus: "",
     chosenLocation: "",
-    chosenDate: dayjs().toString(),
+    chosenDate: sessionStorage.getItem('date') !== null ? sessionStorage.getItem('date') : dayjs().toString(),
     chosenMode: 'light',
     updatePacket: { _id: null, date: null }
 }

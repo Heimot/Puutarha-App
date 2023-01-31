@@ -50,7 +50,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const [locationOrder, setLocationOrder] = useState<Location[] | null>(null);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate, chosenMode } = useSelector((state: State) => state.data);
+    const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate } = useSelector((state: State) => state.data);
 
     const dispatch = useDispatch();
     const { setChosenStatus, setChosenLocation, setChosenDate, setUserData, setChosenMode } = bindActionCreators(actionCreators, dispatch);
@@ -215,6 +215,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                                             closeOnSelect={true}
                                             onChange={(newValue) => {
                                                 setChosenDate(newValue.toString());
+                                                sessionStorage.setItem('date', newValue.toString());
                                                 toggleDrawer(newValue);
                                             }}
                                             renderInput={(params) => <TextField {...params} />}

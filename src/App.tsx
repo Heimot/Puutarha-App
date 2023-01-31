@@ -14,7 +14,6 @@ import * as actionCreators from './app/redux/actions';
 import dayjs from 'dayjs';
 import Settings from './features/Settings/Settings';
 import Calendar from './features/Calendar/Calendar';
-import { SocketProvider } from './app/contexts/SocketProvider';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -37,7 +36,7 @@ const App = () => {
   const [mode, setMode] = useState<'light' | 'dark'>('light');
 
   const dispatch = useDispatch();
-  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenDate, setChosenMode } = bindActionCreators(actionCreators, dispatch);
+  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenMode } = bindActionCreators(actionCreators, dispatch);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,8 +103,9 @@ const App = () => {
         setFlowers(applicationSettings.flowers);
         setStores(applicationSettings.stores);
         setPDF(applicationSettings.pdf);
-
-        setChosenDate(dayjs().toString())
+        if (sessionStorage.getItem('date') === null) {
+          sessionStorage.setItem('date', dayjs().toString());
+        }
         let path = window.location.pathname;
         if (path !== '/') {
           navigate(path);
