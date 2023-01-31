@@ -5,7 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { styled, useTheme } from "@mui/material/styles";
 import FetchData from '../Components/Fetch';
 import dayjs from 'dayjs';
-import { Order, Products } from './Model';
+import { Order, Products, Stickers } from './Model';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -23,6 +23,7 @@ import { useSocket } from '../../app/contexts/SocketProvider';
 import PrintIcon from '@mui/icons-material/Print';
 
 import './Main.css';
+import Printer from '../Printing/Printer';
 
 interface OrderUpdate {
     orderId: string;
@@ -36,16 +37,6 @@ interface ProductUpdate {
     nextState: string;
     pickedAmount: string | number;
     date: Date;
-}
-
-interface OrderEditing {
-    orderId: string;
-    userId: string;
-}
-
-interface Editing {
-    orderId: string;
-    userId: string;
 }
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -63,7 +54,8 @@ const Main = () => {
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
     const [deleteOrderData, setDeleteOrderData] = useState<Order>();
     const [editData, setEditData] = useState<Order | null>(null);
-    const [stickers, setStickers] = useState<Products[]>([]);
+    const [stickers, setStickers] = useState<Stickers[]>([]);
+    const [printerOpen, setPrinterOpen] = useState<boolean>(false);
     const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket } = useSelector((state: State) => state.data);
 
 
@@ -114,14 +106,14 @@ const Main = () => {
         return () => { setOrders([]); userId = null; url = ''; }
     }, [chosenStatus, chosenLocation, chosenDate])
 
-    const updatedSocketProduct = (nextState: string, pickedAmount: number | string, orderId: string, product: Products) => {
+    const updatedSocketProduct = (nextState: string, pickedAmount: number | string, order: Order, product: Products) => {
         if (!socket) return;
         // Get nextState for checking if stickerPoint is true.
         let next = stateSettings.filter((state: any) => {
             return state._id === nextState;
         })[0];
         socket.emit('update-product', {
-            orderId: orderId,
+            orderId: order._id,
             productId: product._id,
             nextState: nextState,
             pickedAmount: Number(pickedAmount),
@@ -129,9 +121,10 @@ const Main = () => {
         })
         // If stickerPoint is true put the sticker in the printing list.
         if (next.stickerPoint) {
-            setStickers(prevState => [...prevState, product]);
+            let newData = { store: order.store, pickingdate: order.pickingdate, deliverydate: order.deliverydate, ...product };
+            setStickers(prevState => [...prevState, newData]);
         }
-        updatedData(nextState, pickedAmount, orderId, product._id, chosenDate);
+        updatedData(nextState, pickedAmount, order._id, product._id, chosenDate);
     }
 
     const updatedData = (nextState: string, pickedAmount: number | string, orderId: string, productId: string, date: Date) => {
@@ -275,7 +268,7 @@ const Main = () => {
                                             <MainTableData
                                                 key={product._id}
                                                 product={product}
-                                                updateOrder={(nextState, pickedAmount) => updatedSocketProduct(nextState, pickedAmount, order._id, product)}
+                                                updateOrder={(nextState, pickedAmount) => updatedSocketProduct(nextState, pickedAmount, order, product)}
                                             />
                                         ))
                                     }
@@ -292,13 +285,20 @@ const Main = () => {
                     </Grid>
                 ))}
             </Grid>
-            <Fab sx={{ position: 'fixed', bottom: 16, right: 16 }} color="secondary" aria-label="add">
+            <Fab onClick={() => setPrinterOpen(prevState => !prevState)} sx={{ position: 'fixed', bottom: 16, right: 16 }} color="secondary" aria-label="add">
                 <PrintIcon />
                 <Typography sx={{ fontWeight: 'bold' }}>{stickers.length}</Typography>
             </Fab>
             <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
                 {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
             </MenuDialog>
+            {
+                printerOpen
+                    ?
+                    <Printer isOpen={printerOpen} setIsOpen={(value) => setPrinterOpen(value)} stickers={stickers} setStickers={(value) => setStickers(value)} />
+                    :
+                    null
+            }
             {
                 isOpen
                     ?
