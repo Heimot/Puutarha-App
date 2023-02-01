@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Button, Typography, TextField, Box } from '@mui/material';
 import { Tr, Td } from 'react-super-responsive-table'
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Stickers } from '../MainMenu/Model'
+import { Stickers } from '../../Model'
 import { useTheme } from '@mui/material/styles';
 
 interface Props {
@@ -19,6 +19,7 @@ const PrinterData: React.FC<Props> = ({ sticker, deleteSticker, addStickers }) =
         borderLeft: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
         borderTop: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
     }
+    
     return (
         <Tr style={{ textAlign: 'center' }}>
             <Td style={borderStyle}>

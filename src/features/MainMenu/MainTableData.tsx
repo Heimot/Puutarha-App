@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Order, Products } from './Model'
+import { Order, Products } from '../../Model'
 import { Tr, Td } from 'react-super-responsive-table'
 import { Button, TextField } from '@mui/material';
 import FetchData from '../Components/Fetch';

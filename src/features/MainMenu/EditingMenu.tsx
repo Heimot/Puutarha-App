@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 
-import { Order, Products, PropData, Acc } from './Model';
+import { Order, Products, PropData, Acc } from '../../Model';
 import FetchData from '../Components/Fetch';
 import EditTable from '../Components/EditTable';
 

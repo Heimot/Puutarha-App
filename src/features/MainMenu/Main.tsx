@@ -5,7 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { styled, useTheme } from "@mui/material/styles";
 import FetchData from '../Components/Fetch';
 import dayjs from 'dayjs';
-import { Order, Products, Stickers } from './Model';
+import { Order, Products, Stickers } from '../../Model';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -219,7 +219,7 @@ const Main = () => {
 
     return (
         <Box sx={{ flexGrow: 1, padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh' }}>
-            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
                 {orders.map((order) => (
                     <Grid xs={12} sm={12} md={6} lg={4} xl={3} key={order._id}>
                         <Item>

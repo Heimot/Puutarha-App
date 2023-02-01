@@ -13,7 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import dayjs from 'dayjs';
-import { Order, Store, Location } from '../MainMenu/Model';
+import { Order, Store, Location } from '../../Model';
 import FetchData from './Fetch';
 import EditingMenuData from './EditingMenuData';
 
