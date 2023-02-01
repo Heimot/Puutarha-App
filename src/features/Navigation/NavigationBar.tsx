@@ -78,15 +78,21 @@ const NavigationBar = () => {
                         >
                             Heimosen Puutarha
                         </Typography>
-                        <Search>
-                            <SearchIconWrapper>
-                                <SearchIcon />
-                            </SearchIconWrapper>
-                            <StyledInputBase
-                                placeholder="Search…"
-                                inputProps={{ 'aria-label': 'search' }}
-                            />
-                        </Search>
+                        {
+                            window.location.pathname === '/dashboard'
+                                ?
+                                <Search>
+                                    <SearchIconWrapper>
+                                        <SearchIcon />
+                                    </SearchIconWrapper>
+                                    <StyledInputBase
+                                        placeholder="Search…"
+                                        inputProps={{ 'aria-label': 'search' }}
+                                    />
+                                </Search>
+                                :
+                                null
+                        }
                     </Toolbar>
                 </AppBar>
                 <NavigationDrawer drawerOpen={isOpen} drawerClose={() => setIsOpen(prevState => !prevState)} />
