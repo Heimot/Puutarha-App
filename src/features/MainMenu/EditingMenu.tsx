@@ -125,9 +125,9 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
                 <EditTable setOrderData={(value, name) => setEditData({ ...editData, [name]: value })} orderData={editData} updateData={(value) => setEditData(value)} />
             </DialogContent>
             <DialogActions>
-                <Button startIcon={<AddIcon />} onClick={() => addProduct()}>Add product</Button>
+                <Button startIcon={<AddIcon />} onClick={() => addProduct()}>Lisää tuote</Button>
                 <Button variant='contained' autoFocus startIcon={<SaveIcon />} onClick={handleClick}>
-                    Save changes
+                    Tallenna muutokset
                 </Button>
             </DialogActions>
         </Dialog >
