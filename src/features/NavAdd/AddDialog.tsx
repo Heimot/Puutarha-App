@@ -9,7 +9,6 @@ import AddIcon from '@mui/icons-material/Add';
 import EditTable from '../Components/EditTable';
 import FetchData from '../Components/Fetch';
 import { bindActionCreators } from '@reduxjs/toolkit';
-import { } from 'react-redux';
 import * as actionCreators from '../../app/redux/actions';
 
 interface Props {
@@ -154,9 +153,9 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
                 <EditTable setOrderData={(value, name) => setNewOrder({ ...newOrder, [name]: value })} orderData={newOrder} updateData={(value) => setNewOrder(value)} />
             </DialogContent>
             <DialogActions>
-                <Button startIcon={<AddIcon />} onClick={() => addProduct()}>Add product</Button>
+                <Button startIcon={<AddIcon />} onClick={() => addProduct()}>Lisää tuote</Button>
                 <Button variant='contained' autoFocus startIcon={<SaveIcon />} onClick={handleClick}>
-                    Save changes
+                    Tallenna muutokset
                 </Button>
             </DialogActions>
         </Dialog >
