@@ -98,7 +98,12 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
         for (let i = 0; i < locationSettings.length; i++) {
             if (locationSettings[i].default) {
                 defaultLocation = locationSettings[i];
-                setChosenLocation(locationSettings[i]._id);
+                if (localStorage.getItem('location') !== null) {
+                    setChosenLocation(localStorage.getItem('location'));
+                } else {
+                    setChosenLocation('*');
+                    localStorage.setItem('location', '*');
+                }
             }
             locationSettingsOrder.push({});
         }
@@ -129,6 +134,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
             setChosenStatus(e.target.value);
         } else {
             setChosenLocation(e.target.value);
+            localStorage.setItem('location', e.target.value);
         }
     }
 
