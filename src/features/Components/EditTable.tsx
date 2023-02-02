@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import { Order, Store, Location } from '../../Model';
 import FetchData from './Fetch';
 import EditingMenuData from './EditingMenuData';
+import AddAutofill from './AddAutofill';
 
 interface Props {
     orderData: any;
@@ -26,12 +27,13 @@ interface Props {
 const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => {
     const [orderCode, setOrderCode] = useState<string>('');
     const [information, setInformation] = useState<string>('');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const theme = useTheme();
     const { locationSettings, storeSettings } = useSelector((state: State) => state.data);
 
     const defaultFilterOptions = createFilterOptions<Store>();
     const filterOptions = (options: Store[], state: FilterOptionsState<Store>) => {
-        return defaultFilterOptions(options, state).slice(0, 15);
+        return defaultFilterOptions(options, state).slice(0, 10);
     }
 
     useEffect(() => {
@@ -148,7 +150,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
                                     getOptionLabel={(option: Store) => option.name}
                                     isOptionEqualToValue={(option, value) => option._id === value._id}
                                     sx={{ maxWidth: 300 }}
-                                    noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => console.log("AAAAAAAAAA")}>Create new?</Button>}
+                                    noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => setIsOpen(true)}>Luo uusi?</Button>}
                                     includeInputInList
                                     disableClearable
                                     renderInput={(params) => (
@@ -164,7 +166,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
                         <TextField name='information' label="Lisätietoa" value={information} multiline onChange={(e) => setInformation(e.target.value)}></TextField>
                     </Grid>
                     <Grid style={{ display: "flex", justifyContent: "flex-end", margin: '10px 0 10px 0' }} xs={12}>
-                        <TextField name='ordercode' label="Order code" value={orderCode} multiline onChange={(e) => setOrderCode(e.target.value)}></TextField>
+                        <TextField name='ordercode' label="Tilauskoodi" value={orderCode} multiline onChange={(e) => setOrderCode(e.target.value)}></TextField>
                     </Grid>
                 </Grid>
             </Grid>
@@ -188,6 +190,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
                     }
                 </Tbody>
             </Table>
+            <AddAutofill isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} usedGroup='Stores' updateText={(value) => setOrderData(value, 'store')} />
         </div>
     )
 }

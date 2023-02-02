@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { Flower, Products } from '../../Model'
 import { Tr, Td } from 'react-super-responsive-table'
-import { Button, TextField, Select, MenuItem, Box, Autocomplete, createFilterOptions, FilterOptionsState } from '@mui/material';
+import { Button, TextField, Select, MenuItem, Box, Autocomplete, createFilterOptions, FilterOptionsState, Dialog } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTheme } from '@mui/material/styles';
+import AddAutofill from './AddAutofill';
 
 interface Props {
     product: Products;
@@ -18,10 +19,12 @@ interface Props {
 const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProduct }) => {
     const [amount, setAmount] = useState<number | string>(0);
     const [information, setInformation] = useState<string>('');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const { locationSettings, flowerSettings } = useSelector((state: State) => state.data);
+
     const defaultFilterOptions = createFilterOptions<Flower>();
     const filterOptions = (options: Flower[], state: FilterOptionsState<Flower>) => {
-        return defaultFilterOptions(options, state).slice(0, 15);
+        return defaultFilterOptions(options, state).slice(0, 10);
     }
 
     const theme = useTheme();
@@ -66,7 +69,7 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
                     options={flowerSettings}
                     getOptionLabel={(option: Flower) => option.name}
                     isOptionEqualToValue={(option, value) => option._id === value._id}
-                    noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => console.log("AAAAAAAAAA")}>Create new?</Button>}
+                    noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => setIsOpen(true)}>Luo uusi?</Button>}
                     includeInputInList
                     disableClearable
                     renderInput={(params) => (
@@ -92,6 +95,7 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
                     </Button>
                 </Box>
             </Td>
+            <AddAutofill isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} usedGroup='Flowers' updateText={(value) => updateProducts(value, 'flower', product._id)} />
         </Tr>
     )
 }
