@@ -20,7 +20,7 @@ const Item = styled(Paper)(({ theme }) => ({
   border: theme.palette.mode === 'dark' ? 'none' : 'solid 1px black',
 }));
 
-interface Calendar {
+interface CalendarData {
   [key: number]: any;
   0: Order[];
   1: Order[];
@@ -33,8 +33,8 @@ interface Calendar {
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(dayjs().toDate())
-  const [pickingWeek, setPickingWeek] = useState<Calendar | null>(null);
-  const [deliveryWeek, setDeliveryWeek] = useState<Calendar | null>(null);
+  const [pickingWeek, setPickingWeek] = useState<CalendarData | null>(null);
+  const [deliveryWeek, setDeliveryWeek] = useState<CalendarData | null>(null);
   const theme = useTheme();
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const Calendar = () => {
       const calendarDelivery = await FetchData({ urlHost: url, urlPath: '/orders/get_calendar_delivery', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&firstDate=${dayjs(date).day(1).format('YYYY-MM-DD')}&lastDate=${dayjs(date).day(7).format('YYYY-MM-DD')}` });
 
       if (!calendarPicking?.result) return;
-      let calendar: Calendar = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+      let calendar: CalendarData = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
       for (let i = 0; 7 > i; i++) {
         let filteredDate = calendarPicking.result.filter((day: Order) => {
           return dayjs(day.pickingdate).format('YYYY-MM-DD') === dayjs(date).day(i + 1).format('YYYY-MM-DD')
@@ -57,7 +57,7 @@ const Calendar = () => {
       setPickingWeek(calendar);
 
       if (!calendarDelivery?.result) return;
-      let dCalendar: Calendar = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+      let dCalendar: CalendarData = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
       for (let i = 0; 7 > i; i++) {
         let filteredDate = calendarDelivery.result.filter((day: Order) => {
           return dayjs(day.deliverydate).format('YYYY-MM-DD') === dayjs(date).day(i + 1).format('YYYY-MM-DD')
@@ -76,21 +76,21 @@ const Calendar = () => {
     borderTop: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
   }
 
-  const weekTD = (week: Calendar | null) => {
+  const weekTD = (week: CalendarData | null) => {
     let items = [];
     for (let i = 0; 7 > i; i++) {
       items.push(
-        <Td key={i} style={borderStyle}>
+        <Td key={i} style={{ ...borderStyle, padding: 0, height: '100%', verticalAlign: 'top', }} >
           {
             week !== null
               ?
               week[i].map((item: Order) => (
-                <div key={item._id}>{item.store.name}</div>
+                <Box sx={{ border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`, padding: '10px', }} key={item._id}>{item.store.name}</Box>
               ))
               :
               null
           }
-        </Td>
+        </Td >
       )
     }
     return (items)
