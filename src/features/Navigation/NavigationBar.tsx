@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,6 +8,9 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import { InputAdornment } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+
 import NavigationDrawer from './NavigationDrawer';
 
 const Search = styled('div')(({ theme }) => ({
@@ -43,6 +46,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         paddingLeft: `calc(1em + ${theme.spacing(4)})`,
         transition: theme.transitions.create('width'),
         width: '100%',
+
         [theme.breakpoints.up('sm')]: {
             width: '12ch',
             '&:focus': {
@@ -54,6 +58,19 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const NavigationBar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState('');
+
+    const theme = useTheme();
+
+    const handleChange = (e: any) => {
+        setSearch(e.target.value);
+    }
+
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            alert('Searched value: ' + search)
+        }
+    }
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -87,6 +104,21 @@ const NavigationBar = () => {
                                     </SearchIconWrapper>
                                     <StyledInputBase
                                         placeholder="Search…"
+                                        value={search}
+                                        onChange={handleChange}
+                                        onKeyDown={handleKeyDown}
+                                        endAdornment={
+                                            <InputAdornment
+                                                sx={{ display: search !== '' ? 'flex' : 'none', paddingRight: '10px', }}
+                                                position='end'
+                                                onClick={() => setSearch('')}
+                                            >
+                                                <ClearIcon sx={{
+                                                    '&:hover': {
+                                                        backgroundColor: alpha(theme.palette.common.white, 0.25),
+                                                    }
+                                                }} />
+                                            </InputAdornment>}
                                         inputProps={{ 'aria-label': 'search' }}
                                     />
                                 </Search>
