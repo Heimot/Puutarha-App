@@ -98,8 +98,12 @@ const Main = () => {
         let url = process.env.REACT_APP_API_URL;
         const getOrderData = async () => {
             if (!chosenDate) return;
+            let locations = localStorage.getItem('location');
+            if (locations === null) {
+                locations = chosenLocation;
+            }
             let date = dayjs(chosenDate).format('YYYY-MM-DD');
-            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}` });
+            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}` });
             setOrders(orderData.result);
         }
         getOrderData();
