@@ -11,6 +11,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import { InputAdornment } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 
+import { useDispatch } from 'react-redux';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import * as actionCreators from '../../app/redux/actions';
+
 import NavigationDrawer from './NavigationDrawer';
 
 const Search = styled('div')(({ theme }) => ({
@@ -61,6 +65,8 @@ const NavigationBar = () => {
     const [search, setSearch] = useState('');
 
     const theme = useTheme();
+    const dispatch = useDispatch();
+    const { setSearchWord } = bindActionCreators(actionCreators, dispatch);
 
     const handleChange = (e: any) => {
         setSearch(e.target.value);
@@ -68,7 +74,7 @@ const NavigationBar = () => {
 
     const handleKeyDown = (e: any) => {
         if (e.key === 'Enter') {
-            alert('Searched value: ' + search)
+            setSearchWord(search);
         }
     }
 
@@ -111,7 +117,7 @@ const NavigationBar = () => {
                                             <InputAdornment
                                                 sx={{ display: search !== '' ? 'flex' : 'none', paddingRight: '10px', }}
                                                 position='end'
-                                                onClick={() => setSearch('')}
+                                                onClick={() => { setSearch(''); setSearchWord(''); }}
                                             >
                                                 <ClearIcon sx={{
                                                     '&:hover': {
