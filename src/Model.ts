@@ -126,3 +126,19 @@ export interface PDFImage {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface User {
+    _id: string;
+    email: string;
+    username: string;
+    role: Role;
+    lastSignInAt: Date;
+    currentSignInAt: Date;
+}
+
+export interface Role {
+    _id: string;
+    role: string;
+    rights: Object;
+    default: boolean;
+}
