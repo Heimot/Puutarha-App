@@ -84,3 +84,10 @@ export const setUpdatePacket = (updatePacket: any) => (dispatch: Dispatch<Action
     payload: updatePacket
   });
 };
+
+export const setSearchWord = (searchWord: any) => (dispatch: Dispatch<Action>) => {
+  dispatch({
+    type: ActionType.SearchWord,
+    payload: searchWord
+  });
+};

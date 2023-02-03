@@ -13,7 +13,8 @@ const initialState = {
     chosenLocation: "",
     chosenDate: sessionStorage.getItem('date') !== null ? sessionStorage.getItem('date') : dayjs().toString(),
     chosenMode: 'light',
-    updatePacket: { _id: null, date: null }
+    updatePacket: { _id: null, date: null },
+    searchWord: '',
 }
 
 const dataReducer = (state: any = initialState, action: Action) => {
@@ -42,6 +43,8 @@ const dataReducer = (state: any = initialState, action: Action) => {
             return { ...state, chosenMode: action.payload };
         case ActionType.UpdatePacket:
             return { ...state, updatePacket: action.payload };
+        case ActionType.SearchWord:
+            return { ...state, searchWord: action.payload };
         default:
             return state;
     }

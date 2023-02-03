@@ -10,7 +10,8 @@ export enum ActionType {
     ChosenLocation = "SET_CHOSEN_LOCATION",
     ChosenDate = "SET_CHOSEN_DATE",
     ChosenMode = "SET_CHOSEN_MODE",
-    UpdatePacket = "SET_UPDATE_PACKET"
+    UpdatePacket = "SET_UPDATE_PACKET",
+    SearchWord = "SET_SEARCH_WORD",
 }
 
 interface UserDataAction {
@@ -74,4 +75,10 @@ interface UpdatePacket {
     payload?: string;
 }
 
-export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction | StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket;
+interface SeachWord {
+    type: ActionType.SearchWord,
+    payload?: string;
+}
+
+export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction |
+    StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket | SeachWord;
