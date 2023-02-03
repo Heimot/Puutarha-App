@@ -56,7 +56,7 @@ const Main = () => {
     const [editData, setEditData] = useState<Order | null>(null);
     const [stickers, setStickers] = useState<Stickers[]>([]);
     const [printerOpen, setPrinterOpen] = useState<boolean>(false);
-    const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket } = useSelector((state: State) => state.data);
+    const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord } = useSelector((state: State) => state.data);
 
 
     const dispatch = useDispatch();
@@ -94,6 +94,7 @@ const Main = () => {
     }, [updatePacket])
 
     useEffect(() => {
+        if (chosenStatus === '' || chosenLocation === '' || chosenDate === null) return;
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         const getOrderData = async () => {
@@ -103,12 +104,12 @@ const Main = () => {
                 locations = chosenLocation;
             }
             let date = dayjs(chosenDate).format('YYYY-MM-DD');
-            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}` });
+            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}&flowerSearch=${searchWord}` });
             setOrders(orderData.result);
         }
         getOrderData();
         return () => { setOrders([]); userId = null; url = ''; }
-    }, [chosenStatus, chosenLocation, chosenDate])
+    }, [chosenStatus, chosenLocation, chosenDate, searchWord])
 
     const updatedSocketProduct = (nextState: string, pickedAmount: number | string, order: Order, product: Products) => {
         if (!socket) return;
