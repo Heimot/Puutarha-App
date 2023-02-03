@@ -134,6 +134,7 @@ export interface User {
     role: Role;
     lastSignInAt: Date;
     currentSignInAt: Date;
+    signInCount: number;
 }
 
 export interface Role {
