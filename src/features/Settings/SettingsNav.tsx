@@ -145,7 +145,7 @@ const SettingsNav: React.FC<Props> = ({ page, setPage }) => {
                                 lineHeight: '20px',
                                 mb: '2px',
                             }}
-                            secondary="Muokkaa käyttäjiä, Custom settings, RFID, Muokkaa tuotteen tiloja, Muokkaa tilauksen tiloja, Muokkaa keräyspaikkoja, Muokkaa kauppoja ja kukkia, Muokkaa tarroja, Logit"
+                            secondary="Muokkaa käyttäjiä, Muokkaa rooleja, RFID, Muokkaa tuotteen tiloja, Muokkaa tilauksen tiloja, Muokkaa keräyspaikkoja, Muokkaa kauppoja ja kukkia, Muokkaa tarroja, Logit"
                             secondaryTypographyProps={{
                                 noWrap: true,
                                 fontSize: 12,
