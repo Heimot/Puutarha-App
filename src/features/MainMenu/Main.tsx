@@ -5,7 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { styled, useTheme } from "@mui/material/styles";
 import FetchData from '../Components/Fetch';
 import dayjs from 'dayjs';
-import { Order, Products, Stickers } from '../../Model';
+import { Order, Products, Status, Stickers } from '../../Model';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -15,7 +15,7 @@ import * as actionCreators from '../../app/redux/actions';
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import MainTableData from './MainTableData';
-import { Button, Typography, Fab } from '@mui/material';
+import { Button, Typography, Fab, Select, MenuItem } from '@mui/material';
 import EditingMenu from './EditingMenu';
 import MenuDialog from '../Components/MenuDialog';
 import { useSocket } from '../../app/contexts/SocketProvider';
@@ -52,11 +52,12 @@ const Main = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
+    const [statusOpen, setStatusOpen] = useState<boolean>(false);
     const [deleteOrderData, setDeleteOrderData] = useState<Order>();
     const [editData, setEditData] = useState<Order | null>(null);
     const [stickers, setStickers] = useState<Stickers[]>([]);
     const [printerOpen, setPrinterOpen] = useState<boolean>(false);
-    const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord } = useSelector((state: State) => state.data);
+    const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord, statusSettings } = useSelector((state: State) => state.data);
 
 
     const dispatch = useDispatch();
@@ -127,7 +128,12 @@ const Main = () => {
         // If stickerPoint is true put the sticker in the printing list.
         if (next.stickerPoint) {
             let newData = { store: order.store, pickingdate: order.pickingdate, deliverydate: order.deliverydate, ...product };
-            setStickers(prevState => [...prevState, newData]);
+            let exists = stickers.filter((sticker) => {
+                return product._id === sticker._id
+            })
+            if (exists.length <= 0) {
+                setStickers(prevState => [...prevState, newData]);
+            }
         }
         updatedData(nextState, pickedAmount, order._id, product._id, chosenDate);
     }
@@ -280,7 +286,7 @@ const Main = () => {
                                 </Tbody>
                             </Table>
                             <Grid container xs={12}>
-                                <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }} onClick={() => console.log(socket)}>Valmis</Button>
+                                <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }} onClick={() => setStatusOpen(true)}>Valmis</Button>
                                 <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none' }}>Muokkaa</Button>
                                 <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none' }}>Poista</Button>
                                 <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none' }}>Vie Exceliin</Button>
@@ -294,9 +300,35 @@ const Main = () => {
                 <PrintIcon />
                 <Typography sx={{ fontWeight: 'bold' }}>{stickers.length}</Typography>
             </Fab>
-            <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
-                {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
-            </MenuDialog>
+            {
+                statusOpen
+                    ?
+                    <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => console.log('222')} dialogTitle={'Haluatko siirtää tämän tilauksen valmiisiin.'}>
+                        <>
+                            {`Haluatko varmasti siirtää tilauksen valmiisiin?`}
+                            <Select>
+                                {
+                                    statusSettings.map((status: Status) => (
+                                        <MenuItem>
+                                            {status.status}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </Select>
+                        </>
+                    </MenuDialog>
+                    :
+                    null
+            }
+            {
+                menuOpen
+                    ?
+                    <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
+                        {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
+                    </MenuDialog>
+                    :
+                    null
+            }
             {
                 printerOpen
                     ?
