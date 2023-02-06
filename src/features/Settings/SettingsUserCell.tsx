@@ -27,8 +27,12 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser }
     }
 
     useEffect(() => {
-        if (role === '') {
-            setRole(user?.role._id)
+        if (typeof user.role === 'string') {
+            setRole(user.role)
+        } else {
+            if (role === '') {
+                setRole(user?.role._id)
+            }
         }
     }, [user])
 

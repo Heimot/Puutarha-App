@@ -5,7 +5,11 @@ import FetchData from '../Components/Fetch';
 import SettingsUserCell from './SettingsUserCell';
 import { User, Role } from '../../Model';
 
-const SettingsUsersTable: React.FC = () => {
+interface Props {
+    newUser: User | undefined;
+}
+
+const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const theme = useTheme();
@@ -27,6 +31,12 @@ const SettingsUsersTable: React.FC = () => {
         }
     }, [])
 
+    useEffect(() => {
+        if (newUser !== undefined) {
+            setUsers(prevState => [...prevState, newUser]);
+        }
+    }, [newUser])
+
     const saveUser = async (userId: string, roleId: string) => {
         let usrid = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
@@ -40,9 +50,9 @@ const SettingsUsersTable: React.FC = () => {
 
         const useRole = roles.filter((role) => {
             return role._id === roleId
-        })
+        });
 
-        updateRole.result.role = useRole[0]
+        updateRole.result.role = useRole[0];
 
         const newUsers = users.map((user) => {
             return user._id === updateRole.result._id
@@ -50,7 +60,7 @@ const SettingsUsersTable: React.FC = () => {
                 updateRole.result
                 :
                 user
-        })
+        });
         setUsers(newUsers);
     }
 
