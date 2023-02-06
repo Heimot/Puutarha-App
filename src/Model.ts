@@ -143,3 +143,8 @@ export interface Role {
     rights: Object;
     default: boolean;
 }
+
+export interface Message {
+    title: string;
+    message: string;
+}
