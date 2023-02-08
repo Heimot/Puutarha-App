@@ -57,6 +57,9 @@ const Main = () => {
     const [editData, setEditData] = useState<Order | null>(null);
     const [stickers, setStickers] = useState<Stickers[]>([]);
     const [printerOpen, setPrinterOpen] = useState<boolean>(false);
+    const [statusOrder, setStatusOrder] = useState<Status[] | null>(null);
+    const [statusMove, setStatusMove] = useState<string>('');
+    const [statusMoveOrder, setStatusMoveOrder] = useState<string>('');
     const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord, statusSettings } = useSelector((state: State) => state.data);
 
 
@@ -65,6 +68,9 @@ const Main = () => {
     const theme = useTheme();
     const socket = useSocket()
 
+    /**
+     * This useEffect opens a socket.io connection when socket has been updated.
+     */
     useEffect(() => {
         const orderUpdate = (value: OrderUpdate) => {
             updateOrder(value.orderId, false, value.method, value.pickingDate);
@@ -83,17 +89,20 @@ const Main = () => {
         };
     }, [socket, orders])
 
-    useEffect(() => {
-        if (!socket) return;
-        socket.emit('get-current-edits')
-    }, [socket])
-
+    /**
+     *  This will emit the updated order id, method and date.
+     *  Only when updatePacket is updated.
+     */
     useEffect(() => {
         if (updatePacket.date === null && updatePacket._id === null) return;
         updateSocket(updatePacket._id, false, 'POST', updatePacket.date);
         setUpdatePacket('');
     }, [updatePacket])
 
+    /**
+     *  If status/location/date has changed from the navigation menu please refresh the data we have right now.
+     *  Also refreshes the data if you have searched for something.
+     */
     useEffect(() => {
         if (chosenStatus === '' || chosenLocation === '' || chosenDate === null) return;
         let userId = localStorage.getItem('userId');
@@ -105,13 +114,53 @@ const Main = () => {
                 locations = chosenLocation;
             }
             let date = dayjs(chosenDate).format('YYYY-MM-DD');
-            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}&flowerSearch=${searchWord}` });
+            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}&flowerSearch=${searchWord}&statusSearch=${chosenStatus}` });
             setOrders(orderData.result);
         }
         getOrderData();
         return () => { setOrders([]); userId = null; url = ''; }
     }, [chosenStatus, chosenLocation, chosenDate, searchWord])
 
+    useEffect(() => {
+        let statusSettingsOrder = [];
+        let defaultStatus;
+        if (!statusSettings) return;
+        for (let i = 0; i < statusSettings.length; i++) {
+            if (statusSettings[i].default) {
+                defaultStatus = statusSettings[i];
+                setStatusMove(statusSettings[i]._id)
+            }
+            statusSettingsOrder.push({});
+        }
+
+        let nextId = defaultStatus?.nextStatus;
+        for (let i = 0; i < statusSettings.length; i++) {
+
+            if (defaultStatus?.default) {
+                statusSettingsOrder[0] = defaultStatus;
+                defaultStatus = null;
+            } else {
+                defaultStatus = statusSettings.filter((status: Status) => {
+                    return status._id === nextId;
+                })[0];
+                statusSettingsOrder[i] = defaultStatus;
+                nextId = defaultStatus.nextStatus;
+            }
+        }
+        setStatusOrder(statusSettingsOrder);
+        return () => {
+            setStatusOrder(null);
+        }
+    }, [statusSettings])
+
+    /**
+     * This function will emit the new updated products state
+     * @param nextState NextState is the state which is next on the line in picking.
+     * @param pickedAmount PickedAmount is the amount which pickedamount input.
+     * @param order Order is used to get the order id of the order which the product belongs to.
+     * @param product And product is used for getting product id of the product which state has been updated.
+     * @returns The end return is updatedData which will update the orders and products itself.
+     */
     const updatedSocketProduct = (nextState: string, pickedAmount: number | string, order: Order, product: Products) => {
         if (!socket) return;
         // Get nextState for checking if stickerPoint is true.
@@ -138,6 +187,15 @@ const Main = () => {
         updatedData(nextState, pickedAmount, order._id, product._id, chosenDate);
     }
 
+    /**
+     * This will update the state of the product in order.
+     * @param nextState NextState is the state which is next on the line in picking.
+     * @param pickedAmount PickedAmount is the amount which pickedamount input.
+     * @param orderId Order id of the order where the product exists.
+     * @param productId Product id where the state has changed.
+     * @param date And the pickingdate of the order. This is needed to check if other socket.io connections are on the same day.
+     * @returns Updated setOrders data with the new product states.
+     */
     const updatedData = (nextState: string, pickedAmount: number | string, orderId: string, productId: string, date: Date) => {
         if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) return;
         let next = stateSettings.filter((state: any) => {
@@ -160,6 +218,9 @@ const Main = () => {
         setOrders(data);
     }
 
+    /**
+     * This will delete a order and then send a socket.io message about which order should be removed.
+     */
     const deleteOrder = async () => {
         let orderId = deleteOrderData?._id;
         let userId = localStorage.getItem('userId');
@@ -172,6 +233,14 @@ const Main = () => {
         updateSocket(orderId, false, 'DELETE', chosenDate);
     }
 
+    /**
+     * This sends a socket message about a order deletion.
+     * @param id Id of the order which should be removed.
+     * @param isCreator This is false if you created a order or if someone else created or edited a order when using socket, when you edit it has a value of true.
+     * @param method This tells the updateOrder what you have done. (DELETE, POST, PATCH)
+     * @param date This tells the date you've edited the order in.
+     * @returns Calls updateOrder function to update the current order.
+     */
     const updateSocket = (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => {
         if (!socket) return;
         socket.emit('update-order', {
@@ -187,7 +256,7 @@ const Main = () => {
      * 
      * @param {string} id This is the id of the edited order
      * @param {boolean} isCreator This is false if you created a order or if someone else created or edited a order when using socket, when you edit it has a value of true
-     * @param {string} method This tells the updateOrder what you have done.
+     * @param {string} method This tells the updateOrder what you have done. (DELETE, POST, PATCH)
      * @param {Date} date This tells the date you've edited the order in.
      * @returns Returns new edited/added/removed order data
      */
@@ -196,8 +265,12 @@ const Main = () => {
         if (!id) return;
         if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) return;
         let userId = localStorage.getItem('userId');
+        let locations = localStorage.getItem('location');
+        if (locations === null) {
+            locations = chosenLocation;
+        }
         let url = process.env.REACT_APP_API_URL;
-        let newData = await FetchData({ urlHost: url, urlPath: '/orders/get_order_with_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&_id=${id}&date=${chosenDate}` });
+        let newData = await FetchData({ urlHost: url, urlPath: '/orders/get_order_with_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&_id=${id}&date=${chosenDate}&locationSearch=${locations}&flowerSearch=${searchWord}&statusSearch=${chosenStatus}` });
         let data;
 
         // Switch case for all methods.
@@ -228,6 +301,24 @@ const Main = () => {
         }
     }
 
+    /**
+     * Move order function is used to move a order and its flowers to different status mode.
+     */
+    const moveOrder = async () => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            orderId: statusMoveOrder,
+            status: statusMove,
+            location: chosenLocation
+        }
+        await FetchData({ urlHost: url, urlPath: '/statuslocation/create_status_location', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
+        updateSocket(statusMoveOrder, true, 'PATCH', chosenDate);
+        setStatusOpen(false);
+        setStatusMoveOrder('');
+    }
+
     return (
         <Box sx={{ flexGrow: 1, padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh' }}>
             <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -250,7 +341,12 @@ const Main = () => {
                                     </Grid>
                                 </Grid>
                                 <Grid xs={12} sm={6}>
-                                    <Typography align='left'>Location order status here with .map</Typography>
+                                    {order.statusLocation.map((sLoc: any) => (
+                                        <Grid key={sLoc._id} sx={{ paddingLeft: 0, paddingTop: 0 }} xs={12}>
+                                            <Typography align='left'>{sLoc.location.location}: {sLoc.status.status}</Typography>
+
+                                        </Grid>
+                                    ))}
                                 </Grid>
                                 <Grid xs={12} sm={6}>
                                     <Typography align='right'>Maybe some buttons here</Typography>
@@ -286,7 +382,7 @@ const Main = () => {
                                 </Tbody>
                             </Table>
                             <Grid container xs={12}>
-                                <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }} onClick={() => setStatusOpen(true)}>Valmis</Button>
+                                <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }} onClick={() => { if (order.products.length > 0) { setStatusMoveOrder(order._id); setStatusOpen(true); } }}>Valmis</Button>
                                 <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none' }}>Muokkaa</Button>
                                 <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none' }}>Poista</Button>
                                 <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none' }}>Vie Exceliin</Button>
@@ -294,8 +390,9 @@ const Main = () => {
                             </Grid>
                         </Item>
                     </Grid>
-                ))}
-            </Grid>
+                ))
+                }
+            </Grid >
             <Fab onClick={() => setPrinterOpen(prevState => !prevState)} sx={{ position: 'fixed', bottom: 16, right: 16 }} color="secondary" aria-label="add">
                 <PrintIcon />
                 <Typography sx={{ fontWeight: 'bold' }}>{stickers.length}</Typography>
@@ -303,18 +400,22 @@ const Main = () => {
             {
                 statusOpen
                     ?
-                    <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => console.log('222')} dialogTitle={'Haluatko siirtää tämän tilauksen valmiisiin.'}>
+                    <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => moveOrder()} dialogTitle={'Tilauksen siirto'}>
                         <>
-                            {`Haluatko varmasti siirtää tilauksen valmiisiin?`}
-                            <Select>
-                                {
-                                    statusSettings.map((status: Status) => (
-                                        <MenuItem>
-                                            {status.status}
-                                        </MenuItem>
-                                    ))
-                                }
-                            </Select>
+                            <div>
+                                {`Mihin haluat siirtää tämän tilauksen?`}
+                            </div>
+                            <div>
+                                <Select defaultValue={chosenStatus} value={statusMove} onChange={(e: any) => setStatusMove(e.target.value)}>
+                                    {
+                                        statusOrder?.map((status: Status) => (
+                                            <MenuItem key={status._id} value={status._id}>
+                                                {status.status}
+                                            </MenuItem>
+                                        ))
+                                    }
+                                </Select>
+                            </div>
                         </>
                     </MenuDialog>
                     :
@@ -343,7 +444,7 @@ const Main = () => {
                     :
                     null
             }
-        </Box>
+        </Box >
     )
 }
 
