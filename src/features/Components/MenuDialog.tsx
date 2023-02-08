@@ -1,10 +1,5 @@
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, IconButton, Button } from '@mui/material';
-
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close';
-import SaveIcon from '@mui/icons-material/Save';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 interface Props {
     setIsOpen: (value: boolean) => void;
@@ -33,9 +28,7 @@ const MenuDialog: React.FC<Props> = ({ setIsOpen, isOpen, result, dialogTitle, c
                 {dialogTitle}
             </DialogTitle>
             <DialogContent>
-                <DialogContentText>
-                    {children}
-                </DialogContentText>
+                {children}
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => setIsOpen(!isOpen)}>Ei</Button>
