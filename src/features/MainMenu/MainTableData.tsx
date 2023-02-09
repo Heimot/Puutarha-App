@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { Order, Products } from '../../Model'
+import { Products, Status } from '../../Model'
 import { Tr, Td } from 'react-super-responsive-table'
 import { Button, TextField } from '@mui/material';
 import FetchData from '../Components/Fetch';
 import { useTheme } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
+import { State } from '../../app/redux/store';
 
 interface Props {
     product: Products;
+    defaultStatus: Status | null;
     updateOrder: (nextState: string, pickedAmount: number | string) => void;
+    updateStatus: (nextStatus: string) => void;
 }
 
-const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
+const MainTableData: React.FC<Props> = ({ product, defaultStatus, updateOrder, updateStatus }) => {
     const [pickedAmount, setPickedAmount] = useState<number | string>('');
+    const { chosenStatus } = useSelector((state: State) => state.data);
 
     const theme = useTheme();
 
     useEffect(() => {
-        setPickedAmount(product.amountToDeliver)
+        setPickedAmount(product.amountToDeliver);
     }, [product])
 
 
@@ -39,6 +44,18 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
         updateOrder(product.state.nextState, pickedAmount);
     }
 
+    const nextStatus = async () => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            _id: product._id,
+
+        }
+        await FetchData({ urlHost: url, urlPath: '/products/change_products_status', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
+        updateStatus(product.status.nextStatus);
+    }
+
     const isEmpty = () => {
         if (pickedAmount === '') {
             setPickedAmount(product.amountToDeliver);
@@ -46,7 +63,10 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
     }
 
     return (
-        <Tr>
+        <Tr
+            onDoubleClick={() => { if (chosenStatus !== defaultStatus) { nextStatus(); } }}
+            style={!product.status.default && chosenStatus !== defaultStatus ? { backgroundColor: product.status.color, color: product.status.fontcolor } : null}
+        >
             <Td style={borderStyle}>{product.flower.name}</Td>
             <Td style={borderStyle}>{product.amount}</Td>
             <Td style={borderStyle}>{product.location.location}</Td>
@@ -65,7 +85,7 @@ const MainTableData: React.FC<Props> = ({ product, updateOrder }) => {
             <Td style={borderStyle}>
                 <TextField
                     sx={{ padding: '5px' }}
-                    inputProps={{ style: { textAlign: 'center' } }}
+                    inputProps={!product.status.default && chosenStatus !== defaultStatus ? { style: { textAlign: 'center', color: product.status.fontcolor, borderRadius: '4px' } } : { style: { textAlign: 'center' } }}
                     type="number"
                     value={pickedAmount}
                     onBlur={isEmpty}
