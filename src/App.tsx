@@ -36,7 +36,7 @@ const App = () => {
   const [mode, setMode] = useState<'light' | 'dark'>('light');
 
   const dispatch = useDispatch();
-  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenMode } = bindActionCreators(actionCreators, dispatch);
+  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenMode, setPersonalSettings } = bindActionCreators(actionCreators, dispatch);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -103,6 +103,7 @@ const App = () => {
         setFlowers(applicationSettings.flowers);
         setStores(applicationSettings.stores);
         setPDF(applicationSettings.pdf);
+        setPersonalSettings(applicationSettings.personalSettings);
         if (sessionStorage.getItem('date') === null) {
           sessionStorage.setItem('date', dayjs().toString());
         }
