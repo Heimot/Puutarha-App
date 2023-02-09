@@ -19,6 +19,8 @@ import NavigationDrawer from './NavigationDrawer';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'row',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
     '&:hover': {
@@ -109,6 +111,7 @@ const NavigationBar = () => {
                                         <SearchIcon />
                                     </SearchIconWrapper>
                                     <StyledInputBase
+                                        fullWidth
                                         placeholder="Search…"
                                         value={search}
                                         onChange={handleChange}
