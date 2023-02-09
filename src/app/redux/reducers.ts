@@ -15,6 +15,7 @@ const initialState = {
     chosenMode: 'light',
     updatePacket: { _id: null, date: null },
     searchWord: '',
+    personalSettings: null,
 }
 
 const dataReducer = (state: any = initialState, action: Action) => {
@@ -45,6 +46,8 @@ const dataReducer = (state: any = initialState, action: Action) => {
             return { ...state, updatePacket: action.payload };
         case ActionType.SearchWord:
             return { ...state, searchWord: action.payload };
+        case ActionType.PersonalSettings:
+            return { ...state, personalSettings: action.payload };
         default:
             return state;
     }

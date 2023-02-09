@@ -91,3 +91,10 @@ export const setSearchWord = (searchWord: any) => (dispatch: Dispatch<Action>) =
     payload: searchWord
   });
 };
+
+export const setPersonalSettings = (personalSettings: any) => (dispatch: Dispatch<Action>) => {
+  dispatch({
+    type: ActionType.PersonalSettings,
+    payload: personalSettings
+  });
+};

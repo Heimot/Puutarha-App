@@ -12,6 +12,7 @@ export enum ActionType {
     ChosenMode = "SET_CHOSEN_MODE",
     UpdatePacket = "SET_UPDATE_PACKET",
     SearchWord = "SET_SEARCH_WORD",
+    PersonalSettings = "SET_PERSONAL_SETTINGS",
 }
 
 interface UserDataAction {
@@ -80,5 +81,11 @@ interface SeachWord {
     payload?: string;
 }
 
+interface PersonalSettings {
+    type: ActionType.PersonalSettings,
+    payload?: any;
+}
+
 export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction |
-    StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket | SeachWord;
+    StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket | SeachWord |
+    PersonalSettings;
