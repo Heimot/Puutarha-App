@@ -65,7 +65,12 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
         for (let i = 0; i < statusSettings.length; i++) {
             if (statusSettings[i].default) {
                 defaultStatus = statusSettings[i];
-                setChosenStatus(statusSettings[i]._id);
+                if (localStorage.getItem('status') !== null) {
+                    setChosenStatus(localStorage.getItem('status'));
+                } else {
+                    setChosenStatus(statusSettings[i]._id);
+                    localStorage.setItem('status', statusSettings[i]._id);
+                }
             }
             statusSettingsOrder.push({});
         }
@@ -132,6 +137,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const handleChange = (e: any) => {
         if (e.target.name === "Tilanne") {
             setChosenStatus(e.target.value);
+            localStorage.setItem('status', e.target.value);
         } else {
             setChosenLocation(e.target.value);
             localStorage.setItem('location', e.target.value);
