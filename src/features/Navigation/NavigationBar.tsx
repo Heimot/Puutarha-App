@@ -16,6 +16,19 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import * as actionCreators from '../../app/redux/actions';
 
 import NavigationDrawer from './NavigationDrawer';
+import Button from '@mui/material/Button/Button';
+
+const SearchBox = styled('div')(({ theme }) => ({
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'row',
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(1),
+        width: 'auto',
+    },
+}));
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -29,7 +42,6 @@ const Search = styled('div')(({ theme }) => ({
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(1),
         width: 'auto',
     },
 }));
@@ -62,6 +74,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+const SearchTypes = styled(Box)(({ theme }) => ({
+    position: 'absolute',
+    marginTop: '35px',
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : 'white',
+    color: theme.palette.mode === 'dark' ? 'white' : '#1A2027', width: '100%',
+    borderRight: `1px solid ${theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.15) : alpha(theme.palette.common.black, 0.15)}`,
+    borderLeft: `1px solid ${theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.15) : alpha(theme.palette.common.black, 0.15)}`,
+    borderBottom: `1px solid ${theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.15) : alpha(theme.palette.common.black, 0.15)}`,
+    borderBottomLeftRadius: '5px',
+    borderBottomRightRadius: '5px'
+}))
+
 const NavigationBar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -72,12 +96,6 @@ const NavigationBar = () => {
 
     const handleChange = (e: any) => {
         setSearch(e.target.value);
-    }
-
-    const handleKeyDown = (e: any) => {
-        if (e.key === 'Enter') {
-            setSearchWord(search);
-        }
     }
 
     return (
@@ -106,31 +124,56 @@ const NavigationBar = () => {
                         {
                             window.location.pathname === '/dashboard'
                                 ?
-                                <Search>
-                                    <SearchIconWrapper>
-                                        <SearchIcon />
-                                    </SearchIconWrapper>
-                                    <StyledInputBase
-                                        fullWidth
-                                        placeholder="Search…"
-                                        value={search}
-                                        onChange={handleChange}
-                                        onKeyDown={handleKeyDown}
-                                        endAdornment={
-                                            <InputAdornment
-                                                sx={{ display: search !== '' ? 'flex' : 'none', paddingRight: '10px', }}
-                                                position='end'
-                                                onClick={() => { setSearch(''); setSearchWord(''); }}
-                                            >
-                                                <ClearIcon sx={{
-                                                    '&:hover': {
-                                                        backgroundColor: alpha(theme.palette.common.white, 0.25),
-                                                    }
-                                                }} />
-                                            </InputAdornment>}
-                                        inputProps={{ 'aria-label': 'search' }}
-                                    />
-                                </Search>
+                                <SearchBox sx={{ padding: '0' }}>
+                                    <Search>
+                                        <SearchIconWrapper>
+                                            <SearchIcon />
+                                        </SearchIconWrapper>
+                                        <StyledInputBase
+                                            fullWidth
+                                            placeholder="Search…"
+                                            value={search}
+                                            onChange={handleChange}
+                                            endAdornment={
+                                                <InputAdornment
+                                                    sx={{ display: search !== '' ? 'flex' : 'none', paddingRight: '10px', }}
+                                                    position='end'
+                                                    onClick={() => { setSearch(''); setSearchWord({ type: '', search: '' }); }}
+                                                >
+                                                    <ClearIcon sx={{
+                                                        '&:hover': {
+                                                            backgroundColor: alpha(theme.palette.common.white, 0.25),
+                                                        }
+                                                    }} />
+                                                </InputAdornment>}
+                                            inputProps={{ 'aria-label': 'search' }}
+                                        />
+                                    </Search>
+                                    {
+                                        search !== ''
+                                            ?
+                                            <SearchTypes>
+                                                <Box>
+                                                    <Typography sx={{ bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.15) : alpha(theme.palette.common.black, 0.10), padding: '2px 0px 2px 3px' }}>Kukka</Typography>
+                                                    <Button fullWidth sx={{ justifyContent: "flex-start", textTransform: 'none' }} onClick={() => { setSearch(''); setSearchWord({ type: 'flower', search: search }); }}>
+                                                        <Typography noWrap>
+                                                            {search}
+                                                        </Typography>
+                                                    </Button>
+                                                </Box>
+                                                <Box>
+                                                    <Typography sx={{ bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.15) : alpha(theme.palette.common.black, 0.10), padding: '2px 0px 2px 3px' }}>Kauppa</Typography>
+                                                    <Button fullWidth sx={{ justifyContent: "flex-start", textTransform: 'none' }} onClick={() => { setSearch(''); setSearchWord({ type: 'store', search: search }); }}>
+                                                        <Typography noWrap>
+                                                            {search}
+                                                        </Typography>
+                                                    </Button>
+                                                </Box>
+                                            </SearchTypes>
+                                            :
+                                            null
+                                    }
+                                </SearchBox>
                                 :
                                 null
                         }
