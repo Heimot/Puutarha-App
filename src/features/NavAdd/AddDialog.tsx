@@ -43,6 +43,12 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
                 fontcolor: '',
                 default: false,
                 nextStatus: ''
+            },
+            roller: {
+                _id: '',
+                roller: '',
+                lockColor: '',
+                default: false
             }
         });
     }, [])
@@ -62,7 +68,8 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
             pickingdate: newOrder.pickingdate,
             deliverydate: newOrder.deliverydate,
             ordercode: newOrder.ordercode,
-            products: newOrder.products
+            products: newOrder.products,
+            roller: newOrder.roller
         }
 
         const orderCreated = await FetchData({ urlHost: url, urlPath: '/orders/create_order_with_products', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: updateBody });
@@ -86,6 +93,12 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
                 fontcolor: '',
                 default: false,
                 nextStatus: ''
+            },
+            roller: {
+                _id: '',
+                roller: '',
+                lockColor: '',
+                default: false
             }
         });
     }

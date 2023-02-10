@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, TextField, Box, Autocomplete, createFilterOptions, FilterOptionsState, useTheme } from '@mui/material';
+import { Button, TextField, Box, Autocomplete, createFilterOptions, FilterOptionsState, useTheme, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -9,11 +9,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 
-import CloseIcon from '@mui/icons-material/Close';
-import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import dayjs from 'dayjs';
-import { Order, Store, Location } from '../../Model';
+import { Store, Location, Roller } from '../../Model';
 import FetchData from './Fetch';
 import EditingMenuData from './EditingMenuData';
 import AddAutofill from './AddAutofill';
@@ -28,8 +26,9 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
     const [orderCode, setOrderCode] = useState<string>('');
     const [information, setInformation] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [roller, setRoller] = useState<Roller | null>(null);
     const theme = useTheme();
-    const { locationSettings, storeSettings } = useSelector((state: State) => state.data);
+    const { locationSettings, storeSettings, rollerSettings } = useSelector((state: State) => state.data);
 
     const defaultFilterOptions = createFilterOptions<Store>();
     const filterOptions = (options: Store[], state: FilterOptionsState<Store>) => {
@@ -39,15 +38,27 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
     useEffect(() => {
         setOrderCode(orderData.ordercode);
         setInformation(orderData.information);
+        if (orderData?.roller?._id !== '') {
+            setRoller(orderData.roller);
+        } else {
+            const defaultRoller = rollerSettings?.filter((roller: Roller) => {
+                return roller.default;
+            })
+            setRoller(defaultRoller[0]);
+        }
     }, [])
 
     useEffect(() => {
-        setOrderData(information, 'information')
+        setOrderData(information, 'information');
     }, [information])
 
     useEffect(() => {
-        setOrderData(orderCode, 'ordercode')
+        setOrderData(orderCode, 'ordercode');
     }, [orderCode])
+
+    useEffect(() => {
+        setOrderData(roller, 'roller');
+    }, [roller])
 
     const updateProducts = (value: any, name: string, productId: string) => {
         let data = value;
@@ -96,6 +107,13 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
             orderId: orderData._id
         }
         await FetchData({ urlHost: url, urlPath: '/products/delete_product', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+    }
+
+    const updateRoller = (e: any) => {
+        const filteredRoller = rollerSettings?.filter((roller: Roller) => {
+            return roller._id === e.target.value;
+        })
+        setRoller(filteredRoller[0]);
     }
 
     return (
@@ -165,8 +183,27 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
                     <Grid style={{ display: "flex", justifyContent: "flex-end" }} xs={12} >
                         <TextField name='information' label="Lisätietoa" value={information} multiline onChange={(e) => setInformation(e.target.value)}></TextField>
                     </Grid>
-                    <Grid style={{ display: "flex", justifyContent: "flex-end", margin: '10px 0 10px 0' }} xs={12}>
+                    <Grid style={{ display: "flex", justifyContent: "flex-end", margin: '10px 0 0 0' }} xs={12}>
                         <TextField name='ordercode' label="Tilauskoodi" value={orderCode} multiline onChange={(e) => setOrderCode(e.target.value)}></TextField>
+                    </Grid>
+                    <Grid style={{ display: "flex", justifyContent: "flex-end", margin: '10px 0 10px 0' }} xs={12}>
+                        {
+                            roller !== null
+                                ?
+                                <FormControl fullWidth sx={{ maxWidth: 300 }}>
+                                    <InputLabel id='roller-label'>Rullakko</InputLabel>
+                                    <Select labelId='roller-label' label='Rullakko' value={roller._id} onChange={(e) => updateRoller(e)}>
+                                        {
+                                            rollerSettings?.map((roller: Roller) => (
+                                                <MenuItem key={roller._id} value={roller._id}>{roller.roller}</MenuItem>
+                                            ))
+                                        }
+                                    </Select>
+                                </FormControl>
+                                :
+                                null
+                        }
+
                     </Grid>
                 </Grid>
             </Grid>
