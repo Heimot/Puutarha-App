@@ -15,7 +15,7 @@ import * as actionCreators from '../../app/redux/actions';
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import MainTableData from './MainTableData';
-import { Button, Typography, Fab, Select, MenuItem } from '@mui/material';
+import { Button, Typography, Fab, Select, MenuItem, Chip } from '@mui/material';
 import EditingMenu from './EditingMenu';
 import MenuDialog from '../Components/MenuDialog';
 import { useSocket } from '../../app/contexts/SocketProvider';
@@ -66,7 +66,7 @@ const Main = () => {
 
 
     const dispatch = useDispatch();
-    const { setUpdatePacket } = bindActionCreators(actionCreators, dispatch);
+    const { setUpdatePacket, setSearchWord } = bindActionCreators(actionCreators, dispatch);
     const theme = useTheme();
     const socket = useSocket()
 
@@ -119,8 +119,16 @@ const Main = () => {
             if (status === null) {
                 status = chosenStatus;
             }
+            let searchType = '';
+            if (searchWord.type === 'store') {
+                searchType = `&storeSearch=${searchWord.search}`;
+            } else if (searchWord.type === 'flower') {
+                searchType = `&flowerSearch=${searchWord.search}`;
+            } else {
+                searchType = '';
+            }
             let date = dayjs(chosenDate).format('YYYY-MM-DD');
-            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}&flowerSearch=${searchWord}&statusSearch=${status}` });
+            let orderData = await FetchData({ urlHost: url, urlPath: '/orders/get_orders_with_date', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&date=${date}&locationSearch=${locations}${searchType}&statusSearch=${status}` });
             setOrders(orderData.result);
         }
         getOrderData();
@@ -307,8 +315,16 @@ const Main = () => {
         if (status === null) {
             status = chosenStatus;
         }
+        let searchType = '';
+        if (searchWord.type === 'store') {
+            searchType = `&storeSearch=${searchWord.search}`;
+        } else if (searchWord.type === 'flower') {
+            searchType = `&flowerSearch=${searchWord.search}`;
+        } else {
+            searchType = '';
+        }
         let url = process.env.REACT_APP_API_URL;
-        let newData = await FetchData({ urlHost: url, urlPath: '/orders/get_order_with_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&_id=${id}&date=${chosenDate}&locationSearch=${locations}&flowerSearch=${searchWord}&statusSearch=${status}` });
+        let newData = await FetchData({ urlHost: url, urlPath: '/orders/get_order_with_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&_id=${id}&date=${chosenDate}&locationSearch=${locations}${searchType}&statusSearch=${status}` });
         let data;
 
         // Switch case for all methods.
@@ -391,6 +407,7 @@ const Main = () => {
                                         ))}
                                     </Grid>
                                     <Grid xs={12} sm={6}>
+                                        <Typography align='right'>Rullakko: {order?.roller?.roller}</Typography>
                                         <Typography align='right'>Maybe some buttons here</Typography>
                                     </Grid>
                                     <Grid xs={12}>
@@ -438,10 +455,17 @@ const Main = () => {
                 })
                 }
             </Grid >
-            <Fab onClick={() => setPrinterOpen(prevState => !prevState)} sx={{ position: 'fixed', bottom: 16, right: 16 }} color="secondary" aria-label="add">
+            <Fab onClick={() => setPrinterOpen(prevState => !prevState)} sx={{ position: 'fixed', bottom: 16, right: 16 }} color="secondary" aria-label="print">
                 <PrintIcon />
                 <Typography sx={{ fontWeight: 'bold' }}>{stickers.length}</Typography>
             </Fab>
+            {
+                searchWord.type !== ''
+                    ?
+                    <Chip sx={{ position: 'fixed', bottom: 16, right: 75 }} label={`Etsitään: ${searchWord.search}`} variant="outlined" onDelete={() => setSearchWord({ type: '', search: '' })} />
+                    :
+                    null
+            }
             {
                 statusOpen
                     ?
