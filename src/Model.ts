@@ -8,6 +8,7 @@ export interface Order {
     ordercode: string;
     products: Products[];
     status: Status;
+    roller: Roller;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -147,4 +148,13 @@ export interface Role {
 export interface Message {
     title: string;
     message: string;
+}
+
+export interface Roller {
+    _id: string;
+    roller: string;
+    lockColor: string;
+    default: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
