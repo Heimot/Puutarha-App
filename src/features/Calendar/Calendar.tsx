@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Button } from '@mui/material'
+import { Box, Button, TextField } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2';
 import { styled, useTheme } from "@mui/material/styles";
 import Paper from '@mui/material/Paper';
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import FetchData from '../Components/Fetch';
@@ -99,7 +102,21 @@ const Calendar = () => {
   return (
     <Box sx={{ display: 'flex', padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh', justifyContent: 'center' }}>
       <Grid container spacing={{ xs: 2, md: 3 }} sx={{ flexDirection: 'column', flexGrow: 1 }}>
-        <Item sx={{ marginTop: '50px' }}>
+        <Box sx={{ marginTop: '50px', textAlign: 'center' }}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MobileDatePicker
+              label="Kalenteri"
+              value={date}
+              inputFormat='DD.MM.YYYY'
+              closeOnSelect={true}
+              onChange={(newValue) => {
+                setDate(dayjs(newValue).weekday(1).toDate())
+              }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+        </Box>
+        <Item sx={{ marginTop: '25px' }}>
           <Table style={{
             color: theme.palette.mode === 'dark' ? 'white' : 'black',
             border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
@@ -124,7 +141,7 @@ const Calendar = () => {
           <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(-6).toDate())}>Last week</Button>
           <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(8).toDate())}>Next week</Button>
         </ Item>
-        <Item sx={{ marginTop: '50px' }}>
+        <Item sx={{ marginTop: '25px' }}>
           <Table style={{
             color: theme.palette.mode === 'dark' ? 'white' : 'black',
             border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
