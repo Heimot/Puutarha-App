@@ -6,6 +6,7 @@ export enum ActionType {
     FlowerSettings = "SET_FLOWER_SETTINGS",
     StoreSettings = "SET_STORE_SETTINGS",
     PDFSettings = "SET_PDF_SETTINGS",
+    RollerSettings = "SET_ROLLER_SETTINGS",
     ChosenStatus = "SET_CHOSEN_STATUS",
     ChosenLocation = "SET_CHOSEN_LOCATION",
     ChosenDate = "SET_CHOSEN_DATE",
@@ -51,6 +52,11 @@ interface PDFSettingsAction {
     payload?: any;
 }
 
+interface RollerSettings {
+    type: ActionType.RollerSettings;
+    payload?: any;
+}
+
 interface ChosenStatus {
     type: ActionType.ChosenStatus;
     payload?: string;
@@ -78,7 +84,7 @@ interface UpdatePacket {
 
 interface SeachWord {
     type: ActionType.SearchWord,
-    payload?: string;
+    payload?: any;
 }
 
 interface PersonalSettings {
@@ -87,5 +93,5 @@ interface PersonalSettings {
 }
 
 export type Action = UserDataAction | StatusSettingsAction | StateSettingsAction | LocationSettingsAction | FlowerSettingsAction |
-    StoreSettingsAction | PDFSettingsAction | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket | SeachWord |
-    PersonalSettings;
+    StoreSettingsAction | PDFSettingsAction | RollerSettings | ChosenStatus | ChosenLocation | ChosenDate | ChosenMode | UpdatePacket |
+    SeachWord | PersonalSettings;

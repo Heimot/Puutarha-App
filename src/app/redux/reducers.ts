@@ -9,12 +9,13 @@ const initialState = {
     flowerSettings: null,
     storeSettings: null,
     pdfSettings: null,
+    rollerSettings: null,
     chosenStatus: "",
     chosenLocation: "",
     chosenDate: sessionStorage.getItem('date') !== null ? sessionStorage.getItem('date') : dayjs().toString(),
     chosenMode: 'light',
     updatePacket: { _id: null, date: null },
-    searchWord: '',
+    searchWord: { type: '', search: '' },
     personalSettings: null,
 }
 
@@ -34,6 +35,8 @@ const dataReducer = (state: any = initialState, action: Action) => {
             return { ...state, storeSettings: action.payload };
         case ActionType.PDFSettings:
             return { ...state, pdfSettings: action.payload };
+        case ActionType.RollerSettings:
+            return { ...state, rollerSettings: action.payload };
         case ActionType.ChosenStatus:
             return { ...state, chosenStatus: action.payload };
         case ActionType.ChosenLocation:

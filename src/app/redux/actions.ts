@@ -50,6 +50,13 @@ export const setPDF = (pdfSettings: any) => (dispatch: Dispatch<Action>) => {
   });
 };
 
+export const setRoller = (rollerSettings: any) => (dispatch: Dispatch<Action>) => {
+  dispatch({
+    type: ActionType.RollerSettings,
+    payload: rollerSettings
+  });
+};
+
 export const setChosenStatus = (chosenStatus: any) => (dispatch: Dispatch<Action>) => {
   dispatch({
     type: ActionType.ChosenStatus,
