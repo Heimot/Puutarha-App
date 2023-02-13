@@ -174,7 +174,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                 {['Keräykseen', 'Kalenteri', 'Tilanne', 'Paikka', 'Päivä', 'Lisää'].map((text) => (
                     <ListItem key={text} disablePadding>
                         {text !== "Tilanne" && text !== "Paikka" && text !== "Päivä" ?
-                            <ListItemButton onClick={(e: any) => { goToPage(text); toggleDrawer(e); }} onKeyDown={toggleDrawer}>
+                            <ListItemButton onClick={(e: any) => { goToPage(text); toggleDrawer(e); }} onKeyDown={toggleDrawer} disabled={text === 'Lisää' && window.location.pathname !== '/dashboard' ? true : false}>
                                 <ListItemIcon>
                                     {text === "Kalenteri" ? <CalendarMonthIcon /> : text === "Keräykseen" ? <WorkIcon /> : <AddIcon />}
                                 </ListItemIcon>
@@ -182,13 +182,11 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                             </ListItemButton>
                             :
                             text !== "Päivä" ?
-                                <ListItemButton>
-
+                                <ListItemButton disabled={window.location.pathname !== '/dashboard' ? true : false}>
                                     <ListItemIcon>
                                         {text === "Paikka" ? <LocationOnIcon /> : <DoneIcon />}
                                     </ListItemIcon>
                                     <FormControl fullWidth>
-
                                         <InputLabel id="Tilanne_ID">{text}</InputLabel>
                                         <Select
                                             name={text}
@@ -196,7 +194,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                                             labelId={`${text}_ID`}
                                             id={`${text}_ID`}
                                             label={text}
-                                            onChange={(e: any) => { handleChange(e); toggleDrawer(e) }}
+                                            onChange={(e: any) => { handleChange(e); toggleDrawer(e); }}
                                         >
                                             {text !== 'Tilanne' ? <MenuItem key={1} value="*">Molemmat</MenuItem> : null}
                                             {
@@ -215,12 +213,13 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
 
                                 </ListItemButton >
                                 :
-                                <ListItemButton>
+                                <ListItemButton disabled={window.location.pathname !== '/dashboard' ? true : false}>
                                     <ListItemIcon>
                                         <CalendarTodayIcon />
                                     </ListItemIcon>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <MobileDatePicker
+                                            disabled={window.location.pathname !== '/dashboard' ? true : false}
                                             label="Keräyspäivä"
                                             value={chosenDate}
                                             inputFormat='DD.MM.YYYY'
