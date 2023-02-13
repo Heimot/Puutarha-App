@@ -15,6 +15,10 @@ import dayjs from 'dayjs';
 import Settings from './features/Settings/Settings';
 import Calendar from './features/Calendar/Calendar';
 
+// Set the locale of dayjs you can also use finnish but since the application is used by also english speaking people its better to leave it as english. Basically the date system.
+import en from 'dayjs/locale/en-gb'
+dayjs.locale(en);
+
 declare module '@mui/material/styles' {
   interface Theme {
     table: {
