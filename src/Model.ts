@@ -9,6 +9,8 @@ export interface Order {
     products: Products[];
     status: Status;
     roller: Roller;
+    truck: Truck;
+    calendarPosition: Number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -154,6 +156,14 @@ export interface Roller {
     _id: string;
     roller: string;
     lockColor: string;
+    default: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface Truck {
+    _id: string;
+    truckLicensePlate: string;
     default: boolean;
     createdAt: Date;
     updatedAt: Date;
