@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Box } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import SettingsNav from './SettingsNav';
 import SettingsUsers from './SettingsUsers';
 import SettingsRoles from './SettingsRoles';
+import { useTheme } from '@emotion/react';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -47,11 +49,32 @@ const Settings = () => {
     return render;
   }
 
+  const oldTheme = useTheme();
+
+  const theme = createTheme({
+    ...oldTheme,
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 1000,
+        lg: 1200,
+        xl: 1536,
+      },
+    },
+  });
+
   return (
-    <Box sx={{ display: 'flex', paddingTop: 8, height: '100%', minHeight: '100vh' }}>
-      <SettingsNav page={page} setPage={(value: string) => setPage(value)} />
-      {returnRender()}
-    </Box>
+    <ThemeProvider theme={theme}>
+      <Grid container sx={{ paddingTop: 8, minHeight: '100vh' }}>
+        <Grid xs={12} md={2}>
+          <SettingsNav page={page} setPage={(value: string) => setPage(value)} />
+        </Grid>
+        <Grid xs={12} md={10}>
+          {returnRender()}
+        </Grid>
+      </Grid>
+    </ThemeProvider>
   );
 }
 
