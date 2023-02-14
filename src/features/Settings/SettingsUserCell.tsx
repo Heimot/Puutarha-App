@@ -27,10 +27,11 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser }
     }
 
     useEffect(() => {
-        if (typeof user.role === 'string') {
-            setRole(user.role)
+        if (typeof user?.role === 'string') {
+            setRole(user?.role)
         } else {
             if (role === '') {
+                if (!user?.role) return;
                 setRole(user?.role._id)
             }
         }
@@ -39,26 +40,22 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser }
     return (
         <Tr>
             <Td style={borderStyle}>
-                <Typography>{user.email}</Typography>
+                <Typography>{user?.email}</Typography>
 
             </Td>
             <Td style={borderStyle}>
-                <Typography>{user.username}</Typography>
+                <Typography>{user?.username}</Typography>
             </Td>
             <Td style={borderStyle}>
-                {
-                    role !== ''
-                        ?
-                        <Select value={role} onChange={(e: any) => setRole(e.target.value)} fullWidth>
-                            {
-                                roles.map((role) => (
-                                    <MenuItem key={role._id} value={role._id}>{role.role}</MenuItem>
-                                ))
-                            }
-                        </Select>
-                        :
-                        null
-                }
+
+                <Select value={role} onChange={(e: any) => setRole(e.target.value)} fullWidth>
+                    {
+                        roles.map((role) => (
+                            <MenuItem key={role?._id} value={role?._id}>{role?.role}</MenuItem>
+                        ))
+                    }
+                </Select>
+
             </Td>
             <Td style={borderStyle}>
 
@@ -73,8 +70,8 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser }
                     </Button>
                 </Box>
             </Td>
-            <MenuDialog isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} result={() => deleteUser(user._id)} dialogTitle={'Haluatko poistaa tämän käyttäjän?'}>
-                {`Haluatko varmasti poistaa Käyttäjän ${user.email} (${user.username})? Mikäli poistat käyttäjän sitä ei voida enää palauttaa.`}
+            <MenuDialog isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} result={() => deleteUser(user._id)} dialogTitle={'Haluatko poistaa tämän käyttäjän?'} actions={true}>
+                {`Haluatko varmasti poistaa Käyttäjän ${user?.email} (${user?.username})? Mikäli poistat käyttäjän sitä ei voida enää palauttaa.`}
             </MenuDialog>
         </Tr>
     )
