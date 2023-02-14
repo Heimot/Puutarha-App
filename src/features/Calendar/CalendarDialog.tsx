@@ -42,7 +42,7 @@ const CalendarDialog: React.FC<Props> = ({ isOpen, setIsOpen, order, trucks, upd
 
     const updateOrder = async () => {
         if (trucks === null) return;
-        if (chosenTruck === '') return;
+        if (chosenTruck === '') return alert('You cannot leave truck field empty.');
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         let body = [
@@ -87,9 +87,9 @@ const CalendarDialog: React.FC<Props> = ({ isOpen, setIsOpen, order, trucks, upd
             </DialogTitle>
             <DialogContent dividers>
                 <Box>
+                    <Typography sx={{ fontSize: '20px' }}>{order?.store?.name}</Typography>
                     <Typography sx={{ fontSize: '20px' }}>Keräyspäivä: {dayjs(order?.pickingdate).format('DD-MM-YYYY')}</Typography>
                     <Typography sx={{ fontSize: '20px' }}>Toimituspäivä: {dayjs(order?.deliverydate).format('DD-MM-YYYY')}</Typography>
-                    <Typography sx={{ fontSize: '20px' }}>{order?.store?.name}</Typography>
                 </Box>
                 <Box sx={{ marginTop: '15px' }}>
                     {
