@@ -469,7 +469,7 @@ const Main = () => {
             {
                 statusOpen
                     ?
-                    <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => moveOrder()} dialogTitle={'Tilauksen siirto'}>
+                    <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => moveOrder()} dialogTitle={'Tilauksen siirto'} actions={true}>
                         <>
                             <div>
                                 {`Mihin haluat siirtää tämän tilauksen?`}
@@ -493,7 +493,7 @@ const Main = () => {
             {
                 menuOpen
                     ?
-                    <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'}>
+                    <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'} actions={true}>
                         {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
                     </MenuDialog>
                     :
