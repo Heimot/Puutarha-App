@@ -58,7 +58,7 @@ const SettingsNav: React.FC<Props> = ({ page, setPage }) => {
     const [adminOpen, setAdminOpen] = useState(true);
 
     return (
-        <Paper elevation={0} sx={{ maxWidth: 256, bgcolor: 'rgba(71, 98, 130, 0.2)' }}>
+        <Paper elevation={0} sx={{ maxWidth: '100%', bgcolor: 'rgba(71, 98, 130, 0.2)' }}>
             <SettingsNavBar component="nav" disablePadding>
                 <Box
                     sx={{
