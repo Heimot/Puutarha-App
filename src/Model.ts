@@ -168,3 +168,8 @@ export interface Truck {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface TruckData {
+    deliverydate: string;
+    truck: Truck;
+}
