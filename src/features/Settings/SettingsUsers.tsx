@@ -90,68 +90,72 @@ const SettingsUsers = () => {
     }
 
     return (
-        <Grid container sx={{ padding: '10px', width: '100%' }} alignItems={'center'} direction={'column'}>
-            <Grid sx={{ display: 'flex', flexDirection: 'column', padding: '10px 0 10px 0' }}>
-                <Typography>
-                    Lisää käyttäjiä
-                </Typography>
-                <TextField value={email} onChange={(e) => setEmail(e.target.value)} sx={{ margin: '10px 0 5px 0' }} label='Sähköposti' />
-                <TextField value={username} onChange={(e) => setUsername(e.target.value)} sx={{ margin: '5px 0 5px 0' }} label='Käyttäjänimi' />
-                <FormControl sx={{ margin: '5px 0 5px 0', maxWidth: '300px' }} variant="outlined">
-                    <TextField
-                        label="Salasana"
-                        id="password-field"
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        error={passwordError}
-                        helperText={'Salasanassa on oltava vähintään kahdeksan merkkiä. Käytä isoja ja pieniä kirjaimia, numeroita ja erikoismerkkejä.'}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                </FormControl>
-                <Typography sx={{ fontSize: '10px' }}></Typography>
-                <FormControl sx={{ margin: '5px 0 5px 0' }}>
-                    <InputLabel id='Role_ID'>Rooli</InputLabel>
-                    <Select value={role} onChange={(e) => setRole(e.target.value)} labelId='Role_ID' label='Rooli'>
-                        {
-                            roles.map((role) => (
-                                <MenuItem key={role._id} value={role._id}>{role.role}</MenuItem>
-                            ))
-                        }
-                    </Select>
-                </FormControl>
-                <Button color='primary' onClick={() => addUser()}>Tallenna</Button>
-            </Grid>
-            <Grid sx={{ width: '100%' }}>
-                <Item>
-                    <KeyboardArrowDown
-                        onClick={() => setIsOpen(!isOpen)}
-                        sx={{
-                            mr: -1,
-                            transform: isOpen ? 'rotate(-180deg)' : 'rotate(0)',
-                            transition: '0.2s',
-                        }}
-                    />
-                    {isOpen ? 'Piilota käyttäjät' : 'Näytä käyttäjät'}
-                    {
-                        isOpen
-                            ?
-                            <SettingsUsersTable newUser={createdUser} />
-                            :
-                            null
-                    }
+        <Grid container sx={{ padding: '10px', width: '100%' }}>
+            <Grid xs={12}>
+                <Item sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                    <Grid sx={{ display: 'flex', flexDirection: 'column', padding: '10px 0 10px 0', maxWidth: '500px' }}>
+                        <Typography>
+                            Lisää käyttäjiä
+                        </Typography>
+                        <TextField value={email} onChange={(e) => setEmail(e.target.value)} sx={{ margin: '10px 0 5px 0' }} label='Sähköposti' />
+                        <TextField value={username} onChange={(e) => setUsername(e.target.value)} sx={{ margin: '5px 0 5px 0' }} label='Käyttäjänimi' />
+                        <FormControl sx={{ margin: '5px 0 5px 0', maxWidth: '300px' }} variant="outlined">
+                            <TextField
+                                label="Salasana"
+                                id="password-field"
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                error={passwordError}
+                                helperText={'Salasanassa on oltava vähintään kahdeksan merkkiä. Käytä isoja ja pieniä kirjaimia, numeroita ja erikoismerkkejä.'}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                        </FormControl>
+                        <Typography sx={{ fontSize: '10px' }}></Typography>
+                        <FormControl sx={{ margin: '5px 0 5px 0' }}>
+                            <InputLabel id='Role_ID'>Rooli</InputLabel>
+                            <Select value={role} onChange={(e) => setRole(e.target.value)} labelId='Role_ID' label='Rooli'>
+                                {
+                                    roles.map((role) => (
+                                        <MenuItem key={role._id} value={role._id}>{role.role}</MenuItem>
+                                    ))
+                                }
+                            </Select>
+                        </FormControl>
+                        <Button color='primary' onClick={() => addUser()}>Tallenna</Button>
+                    </Grid>
+                    <Grid sx={{ width: '100%' }}>
+                        <Item>
+                            <KeyboardArrowDown
+                                onClick={() => setIsOpen(!isOpen)}
+                                sx={{
+                                    mr: -1,
+                                    transform: isOpen ? 'rotate(-180deg)' : 'rotate(0)',
+                                    transition: '0.2s',
+                                }}
+                            />
+                            {isOpen ? 'Piilota käyttäjät' : 'Näytä käyttäjät'}
+                            {
+                                isOpen
+                                    ?
+                                    <SettingsUsersTable newUser={createdUser} />
+                                    :
+                                    null
+                            }
+                        </Item>
+                    </Grid>
                 </Item>
             </Grid>
             {
