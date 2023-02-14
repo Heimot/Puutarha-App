@@ -6,10 +6,11 @@ interface Props {
     isOpen: boolean;
     result: () => void;
     dialogTitle: string;
+    actions: boolean;
     children: React.ReactNode;
 }
 
-const MenuDialog: React.FC<Props> = ({ setIsOpen, isOpen, result, dialogTitle, children }) => {
+const MenuDialog: React.FC<Props> = ({ setIsOpen, isOpen, result, dialogTitle, actions, children }) => {
     const handleClose = () => {
         setIsOpen(!isOpen);
     }
@@ -30,10 +31,18 @@ const MenuDialog: React.FC<Props> = ({ setIsOpen, isOpen, result, dialogTitle, c
             <DialogContent>
                 {children}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={() => setIsOpen(!isOpen)}>Ei</Button>
-                <Button onClick={handleClick}>Kyllä</Button>
-            </DialogActions>
+            {
+                actions
+                    ?
+                    <DialogActions>
+                        <Button onClick={() => setIsOpen(!isOpen)}>Ei</Button>
+                        <Button onClick={handleClick}>Kyllä</Button>
+                    </DialogActions>
+                    :
+                    <DialogActions>
+                        <Button onClick={() => setIsOpen(!isOpen)}>Sulje</Button>
+                    </DialogActions>
+            }
         </Dialog >
     )
 }
