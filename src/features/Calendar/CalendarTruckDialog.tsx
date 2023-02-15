@@ -19,13 +19,15 @@ const CalendarTruckDialog: React.FC<Props> = ({ isOpen, setIsOpen, truckData }) 
     const [exists, setExists] = useState<boolean>(false);
 
     useEffect(() => {
+
         const getInfo = async () => {
+            if (!truckData) return;
             let userId = localStorage.getItem('userId');
             let url = process.env.REACT_APP_API_URL;
-            const cInfo = await FetchData({ urlHost: url, urlPath: '/calendar/get_calendar_info', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&truck=${truckData?.truck._id}&date=${dayjs(truckData?.deliverydate)}` });
-            if (cInfo.result !== null) {
+            const cInfo = await FetchData({ urlHost: url, urlPath: '/calendar/get_calendar_info', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&truck=${truckData?.truck._id}&date=${dayjs(truckData.deliverydate)}` });
+            if (cInfo?.result !== null) {
                 setExists(true);
-                setInfo(cInfo.result.info);
+                setInfo(cInfo?.result?.info);
             }
         }
         getInfo();
@@ -89,7 +91,7 @@ const CalendarTruckDialog: React.FC<Props> = ({ isOpen, setIsOpen, truckData }) 
             <DialogContent dividers>
                 <Box>
                     <Typography sx={{ fontSize: '20px' }}>Rekka: {truckData?.truck.truckLicensePlate}</Typography>
-                    <Typography sx={{ fontSize: '20px' }}>Toimituspäivä: {truckData?.deliverydate}</Typography>
+                    <Typography sx={{ fontSize: '20px' }}>Toimituspäivä: {dayjs(truckData?.deliverydate).format('DD-MM-YYYY')}</Typography>
                     <TextField sx={{ marginTop: '15px' }} label="Rekka info" multiline fullWidth value={info} onChange={(e: any) => setInfo(e.target.value)} />
                 </Box>
             </DialogContent>

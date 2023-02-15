@@ -179,7 +179,7 @@ const Calendar = () => {
                         mode === 'delivery'
                           ?
                           <Box
-                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('DD-MM-YYYY'), truck: item.truck }); setTruckMessage(true); } }}
+                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setTruckMessage(true); } }}
                             sx={
                               {
                                 color: "white",
