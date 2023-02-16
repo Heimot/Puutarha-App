@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import FetchData from '../Components/Fetch';
 import SettingsUserCell from './SettingsUserCell';
 import { User, Role } from '../../Model';
+import Message from '../Components/Message';
 
 interface Props {
     newUser: User | undefined;
@@ -12,6 +13,7 @@ interface Props {
 const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
+    const [messageOpen, setMessageOpen] = useState<boolean>(false);
     const theme = useTheme();
 
     useEffect(() => {
@@ -62,6 +64,7 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
                 user
         });
         setUsers(newUsers);
+        setMessageOpen(true);
     }
 
     const deleteUser = async (userId: string) => {
@@ -100,6 +103,15 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
                     ))
                 }
             </Tbody>
+            {
+                messageOpen
+                    ?
+                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Käyttäjä'>
+                        Käyttäjä on päivitetty.
+                    </Message>
+                    :
+                    null
+            }
         </Table>
     )
 }
