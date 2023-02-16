@@ -10,11 +10,12 @@ import { State } from '../../app/redux/store';
 interface Props {
     product: Products;
     defaultStatus: Status | null;
+    rfidCards: string[];
     updateOrder: (nextState: string, pickedAmount: number | string) => void;
     updateStatus: (nextStatus: string) => void;
 }
 
-const MainTableData: React.FC<Props> = ({ product, defaultStatus, updateOrder, updateStatus }) => {
+const MainTableData: React.FC<Props> = ({ product, defaultStatus, rfidCards, updateOrder, updateStatus }) => {
     const [pickedAmount, setPickedAmount] = useState<number | string>('');
     const { chosenStatus } = useSelector((state: State) => state.data);
 
@@ -38,7 +39,7 @@ const MainTableData: React.FC<Props> = ({ product, defaultStatus, updateOrder, u
             currentUserId: userId,
             _id: product._id,
             amountToDeliver: pickedAmount,
-            cards: ["777000"]
+            cards: rfidCards
         }
         await FetchData({ urlHost: url, urlPath: '/products/change_products_state', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
         updateOrder(product.state.nextState, pickedAmount);
