@@ -8,6 +8,8 @@ import Paper from '@mui/material/Paper';
 import { Role } from '../../Model';
 import FetchData from '../Components/Fetch';
 import Roles from './Roles';
+import Message from '../Components/Message';
+import MenuDialog from '../Components/MenuDialog';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -22,6 +24,8 @@ const SettingsRoles = () => {
     const [roles, setRoles] = useState<Role[]>([]);
     const [role, setRole] = useState<string>('');
     const [isDefault, setIsDefault] = useState<boolean>(false);
+    const [messageOpen, setMessageOpen] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const newRole = useRef<any>();
 
@@ -43,10 +47,10 @@ const SettingsRoles = () => {
     }, [])
 
     const updateRole = async () => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
         if (role === '') {
             if (newRole.current.value === '') return alert('Et voi luoda roolia jolla ei ole nimeä.');
-            let userId = localStorage.getItem('userId');
-            let url = process.env.REACT_APP_API_URL;
             let body = {
                 currentUserId: userId,
                 role: newRole.current.value,
@@ -54,10 +58,37 @@ const SettingsRoles = () => {
                 default: isDefault
             }
             const createRole = await FetchData({ urlHost: url, urlPath: '/roles/create_role', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
+            // If new value is default the older one needs to be flicked to false this is also done server side but should also be done here client side as well.
+            if (isDefault) {
+                setRoles(prevState => [...prevState.map((prev) => { return prev.default ? { ...prev, default: false } : prev })]);
+            }
             setRoles(prevState => [...prevState, createRole.result]);
-            setRole(createRole.result._id)
+            setRole(createRole.result._id);
+            setMessageOpen(true);
         } else {
+            if (newRole.current.value === '') return alert('Et voi jättää nimeä tyhjäksi.');
+            let body = [
+                {
+                    propName: 'role',
+                    value: newRole.current.value
+                },
+                {
+                    propName: 'rights',
+                    value: chosenPermissions
+                },
+                {
+                    propName: 'default',
+                    value: isDefault
+                },
+            ]
+            await FetchData({ urlHost: url, urlPath: '/roles/edit_role', urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: body, urlQuery: `?currentUserId=${userId}&currentRoleId=${role}` });
 
+            // If new value is default the older one needs to be flicked to false this is also done server side but should also be done here client side as well.
+            if (isDefault) {
+                setRoles(prevState => [...prevState.map((prev) => { return prev.default ? { ...prev, default: false } : prev })]);
+            }
+            setRoles(prevState => [...prevState.filter((prev) => { return prev._id !== role }), { _id: role, role: newRole.current.value, rights: chosenPermissions, default: isDefault }]);
+            setMessageOpen(true);
         }
     }
 
@@ -76,10 +107,6 @@ const SettingsRoles = () => {
         }
     }
 
-    useEffect(() => {
-        console.log(chosenPermissions)
-    }, [chosenPermissions])
-
     const addRole = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
             setChosenPermissions(prevState => [...prevState, e.target.value]);
@@ -90,11 +117,26 @@ const SettingsRoles = () => {
         }
     }
 
+    const deleteRole = async () => {
+        if (role === '') return alert('Sinun pitää valita poistettava rooli ensin');
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            _id: role
+        }
+        await FetchData({ urlHost: url, urlPath: '/roles/delete_role', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+        setRoles(prevState => [...prevState.filter((prev) => { return prev._id !== role })]);
+        setRole('');
+        newRole.current.value = '';
+        setChosenPermissions(['/auth/get_my_user_data'])
+    }
+
     return (
         <Grid container sx={{ width: '100%', padding: '10px' }} justifyContent={'center'} alignItems={'center'}>
             <Grid xs={12}>
                 <Item sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-                    <Box sx={{ maxWidth: '500px' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', maxWidth: '500px' }}>
                         <Box>
                             <Typography>
                                 {'Muokkaa roolia (Jätä tyhjäksi mikäli luot uutta roolia)'}
@@ -126,6 +168,7 @@ const SettingsRoles = () => {
                             label='Default'
                         />
                         <Button onClick={() => updateRole()}>{role === '' ? 'Luo rooli' : 'Päivitä roolia'}</Button>
+                        {role !== '' && <Button color='error' onClick={() => setIsOpen(true)}>{'Poista'}</Button>}
                     </Box>
                     <FormGroup>
                         {
@@ -158,6 +201,18 @@ const SettingsRoles = () => {
                     </FormGroup>
                 </Item>
             </Grid>
+            {
+                messageOpen
+                    ?
+                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={'Rooli'}>
+                        Rooli on luotu/päivitetty onnistuneesti.
+                    </Message>
+                    :
+                    null
+            }
+            <MenuDialog isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} result={() => deleteRole()} dialogTitle={'Haluatko poistaa tämän roolin?'} actions={true}>
+                {`Haluatko varmasti poistaa roolin ${newRole?.current?.value} (${role})? Mikäli poistat roolin sitä ei voida enää palauttaa ja käyttäjät joilla rooli oli, ei ole enää oikeuksia.`}
+            </MenuDialog>
         </Grid >
     )
 }
