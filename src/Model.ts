@@ -173,3 +173,12 @@ export interface TruckData {
     deliverydate: string;
     truck: Truck;
 }
+
+export interface Card {
+    _id: string;
+    cardAccount: string | null;
+    cardNumber: string;
+    cardOwner: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
