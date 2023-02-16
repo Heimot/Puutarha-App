@@ -24,6 +24,7 @@ import PrintIcon from '@mui/icons-material/Print';
 
 import './Main.css';
 import Printer from '../Printing/Printer';
+import MainRFID from './MainRFID';
 
 interface OrderUpdate {
     orderId: string;
@@ -62,6 +63,8 @@ const Main = () => {
     const [statusMove, setStatusMove] = useState<string>('');
     const [statusMoveOrder, setStatusMoveOrder] = useState<string>('');
     const [defaultStatus, setDefaultStatus] = useState<Status | null>(null);
+    const [isBlocked, setIsBlocked] = useState<boolean>(true);
+    const [RFIDCards, setRFIDCards] = useState<string[]>([]);
     const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord, statusSettings, personalSettings } = useSelector((state: State) => state.data);
 
 
@@ -435,6 +438,7 @@ const Main = () => {
                                                     key={product._id}
                                                     product={product}
                                                     defaultStatus={defaultStatus}
+                                                    rfidCards={RFIDCards}
                                                     updateOrder={(nextState, pickedAmount) => updatedSocketProduct(nextState, pickedAmount, order, product, 'state')}
                                                     updateStatus={(nextStatus) => updatedSocketProduct(nextStatus, 0, order, product, 'status')}
                                                 />
@@ -502,7 +506,7 @@ const Main = () => {
             {
                 printerOpen
                     ?
-                    <Printer isOpen={printerOpen} setIsOpen={(value) => setPrinterOpen(value)} stickers={stickers} setStickers={(value) => setStickers(value)} />
+                    <Printer isOpen={printerOpen} setIsOpen={(value) => setPrinterOpen(value)} stickers={stickers} setStickers={(value) => setStickers(value)} resetCards={() => { setRFIDCards([]); setIsBlocked(true); }} />
                     :
                     null
             }
@@ -512,6 +516,13 @@ const Main = () => {
                     <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => updateSocket(id, isCreator, method, date)} />
                     :
                     null
+            }
+            {
+                isBlocked
+                &&
+                !personalSettings?.disableRFIDScanning
+                &&
+                <MainRFID setIsBlocked={() => setIsBlocked(false)} rfidCards={(cards) => setRFIDCards(cards)} />
             }
         </Box >
     )
