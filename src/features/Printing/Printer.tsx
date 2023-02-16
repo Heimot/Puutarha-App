@@ -18,6 +18,7 @@ interface Props {
     setIsOpen: (value: boolean) => void;
     stickers: Stickers[],
     setStickers: (value: any) => void;
+    resetCards: () => void;
 }
 
 interface ImageData {
@@ -26,10 +27,9 @@ interface ImageData {
     imageID: string;
 }
 
-const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers }) => {
+const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, resetCards }) => {
     const [printableStickers, setPrintableStickers] = useState<Stickers[]>([]);
     const [chosenSticker, setChosenSticker] = useState<string>('');
-    const [testt, setTestt] = useState<ImageData[]>([]);
     const { pdfSettings } = useSelector((state: State) => state.data);
 
     const theme = useTheme();
@@ -161,6 +161,7 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers }) 
                 window.open(URL.createObjectURL(blob));
                 setStickers([]);
                 setPrintableStickers([]);
+                resetCards();
                 setIsOpen(false);
             })
     }
@@ -239,7 +240,7 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers }) 
                 {
                     chosenSticker !== ''
                         ?
-                        <Select style={{marginRight: 'auto'}} value={chosenSticker} onChange={(e) => setChosenSticker(e.target.value)}>
+                        <Select style={{ marginRight: 'auto' }} value={chosenSticker} onChange={(e) => setChosenSticker(e.target.value)}>
                             {
                                 pdfSettings.map((pdf: PDFData) => (
                                     <MenuItem value={pdf._id} key={pdf._id}>{pdf.PDFName}</MenuItem>
