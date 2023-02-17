@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import SettingsNav from './SettingsNav';
-import SettingsUsers from './SettingsUsers';
-import SettingsRoles from './SettingsRoles';
+import SettingsUsers from './Users/SettingsUsers';
+import SettingsRoles from './Roles/SettingsRoles';
 import { useTheme } from '@emotion/react';
+import SettingsRFID from './RFID/SettingsRFID';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -22,7 +23,7 @@ const Settings = () => {
         render = <SettingsRoles />;
         break;
       case 'rfid':
-
+        render = <SettingsRFID />
         break;
       case 'state':
 
