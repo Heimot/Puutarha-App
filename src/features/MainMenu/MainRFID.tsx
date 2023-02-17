@@ -70,7 +70,7 @@ const MainRFID: React.FC<Props> = ({ setIsBlocked, rfidCards }) => {
         <Backdrop open={true}>
             <Grid container flexDirection={'column'}>
                 <Box>
-                    <Typography variant='h3' sx={{ textAlign: 'center' }}>SCANNING</Typography>
+                    <Typography variant='h3' sx={{ textAlign: 'center' }}>Etsitään</Typography>
                 </Box>
                 <LinearProgress />
                 <Box sx={{ bgcolor: 'white', color: 'black', padding: '5px' }}>
@@ -79,7 +79,7 @@ const MainRFID: React.FC<Props> = ({ setIsBlocked, rfidCards }) => {
                     ))}
                 </Box>
                 <LinearProgress />
-                <Button variant='contained' onClick={() => readyNext()} disabled={users.length !== 0 ? false : true} style={{ marginTop: "10px", borderRadius: "5px", height: "30px" }}>USERS HAVE BEEN SCANNED</Button>
+                <Button variant='contained' onClick={() => readyNext()} disabled={users.length !== 0 ? false : true} style={{ marginTop: "10px", borderRadius: "5px", height: "30px" }}>Keräämään</Button>
             </Grid >
         </ Backdrop >
     )

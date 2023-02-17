@@ -66,27 +66,27 @@ const MainTableData: React.FC<Props> = ({ product, defaultStatus, rfidCards, upd
     return (
         <Tr
             onDoubleClick={() => { if (chosenStatus !== defaultStatus) { nextStatus(); } }}
-            style={!product.status.default && chosenStatus !== defaultStatus ? { backgroundColor: product.status.color, color: product.status.fontcolor } : null}
+            style={!product?.status?.default && chosenStatus !== defaultStatus ? { backgroundColor: product?.status?.color, color: product?.status?.fontcolor } : null}
         >
-            <Td style={borderStyle}>{product.flower.name}</Td>
-            <Td style={borderStyle}>{product.amount}</Td>
-            <Td style={borderStyle}>{product.location.location}</Td>
-            <Td style={borderStyle}>{product.information}</Td>
+            <Td style={borderStyle}>{product?.flower.name}</Td>
+            <Td style={borderStyle}>{product?.amount}</Td>
+            <Td style={borderStyle}>{product?.location.location}</Td>
+            <Td style={borderStyle}>{product?.information}</Td>
             <Td style={{ padding: '5px', ...borderStyle }}>
                 <Button
                     variant="contained"
                     size='small'
                     sx={{ fontSize: 15, whiteSpace: 'wrap', textTransform: 'none' }}
-                    style={{ maxWidth: '150px', minWidth: '150px', backgroundColor: product.state.color, color: product.state.fontcolor }}
+                    style={{ maxWidth: '150px', minWidth: '150px', backgroundColor: product?.state?.color, color: product?.state?.fontcolor }}
                     onClick={() => nextState()}
                 >
-                    {product.state.state}
+                    {product?.state?.state}
                 </Button>
             </Td>
             <Td style={borderStyle}>
                 <TextField
                     sx={{ padding: '5px' }}
-                    inputProps={!product.status.default && chosenStatus !== defaultStatus ? { style: { textAlign: 'center', color: product.status.fontcolor, borderRadius: '4px' } } : { style: { textAlign: 'center' } }}
+                    inputProps={!product?.status?.default && chosenStatus !== defaultStatus ? { style: { textAlign: 'center', color: product?.status?.fontcolor, borderRadius: '4px' } } : { style: { textAlign: 'center' } }}
                     type="number"
                     value={pickedAmount}
                     onBlur={isEmpty}

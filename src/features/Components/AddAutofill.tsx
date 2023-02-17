@@ -42,7 +42,6 @@ const AddAutofill: React.FC<Props> = ({ isOpen, setIsOpen, usedGroup, updateText
         }
 
         const data = await FetchData({ urlHost: url, urlPath: '/names/create_name', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
-        console.log(data)
         if (!data?.result) return;
         if (group === 'Flowers') {
             setFlowers([...flowerSettings, data.result]);

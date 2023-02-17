@@ -151,7 +151,35 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
                 Uusi tilaus
                 <IconButton
                     aria-label="close"
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={() => {
+                        setIsOpen(!isOpen); setNewOrder({
+                            _id: Date.now().toString(),
+                            store: {
+                                _id: '',
+                                name: 'default',
+                                group: 'Stores'
+                            },
+                            information: '',
+                            pickingdate: new Date(),
+                            deliverydate: new Date(),
+                            ordercode: '',
+                            products: [],
+                            status: {
+                                _id: '',
+                                status: '',
+                                color: '',
+                                fontcolor: '',
+                                default: false,
+                                nextStatus: ''
+                            },
+                            roller: {
+                                _id: '',
+                                roller: '',
+                                lockColor: '',
+                                default: false
+                            }
+                        })
+                    }}
                     sx={{
                         position: 'absolute',
                         right: 8,
@@ -163,7 +191,7 @@ const AddDialog: React.FC<Props> = ({ setIsOpen, isOpen }) => {
                 </IconButton>
             </DialogTitle>
             <DialogContent dividers>
-                <EditTable setOrderData={(value, name) => setNewOrder({ ...newOrder, [name]: value })} orderData={newOrder} updateData={(value) => setNewOrder(value)} />
+                <EditTable setOrderData={(value, name) => setNewOrder({ ...newOrder, [name]: value })} orderData={newOrder} updateData={(value) => setNewOrder(value)} isCreated={false} />
             </DialogContent>
             <DialogActions>
                 <Button startIcon={<AddIcon />} onClick={() => addProduct()}>Lisää tuote</Button>
