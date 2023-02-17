@@ -7,19 +7,24 @@ import { State } from '../../app/redux/store';
 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+
 import { useTheme } from '@mui/material/styles';
 import AddAutofill from './AddAutofill';
+import ProductLogs from './ProductLogs';
 
 interface Props {
     product: Products;
     updateProducts: (value: any, name: string, productId: string) => void;
     deleteProduct: (productId: string) => void;
+    isCreated: boolean;
 }
 
-const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProduct }) => {
+const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProduct, isCreated }) => {
     const [amount, setAmount] = useState<number | string>(0);
     const [information, setInformation] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const { locationSettings, flowerSettings } = useSelector((state: State) => state.data);
 
     const defaultFilterOptions = createFilterOptions<Flower>();
@@ -90,12 +95,24 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
             <Td style={borderStyle}>
                 <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
                     <TextField name='information' fullWidth value={information} onChange={(e) => setInformation(e.target.value)} />
+                    {
+                        isCreated
+                        &&
+                        <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                            <ListAltIcon fontSize='large' />
+                        </Button>
+                    }
                     <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteProduct(product._id)}>
                         <DeleteIcon fontSize='large' />
                     </Button>
                 </Box>
             </Td>
             <AddAutofill isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} usedGroup='Flowers' updateText={(value) => updateProducts(value, 'flower', product._id)} />
+            {
+                isMenuOpen
+                &&
+                <ProductLogs setIsOpen={(value) => setIsMenuOpen(value)} isOpen={isMenuOpen} product={product} />
+            }
         </Tr>
     )
 }
