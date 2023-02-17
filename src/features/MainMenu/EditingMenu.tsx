@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -15,8 +15,8 @@ interface Props {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     editData: Order | any;
-    setEditData: (value: Order) => void;
-    dataSaved: (id: string, isEditor: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => void;
+    setEditData: (value: Order | null) => void;
+    dataSaved: (id: string, isEditor: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => void;
 }
 
 const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData, dataSaved }) => {
@@ -77,7 +77,7 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         await FetchData({ urlHost: url, urlPath: '/orders/edit_order', urlQuery: `?currentUserId=${userId}&currentOrderId=${editData._id}`, urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: updateBody });
-        dataSaved(editData._id, true, 'PATCH', editData.pickingdate);
+        dataSaved(editData._id, true, 'PATCH', editData.pickingdate, undefined);
     }
 
     const addProduct = () => {
@@ -122,7 +122,7 @@ const EditingMenu: React.FC<Props> = ({ isOpen, setIsOpen, editData, setEditData
                 </IconButton>
             </DialogTitle>
             <DialogContent dividers>
-                <EditTable setOrderData={(value, name) => setEditData({ ...editData, [name]: value })} orderData={editData} updateData={(value) => setEditData(value)} />
+                <EditTable setOrderData={(value, name) => setEditData({ ...editData, [name]: value })} orderData={editData} updateData={(value) => setEditData(value)} isCreated={true} removeProduct={(id: string, isEditor: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => dataSaved(id, isEditor, method, date, productId)} />
             </DialogContent>
             <DialogActions>
                 <Button startIcon={<AddIcon />} onClick={() => addProduct()}>Lisää tuote</Button>

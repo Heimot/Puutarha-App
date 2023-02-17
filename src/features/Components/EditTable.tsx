@@ -20,14 +20,18 @@ interface Props {
     orderData: any;
     setOrderData: (value: any, name: string) => void;
     updateData: (value: any) => void;
+    isCreated: boolean;
+    removeProduct?: (id: string, isEditor: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => void;
 }
 
-const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => {
+const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCreated, removeProduct }) => {
     const [orderCode, setOrderCode] = useState<string>('');
     const [information, setInformation] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roller, setRoller] = useState<Roller | null>(null);
+
     const theme = useTheme();
+
     const { locationSettings, storeSettings, rollerSettings } = useSelector((state: State) => state.data);
 
     const defaultFilterOptions = createFilterOptions<Store>();
@@ -107,6 +111,10 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
             orderId: orderData._id
         }
         await FetchData({ urlHost: url, urlPath: '/products/delete_product', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+        if (isCreated) {
+            if (!removeProduct) return;
+            removeProduct(orderData._id, false, 'DELETEPRODUCT', orderData.pickingdate, productId);
+        }
     }
 
     const updateRoller = (e: any) => {
@@ -166,7 +174,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
                                     onChange={(e, value) => setOrderData(value, 'store')}
                                     options={storeSettings}
                                     getOptionLabel={(option: Store) => option.name}
-                                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                                    isOptionEqualToValue={(option, value) => option?._id === value?._id}
                                     sx={{ maxWidth: 300 }}
                                     noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => setIsOpen(true)}>Luo uusi?</Button>}
                                     includeInputInList
@@ -222,7 +230,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData }) => 
                 <Tbody>
                     {
                         orderData?.products.map((product: any) =>
-                            <EditingMenuData key={product._id} product={product} updateProducts={(value, name, productId) => updateProducts(value, name, productId)} deleteProduct={(productId) => deleteProduct(productId)} />
+                            <EditingMenuData key={product._id} product={product} updateProducts={(value, name, productId) => updateProducts(value, name, productId)} deleteProduct={(productId) => deleteProduct(productId)} isCreated={isCreated} />
                         )
                     }
                 </Tbody>

@@ -30,6 +30,7 @@ interface OrderUpdate {
     orderId: string;
     pickingDate: Date;
     method: 'DELETE' | 'POST' | 'PATCH';
+    productId: string | undefined;
 }
 
 interface ProductUpdate {
@@ -78,7 +79,7 @@ const Main = () => {
      */
     useEffect(() => {
         const orderUpdate = (value: OrderUpdate) => {
-            updateOrder(value.orderId, false, value.method, value.pickingDate);
+            updateOrder(value.orderId, false, value.method, value.pickingDate, value.productId);
         }
 
         const productUpdate = (value: ProductUpdate) => {
@@ -100,7 +101,7 @@ const Main = () => {
      */
     useEffect(() => {
         if (updatePacket.date === null && updatePacket._id === null) return;
-        updateSocket(updatePacket._id, false, 'POST', updatePacket.date);
+        updateSocket(updatePacket._id, false, 'POST', updatePacket.date, undefined);
         setUpdatePacket('');
     }, [updatePacket])
 
@@ -275,7 +276,7 @@ const Main = () => {
             _id: orderId
         };
         await FetchData({ urlHost: url, urlPath: '/orders/delete_order', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: bodyData });
-        updateSocket(orderId, false, 'DELETE', chosenDate);
+        updateSocket(orderId, false, 'DELETE', chosenDate, undefined);
     }
 
     /**
@@ -286,14 +287,15 @@ const Main = () => {
      * @param date This tells the date you've edited the order in.
      * @returns Calls updateOrder function to update the current order.
      */
-    const updateSocket = (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => {
+    const updateSocket = (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => {
         if (!socket) return;
         socket.emit('update-order', {
             orderId: id,
             pickingDate: date,
-            method: method
+            method: method,
+            productId: productId
         })
-        updateOrder(id, isCreator, method, date);
+        updateOrder(id, isCreator, method, date, productId);
     }
 
     /**
@@ -306,7 +308,7 @@ const Main = () => {
      * @returns Returns new edited/added/removed order data
      */
 
-    const updateOrder = async (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => {
+    const updateOrder = async (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => {
         if (!id) return;
         if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) return;
         let userId = localStorage.getItem('userId');
@@ -338,14 +340,29 @@ const Main = () => {
                 })
                 break;
             case 'POST':
-                data = [...orders, newData.result[0]];
+                data = [...orders, newData.result];
                 break;
             case 'PATCH':
                 data = orders.map((order) => {
                     return order._id === id
-                        ? newData.result[0]
+                        ? newData.result
                         : order;
                 })
+                break;
+            case 'DELETEPRODUCT':
+                data = orders.map((order) => {
+                    return order._id === id
+                        ?
+                        {
+                            ...order,
+                            products: order.products.filter((product) => {
+                                return product._id !== productId
+                            })
+                        }
+                        :
+                        order;
+                })
+                console.log(data)
                 break;
             default:
                 console.log('No method chosen');
@@ -371,7 +388,7 @@ const Main = () => {
             location: chosenLocation
         }
         await FetchData({ urlHost: url, urlPath: '/statuslocation/create_status_location', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
-        updateSocket(statusMoveOrder, true, 'PATCH', chosenDate);
+        updateSocket(statusMoveOrder, true, 'PATCH', chosenDate, undefined);
         setStatusOpen(false);
         setStatusMoveOrder('');
     }
@@ -513,7 +530,7 @@ const Main = () => {
             {
                 isOpen
                     ?
-                    <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH', date: Date) => updateSocket(id, isCreator, method, date)} />
+                    <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => updateSocket(id, isCreator, method, date, productId)} />
                     :
                     null
             }
