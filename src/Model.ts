@@ -48,6 +48,7 @@ export interface State {
     fontcolor: string;
     default: boolean;
     nextState: string;
+    stickerPoint: boolean;
 }
 
 export interface Location {
