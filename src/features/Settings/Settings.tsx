@@ -6,6 +6,7 @@ import SettingsUsers from './Users/SettingsUsers';
 import SettingsRoles from './Roles/SettingsRoles';
 import { useTheme } from '@emotion/react';
 import SettingsRFID from './RFID/SettingsRFID';
+import SettingsState from './SettingsState.tsx/SettingsState';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -26,7 +27,7 @@ const Settings = () => {
         render = <SettingsRFID />
         break;
       case 'state':
-
+        render = <SettingsState />
         break;
       case 'status':
 
