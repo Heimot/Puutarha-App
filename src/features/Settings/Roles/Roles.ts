@@ -114,6 +114,7 @@ const Roles: Role[] = [
         permissions: [
             { path: '/names/get_names', label: 'Voi hakea kaikki kaupat ja kukat' },
             { path: '/names/get_names_with_group', label: 'Voi hakea joko kaupat tai kukat' },
+            { path: '/names/get_group_search', label: 'Voi hakea kaupat ja kukat autotäyttöön' },
             { path: '/names/create_name', label: 'Voi luoda uusia kukkia tai kauppoja' },
             { path: '/names/edit_name', label: 'Voi muokata kukkia tai kauppoja' },
             { path: '/names/delete_name', label: 'Voi poistaa kukkia tai kauppoja' }
