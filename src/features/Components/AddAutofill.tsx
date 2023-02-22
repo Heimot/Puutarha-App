@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, TextField, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-import { useSelector, useDispatch } from 'react-redux';
-import { State } from '../../app/redux/store';
-import { bindActionCreators } from '@reduxjs/toolkit';
-import * as actionCreators from '../../app/redux/actions';
 
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
@@ -27,10 +23,6 @@ const GridStyles = {
 const AddAutofill: React.FC<Props> = ({ isOpen, setIsOpen, usedGroup, updateText }) => {
     const [name, setName] = useState<string>('');
     const [group, setGroup] = useState<'Flowers' | 'Stores'>(usedGroup);
-    const { flowerSettings, storeSettings } = useSelector((state: State) => state.data);
-
-    const dispatch = useDispatch();
-    const { setFlowers, setStores } = bindActionCreators(actionCreators, dispatch);
 
     const AddAutofill = async () => {
         let userId = localStorage.getItem('userId');
@@ -44,10 +36,8 @@ const AddAutofill: React.FC<Props> = ({ isOpen, setIsOpen, usedGroup, updateText
         const data = await FetchData({ urlHost: url, urlPath: '/names/create_name', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
         if (!data?.result) return;
         if (group === 'Flowers') {
-            setFlowers([...flowerSettings, data.result]);
             updateText(data.result);
         } else {
-            setStores([...storeSettings, data.result]);
             updateText(data.result);
         }
         setName('');
