@@ -148,8 +148,8 @@ const SettingsStateTable: React.FC<Props> = ({ newCard }) => {
             {
                 messageOpen
                     ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='RFID kortti'>
-                        Kortti on päivitetty.
+                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Tuotteen tila'>
+                        Tuotteen tila on päivitetty.
                     </Message>
                     :
                     null
