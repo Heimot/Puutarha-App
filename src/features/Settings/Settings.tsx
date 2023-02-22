@@ -6,7 +6,10 @@ import SettingsUsers from './Users/SettingsUsers';
 import SettingsRoles from './Roles/SettingsRoles';
 import { useTheme } from '@emotion/react';
 import SettingsRFID from './RFID/SettingsRFID';
-import SettingsState from './SettingsState.tsx/SettingsState';
+import SettingsState from './SettingsState/SettingsState';
+import SettingsStatus from './SettingsStatus/SettingsStatus';
+import SettingsNames from './SettingsNames/SettingsNames';
+import SettingsLocation from './SettingsLocations/SettingsLocation';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -30,13 +33,13 @@ const Settings = () => {
         render = <SettingsState />
         break;
       case 'status':
-
+        render = <SettingsStatus />
         break;
       case 'location':
-
+        render = <SettingsLocation />
         break;
       case 'autofill':
-
+        render = <SettingsNames />
         break;
       case 'stickers':
 
