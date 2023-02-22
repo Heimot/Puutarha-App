@@ -29,20 +29,6 @@ export const setLocation = (locationSettings: any) => (dispatch: Dispatch<Action
   });
 };
 
-export const setFlowers = (flowerSettings: any) => (dispatch: Dispatch<Action>) => {
-  dispatch({
-    type: ActionType.FlowerSettings,
-    payload: flowerSettings
-  });
-};
-
-export const setStores = (storeSettings: any) => (dispatch: Dispatch<Action>) => {
-  dispatch({
-    type: ActionType.StoreSettings,
-    payload: storeSettings
-  });
-};
-
 export const setPDF = (pdfSettings: any) => (dispatch: Dispatch<Action>) => {
   dispatch({
     type: ActionType.PDFSettings,

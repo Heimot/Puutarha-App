@@ -40,7 +40,7 @@ const App = () => {
   const [mode, setMode] = useState<'light' | 'dark'>('light');
 
   const dispatch = useDispatch();
-  const { setUserData, setStatus, setState, setLocation, setFlowers, setStores, setPDF, setChosenMode, setPersonalSettings, setRoller } = bindActionCreators(actionCreators, dispatch);
+  const { setUserData, setStatus, setState, setLocation, setPDF, setChosenMode, setPersonalSettings, setRoller } = bindActionCreators(actionCreators, dispatch);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,8 +104,6 @@ const App = () => {
         setStatus(applicationSettings.status);
         setState(applicationSettings.state);
         setLocation(applicationSettings.location);
-        setFlowers(applicationSettings.flowers);
-        setStores(applicationSettings.stores);
         setPDF(applicationSettings.pdf);
         setRoller(applicationSettings.rollers);
         setPersonalSettings(applicationSettings.personalSettings);
