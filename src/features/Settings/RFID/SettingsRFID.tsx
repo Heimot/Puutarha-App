@@ -57,7 +57,6 @@ const SettingsRFID = () => {
         }
 
         const createRFID = await FetchData({ urlHost: url, urlPath: '/card/add_card', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
-        console.log(createRFID)
         setCreatedRFID(createRFID.result);
         if (createRFID?.result) {
             setMessage({ title: 'RFID käyttäjä lisätty.', message: 'Käyttäjä on luotu onnistuneesti.' });
@@ -79,7 +78,6 @@ const SettingsRFID = () => {
                         </Typography>
                         <TextField value={cardOwner} onChange={(e) => setCardOwner(e.target.value)} sx={{ margin: '10px 0 5px 0' }} label='Nimi' />
                         <TextField value={cardNumber} onChange={(e) => setUsername(e.target.value)} sx={{ margin: '5px 0 5px 0' }} label='Kortti' />
-                        <Typography sx={{ fontSize: '10px' }}></Typography>
                         <FormControl sx={{ margin: '5px 0 5px 0' }}>
                             <InputLabel id='RFIDUSER_ID'>Käyttäjä (EI PAKOLLINEN)</InputLabel>
                             <Select value={user} onChange={(e) => setUser(e.target.value)} labelId='RFIDUSER_ID' label='Käyttäjä (EI PAKOLLINEN)'>
