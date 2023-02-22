@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Flower, Products } from '../../Model'
 import { Tr, Td } from 'react-super-responsive-table'
-import { Button, TextField, Select, MenuItem, Box, Autocomplete, createFilterOptions, FilterOptionsState, Dialog } from '@mui/material';
+import { Button, TextField, Select, MenuItem, Box, Autocomplete, CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
 
@@ -25,12 +25,13 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
     const [information, setInformation] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const { locationSettings, flowerSettings } = useSelector((state: State) => state.data);
 
-    const defaultFilterOptions = createFilterOptions<Flower>();
-    const filterOptions = (options: Flower[], state: FilterOptionsState<Flower>) => {
-        return defaultFilterOptions(options, state).slice(0, 10);
-    }
+    const [loading, setLoading] = useState<boolean>(false);
+    const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
+    const [options, setOptions] = useState<Flower[]>([]);
+    const prevController = useRef<any>();
+
+    const { locationSettings } = useSelector((state: State) => state.data);
 
     const theme = useTheme();
 
@@ -63,30 +64,90 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
         }
     }
 
+    const getData = (search: string) => {
+        if (prevController.current) {
+            prevController.current.abort();
+        }
+        let userId = localStorage.getItem('userId');
+        const controller = new AbortController();
+        const signal = controller.signal;
+        prevController.current = controller;
+        fetch(`${process.env.REACT_APP_API_URL}/names/get_group_search?currentUserId=${userId}&group=Flowers&name=${search}`, {
+            signal,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then((response) => response.json())
+            .then((res) => {
+                setOptions(res.result);
+                setLoading(false);
+            })
+    }
+
+    const onInputChange = (e: any, value: string, reason: any) => {
+        if (value && value.length >= 3) {
+            if (reason === 'input') {
+                setOptionsOpen(true);
+            }
+            setLoading(true);
+            getData(value);
+        } else {
+            setOptionsOpen(false);
+            setOptions([]);
+        }
+    }
+
+    useEffect(() => {
+        if (!optionsOpen) {
+            setOptions([]);
+        }
+    }, [optionsOpen])
+
     return (
         <Tr>
-            <Td style={borderStyle}>
+            <Td style={{ ...borderStyle, minWidth: '200px' }}>
                 <Autocomplete
                     id="flower-auto"
+                    open={optionsOpen}
+                    onClose={() => setOptionsOpen(false)}
+                    loading={loading}
+                    loadingText='Etsitään...'
                     value={product?.flower}
-                    filterOptions={filterOptions}
                     onChange={valueChosen}
-                    options={flowerSettings}
+                    onInputChange={(e, value, reason) => onInputChange(e, value, reason)}
+                    options={options}
                     getOptionLabel={(option: Flower) => option.name}
                     isOptionEqualToValue={(option, value) => option._id === value._id}
                     noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => setIsOpen(true)}>Luo uusi?</Button>}
                     includeInputInList
                     disableClearable
-                    renderInput={(params) => (
-                        <TextField {...params} />
-                    )}
+                    renderInput={(params) => {
+                        const inputPropsValue = params?.inputProps?.value as string;
+                        return (
+                            <TextField
+                                {...params}
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <React.Fragment>
+                                            {loading && params?.inputProps?.value && inputPropsValue.length >= 3 ? <CircularProgress color="inherit" size={20} /> : null}
+                                            {params.InputProps.endAdornment}
+                                        </React.Fragment>
+                                    )
+                                }}
+                            />
+                        )
+                    }}
                 />
             </Td>
             <Td style={borderStyle}>
-                <TextField name='amount' type="number" sx={{ width: "100%" }} value={amount} onBlur={isEmpty} onChange={(e) => setAmount(e.target.value)} />
+                <TextField name='amount' type="number" fullWidth value={amount} onBlur={isEmpty} onChange={(e) => setAmount(e.target.value)} />
             </Td>
             <Td style={borderStyle}>
-                <Select name='location' sx={{ width: "100%" }} value={product.location._id} onChange={(e) => updateProducts(e.target.value, e.target.name, product._id)}>
+                <Select name='location' fullWidth value={product.location._id} onChange={(e) => updateProducts(e.target.value, e.target.name, product._id)}>
                     {locationSettings.map((location: any) =>
                         <MenuItem key={location._id} value={location._id}>{location.location}</MenuItem>
                     )}

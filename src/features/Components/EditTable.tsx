@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Button, TextField, Box, Autocomplete, createFilterOptions, FilterOptionsState, useTheme, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react'
+import { Button, TextField, Box, Autocomplete, useTheme, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
@@ -30,14 +30,14 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roller, setRoller] = useState<Roller | null>(null);
 
+    const [loading, setLoading] = useState<boolean>(false);
+    const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
+    const [options, setOptions] = useState<Store[]>([]);
+    const prevController = useRef<any>();
+
     const theme = useTheme();
 
-    const { locationSettings, storeSettings, rollerSettings } = useSelector((state: State) => state.data);
-
-    const defaultFilterOptions = createFilterOptions<Store>();
-    const filterOptions = (options: Store[], state: FilterOptionsState<Store>) => {
-        return defaultFilterOptions(options, state).slice(0, 10);
-    }
+    const { locationSettings, rollerSettings } = useSelector((state: State) => state.data);
 
     useEffect(() => {
         setOrderCode(orderData.ordercode);
@@ -124,6 +124,48 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
         setRoller(filteredRoller[0]);
     }
 
+    const getData = (search: string) => {
+        if (prevController.current) {
+            prevController.current.abort();
+        }
+        let userId = localStorage.getItem('userId');
+        const controller = new AbortController();
+        const signal = controller.signal;
+        prevController.current = controller;
+        fetch(`${process.env.REACT_APP_API_URL}/names/get_group_search?currentUserId=${userId}&group=Stores&name=${search}`, {
+            signal,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then((response) => response.json())
+            .then((res) => {
+                setOptions(res.result);
+                setLoading(false);
+            })
+    }
+
+    const onInputChange = (e: any, value: string, reason: any) => {
+        if (value && value.length >= 3) {
+            if (reason === 'input') {
+                setOptionsOpen(true);
+            }
+            setLoading(true);
+            getData(value);
+        } else {
+            setOptionsOpen(false);
+            setOptions([]);
+        }
+    }
+
+    useEffect(() => {
+        if (!optionsOpen) {
+            setOptions([]);
+        }
+    }, [optionsOpen])
+
     return (
         <div>
             <Grid container xs={12}>
@@ -166,22 +208,41 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
                     </Box>
                     <Box sx={{ margin: '10px 0 10px 0' }}>
                         {
-                            orderData?.store !== null && storeSettings !== null ?
+                            orderData?.store !== null ?
                                 <Autocomplete
                                     id="store-auto"
+                                    open={optionsOpen}
+                                    onClose={() => setOptionsOpen(false)}
+                                    loading={loading}
+                                    loadingText='Etsitään...'
                                     value={orderData?.store}
-                                    filterOptions={filterOptions}
                                     onChange={(e, value) => setOrderData(value, 'store')}
-                                    options={storeSettings}
+                                    onInputChange={(e, value, reason) => onInputChange(e, value, reason)}
+                                    options={options}
                                     getOptionLabel={(option: Store) => option.name}
                                     isOptionEqualToValue={(option, value) => option?._id === value?._id}
                                     sx={{ maxWidth: 300 }}
                                     noOptionsText={<Button startIcon={<AddIcon />} style={{ width: '100%' }} onClick={() => setIsOpen(true)}>Luo uusi?</Button>}
                                     includeInputInList
                                     disableClearable
-                                    renderInput={(params) => (
-                                        <TextField {...params} label="Kauppa" />
-                                    )}
+                                    renderInput={(params) => {
+                                        const inputPropsValue = params?.inputProps?.value as string;
+                                        return (
+                                            <TextField
+                                                {...params}
+                                                label="Kauppa"
+                                                InputProps={{
+                                                    ...params.InputProps,
+                                                    endAdornment: (
+                                                        <React.Fragment>
+                                                            {loading && params?.inputProps?.value && inputPropsValue.length >= 3 ? <CircularProgress color="inherit" size={20} /> : null}
+                                                            {params.InputProps.endAdornment}
+                                                        </React.Fragment>
+                                                    )
+                                                }}
+                                            />
+                                        )
+                                    }}
                                 />
                                 : null
                         }
