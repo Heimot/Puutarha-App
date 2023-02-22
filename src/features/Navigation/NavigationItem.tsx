@@ -124,7 +124,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                     return location._id === nextId;
                 })[0];
                 locationSettingsOrder[i] = defaultLocation;
-                nextId = defaultLocation.nextLocation;
+                nextId = defaultLocation?.nextLocation;
             }
         }
         setLocationOrder(locationSettingsOrder);
@@ -201,11 +201,11 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                                                 text === "Tilanne"
                                                     ?
                                                     statusOrder?.map((status: Status) => (
-                                                        <MenuItem key={status._id} value={status._id}>{status.status}</MenuItem>
+                                                        <MenuItem key={status?._id} value={status?._id}>{status?.status}</MenuItem>
                                                     ))
                                                     :
                                                     locationOrder?.map((location: Location) => (
-                                                        <MenuItem key={location._id} value={location._id}>{location.location}</MenuItem>
+                                                        <MenuItem key={location?._id} value={location?._id}>{location?.location}</MenuItem>
                                                     ))
                                             }
                                         </Select>
