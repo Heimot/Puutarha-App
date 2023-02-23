@@ -94,11 +94,12 @@ export interface PropData {
 }
 
 export interface PDFData {
+    [key: string]: any;
     _id: string;
     PDFName: string;
-    width: Number;
-    height: Number;
-    pageLayout: string;
+    width: number;
+    height: number;
+    pageLayout: 'Landscape' | 'Portrait';
     stickerDefault: boolean;
     orderDefault: boolean;
     data: [string];
@@ -109,6 +110,7 @@ export interface PDFData {
 }
 
 export interface PDFText {
+    [key: string]: any;
     _id: string;
     text: string;
     font: string;
@@ -121,6 +123,7 @@ export interface PDFText {
 }
 
 export interface PDFImage {
+    [key: string]: any;
     _id: string;
     imageURL: string;
     height: number;
@@ -182,4 +185,20 @@ export interface Card {
     cardOwner: string;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface Fonts {
+    [key: string]: any;
+    name: string;
+    fontTypes: Object;
+}
+
+export interface GetFonts {
+    [key: string]: string[];
+}
+
+export interface ImageData {
+    _id: string;
+    image: string;
+    imageID: string;
 }
