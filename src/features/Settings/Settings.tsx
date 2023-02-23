@@ -10,6 +10,7 @@ import SettingsState from './SettingsState/SettingsState';
 import SettingsStatus from './SettingsStatus/SettingsStatus';
 import SettingsNames from './SettingsNames/SettingsNames';
 import SettingsLocation from './SettingsLocations/SettingsLocation';
+import SettingsPDF from './SettingsPDF/SettingsPDF';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -42,7 +43,7 @@ const Settings = () => {
         render = <SettingsNames />
         break;
       case 'stickers':
-
+        render = <SettingsPDF />
         break;
       case 'logs':
 
