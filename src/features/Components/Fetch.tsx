@@ -5,13 +5,14 @@ interface Props {
     urlMethod: string;
     urlHeaders: string;
     urlBody?: Object;
+    urlFormData?: FormData;
 }
 
-const FetchData = async ({ urlHost, urlPath, urlQuery, urlMethod, urlHeaders, urlBody }: Props) => {
+const FetchData = async ({ urlHost, urlPath, urlQuery, urlMethod, urlHeaders, urlBody, urlFormData }: Props) => {
     let uq = urlQuery;
     if (uq === undefined) uq = '';
     let url = urlHost + urlPath + uq;
-    let body = JSON.stringify(urlBody);
+    let body: string | FormData = JSON.stringify(urlBody);
     let headersData = {};
     if (urlHeaders === "NoAuth") {
         headersData = {
@@ -22,6 +23,13 @@ const FetchData = async ({ urlHost, urlPath, urlQuery, urlMethod, urlHeaders, ur
         headersData = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+    }
+
+    if (urlFormData) {
+        body = urlFormData;
+        headersData = {
             'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
     }
