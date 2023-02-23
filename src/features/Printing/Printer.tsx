@@ -8,7 +8,7 @@ import { State } from '../../app/redux/store';
 import CloseIcon from '@mui/icons-material/Close';
 import PrintIcon from '@mui/icons-material/Print';
 
-import { Stickers, PDFData, PDFImage, PDFText } from '../../Model';
+import { Stickers, PDFData, PDFImage, PDFText, ImageData } from '../../Model';
 import { useTheme } from '@mui/material/styles';
 import PrinterData from './PrinterData';
 import dayjs from 'dayjs';
@@ -19,12 +19,6 @@ interface Props {
     stickers: Stickers[],
     setStickers: (value: any) => void;
     resetCards: () => void;
-}
-
-interface ImageData {
-    _id: string;
-    image: string;
-    imageID: string;
 }
 
 const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, resetCards }) => {
@@ -61,8 +55,13 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
             callback(dataURL); // the base64 string
         };
 
+        // incase image has been deleted dont show anything.
+        img.onerror = () => {
+            callback(null);
+        }
+
         // set attributes and src 
-        img.crossOrigin = ''; //
+        img.crossOrigin = '';
         img.src = imgUrl;
     }
 
@@ -83,18 +82,29 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
 
         let baseImagePromises = pdfData?.PDFImage.map((image: PDFImage) => new Promise((resolve, reject) => {
             if (imageRef.length > 0) {
-                console.log(imageRef)
                 let exists = imageRef?.filter((item: ImageData) => {
                     return item.imageID === image.imageURL;
                 });
                 if (exists.length <= 0) {
-                    imageToBase64(`http://localhost:5000/files/get_image_by_id?_id=${image.imageURL}&auth=${localStorage.getItem('token')}&currentUserId=${localStorage.getItem('userId')}`, function (base64image: string) {
-                        resolve({ _id: image._id, image: base64image, imageID: image.imageURL });
+                    imageToBase64(`${process.env.REACT_APP_API_URL}/files/get_image_by_id?id=${image.imageURL}&auth=${localStorage.getItem('token')}&currentUserId=${localStorage.getItem('userId')}`, function (base64image: string) {
+                        if (base64image) {
+                            resolve({ _id: image._id, image: base64image, imageID: image.imageURL });
+                        } else {
+                            // It will return empty base64image here if image doesnt exist or fails to fetch for some reason
+                            // Otherwise it wont show the text data
+                            resolve({ _id: image._id, image: base64image, imageID: image.imageURL });
+                        }
                     });
                 }
             } else {
-                imageToBase64(`http://localhost:5000/files/get_image_by_id?_id=${image.imageURL}&auth=${localStorage.getItem('token')}&currentUserId=${localStorage.getItem('userId')}`, function (base64image: string) {
-                    resolve({ _id: image._id, image: base64image, imageID: image.imageURL });
+                imageToBase64(`${process.env.REACT_APP_API_URL}/files/get_image_by_id?id=${image.imageURL}&auth=${localStorage.getItem('token')}&currentUserId=${localStorage.getItem('userId')}`, function (base64image: string) {
+                    if (base64image) {
+                        resolve({ _id: image._id, image: base64image, imageID: image.imageURL });
+                    } else {
+                        // It will return empty base64image here if image doesnt exist or fails to fetch for some reason
+                        // Otherwise it wont show the text data
+                        resolve({ _id: image._id, image: base64image, imageID: image.imageURL });
+                    }
                 });
             }
         }))
@@ -149,6 +159,7 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
                         let docImage = imageRef.filter((img) => {
                             return img.imageID === image.imageURL;
                         })[0];
+                        if (!docImage?.image) return;
                         doc.addImage(docImage.image, "", Number(image.xPosition), Number(image.yPosition), Number(image.width), Number(image.height));
                     })
                     if ((printableStickers.length - 1) > i) {
