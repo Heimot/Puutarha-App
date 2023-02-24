@@ -10,6 +10,7 @@ import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FetchData from '../../Components/Fetch';
 import dayjs from 'dayjs';
+import MenuDialog from '../../Components/MenuDialog';
 
 interface Props {
     isOpen: boolean;
@@ -27,7 +28,9 @@ interface Images {
 }
 
 const SettingsPDFImageTable: React.FC<Props> = ({ isOpen, setIsOpen, chooseImage }) => {
-    const [images, setImages] = useState<Images[]>([])
+    const [images, setImages] = useState<Images[]>([]);
+    const [deletionId, setDeletionId] = useState<string>('');
+    const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -65,6 +68,7 @@ const SettingsPDFImageTable: React.FC<Props> = ({ isOpen, setIsOpen, chooseImage
         let url = process.env.REACT_APP_API_URL;
         const files = await FetchData({ urlHost: url, urlPath: '/files/upload', urlMethod: 'POST', urlHeaders: 'Auth', urlFormData: formData, urlQuery: `?currentUserId=${userId}` });
         setImages(prevState => [...prevState, { _id: files.file.id, filename: files.file.filename, contentType: files.file.contentType, chunkSize: files.file.chunkSize, length: files.file.length, uploadDate: files.file.uploadDate }]);
+        (e.target as any).value = null
     }
 
     const deleteImage = async (_id: string) => {
@@ -128,7 +132,7 @@ const SettingsPDFImageTable: React.FC<Props> = ({ isOpen, setIsOpen, chooseImage
                                                 sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
                                                 aria-label={`Delete image ${item.filename}`}
                                                 component='label'
-                                                onClick={() => { deleteImage(item._id) }}
+                                                onClick={() => { setDeletionId(item._id); setIsDeleteOpen(true); }}
                                             >
                                                 <DeleteIcon />
                                             </IconButton>
@@ -169,6 +173,9 @@ const SettingsPDFImageTable: React.FC<Props> = ({ isOpen, setIsOpen, chooseImage
                     Save changes
                 </Button>
             </DialogActions>
+            <MenuDialog isOpen={isDeleteOpen} setIsOpen={(value: boolean) => setIsDeleteOpen(value)} result={() => deleteImage(deletionId)} dialogTitle={'Haluatko poistaa tämän kuvan?'} actions={true}>
+                {`Haluatko varmasti tämän kuvan? Mikäli poistat sitä ei voida enää palauttaa.`}
+            </MenuDialog>
         </Dialog >
     )
 }

@@ -8,6 +8,7 @@ import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table';
 import FetchData from '../../Components/Fetch';
 import SettingsPDFTextCell from './SettingsPDFTextCell';
 import SettingsPDFImageCell from './SettingsPDFImageCell';
+import Message from '../../Components/Message';
 
 interface Props {
     pdfData: PDFData | null;
@@ -43,6 +44,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
     const [stickerDefault, setStickerDefault] = useState<boolean>(false);
     const [pdfDefault, setPDFDefault] = useState<boolean>(false);
     const [fonts, setFonts] = useState<Fonts[]>([]);
+    const [messageOpen, setMessageOpen] = useState<boolean>(false);
 
     const theme = useTheme();
 
@@ -170,7 +172,9 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
 
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
-        await FetchData({ urlHost: url, urlPath: '/pdf/edit_pdf', urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: patchableData, urlQuery: `?currentUserId=${userId}&currentPDFId=${pdfData._id}` });
+        const data = await FetchData({ urlHost: url, urlPath: '/pdf/edit_pdf', urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: patchableData, urlQuery: `?currentUserId=${userId}&currentPDFId=${pdfData._id}` });
+        setPdfData(data.reslt);
+        setMessageOpen(true);
     }
 
     return (
@@ -272,6 +276,13 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                 </Box>
             </Grid>
             <Button variant='contained' onClick={() => savePDF()}>Save PDF</Button>
+            {
+                messageOpen
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={'PDF'}>
+                    PDF on päivitetty onnistuneesti.
+                </Message>
+            }
         </Grid>
     )
 }

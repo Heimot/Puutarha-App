@@ -6,6 +6,7 @@ import { PDFImage } from '../../../Model';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsPDFImageTable from './SettingsPDFImageTable';
+import MenuDialog from '../../Components/MenuDialog';
 
 interface Props {
     image: PDFImage;
@@ -25,6 +26,7 @@ interface ImageArr {
 const SettingsPDFImageCell: React.FC<Props> = ({ image, removeImageData, updateImageData }) => {
     const [imageData, setImageData] = useState<ImageArr>({ _id: image._id, imageURL: image.imageURL, height: image.height, width: image.width, xPosition: image.xPosition, yPosition: image.yPosition })
     const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
     const theme = useTheme();
 
@@ -67,7 +69,7 @@ const SettingsPDFImageCell: React.FC<Props> = ({ image, removeImageData, updateI
             <Td style={borderStyle}>
                 <Box sx={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
                     <TextField fullWidth name='yPosition' value={imageData.yPosition} onChange={(e) => handleChange(e.target.value, e.target.name)} />
-                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => removeImageData(imageData._id)}><DeleteIcon fontSize='large' /></Button>
+                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsDeleteOpen(true)}><DeleteIcon fontSize='large' /></Button>
                 </Box>
             </Td>
             {
@@ -75,6 +77,9 @@ const SettingsPDFImageCell: React.FC<Props> = ({ image, removeImageData, updateI
                 &&
                 <SettingsPDFImageTable isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} chooseImage={(value: string) => setImageData((prevState) => { return { ...prevState, imageURL: value } })} />
             }
+            <MenuDialog isOpen={isDeleteOpen} setIsOpen={(value: boolean) => setIsDeleteOpen(value)} result={() => removeImageData(imageData._id)} dialogTitle={'Haluatko poistaa tämän kuvan PDF tiedostosta?'} actions={true}>
+                {`Haluatko varmasti tämän kuvan PDF tiedostosta? Mikäli poistat sitä ei voida enää palauttaa.`}
+            </MenuDialog>
         </Tr>
     )
 }
