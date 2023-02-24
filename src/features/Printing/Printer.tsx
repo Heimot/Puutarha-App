@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 interface Props {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
-    stickers: Stickers[],
+    stickers: Stickers[];
     setStickers: (value: any) => void;
     resetCards: () => void;
 }
@@ -269,4 +269,4 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
     )
 }
 
-export default Printer
+export default Printer;
