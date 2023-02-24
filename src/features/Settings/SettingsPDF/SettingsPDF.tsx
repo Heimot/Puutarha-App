@@ -3,9 +3,11 @@ import { Button, Typography, Select, MenuItem, InputLabel, FormControl, Box } fr
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { ImageData, PDFData, PDFImage } from '../../../Model';
 import FetchData from '../../Components/Fetch';
 import SettingsPDFEditor from './SettingsPDFEditor';
+import MenuDialog from '../../Components/MenuDialog';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -27,6 +29,7 @@ const SettingsPDF = () => {
     const [pdfData, setPdfData] = useState<PDFData | null>(null);
     const [pdfs, setPdfs] = useState<pdfs[]>([]);
     const [chosenPDF, setChosenPDF] = useState<string>("")
+    const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
     const pdfRef = useRef<HTMLIFrameElement>(null);
 
@@ -50,6 +53,29 @@ const SettingsPDF = () => {
             let layoutMode = pdfData?.pageLayout as 'p' | 'portrait' | 'l' | 'landscape' | undefined;
             doc = new jsPDF(layoutMode, 'mm', [pdfData?.height, pdfData?.width]);
             let imageRef: ImageData[] = [];
+
+            if (pdfData?.table) {
+                let tableHeader: string[] = [];
+                let result = [];
+
+                for (let i = 0; i < pdfData.table.cells.length; i++) {
+                    result.push(pdfData.table.cells[i].text)
+                }
+
+                for (let i = 0; i < pdfData.table.headers.length; i++) {
+                    tableHeader.push(pdfData.table.headers[i].text);
+                }
+
+                autoTable(doc, {
+                    head: [tableHeader],
+                    body: [result],
+                    margin: { horizontal: pdfData.table.xPosition, top: pdfData.table.yPosition },
+                    bodyStyles: { valign: 'top' },
+                    styles: { overflow: 'linebreak', cellWidth: 'wrap' },
+                    columnStyles: { text: { cellWidth: 'auto' } },
+                    //didDrawPage: header
+                });
+            }
 
             let baseImagePromises = pdfData?.PDFImage.map((image: PDFImage) => new Promise((resolve, reject) => {
                 if (imageRef.length > 0) {
@@ -89,7 +115,6 @@ const SettingsPDF = () => {
                         doc.setFontSize(text.fontSize);
                         doc.text(text.text, text.xPosition, text.yPosition);
                     })
-
                     if (pdfData === null) return;
                     pdfData?.PDFImage.map((image: any) => {
                         if (image.imageURL === "") return;
@@ -194,17 +219,27 @@ const SettingsPDF = () => {
                         </Select>
                     </ FormControl>
                     <Button onClick={() => createNewPDF()}>Luo uusi PDF</Button>
-                    <Button onClick={() => deletePDF()}>Poista PDF</Button>
+                    {
+                        chosenPDF !== ''
+                        &&
+                        <Button onClick={() => setIsDeleteOpen(true)}>Poista PDF</Button>
+                    }
                 </Box>
                 <Box>
                     <iframe style={{ "width": (pdfData !== null ? pdfData?.width * 3.7795275591 : 0), "height": (pdfData !== null ? pdfData?.height * 3.7795275591 : 0), "backgroundColor": 'white', border: "black 5px solid", transform: "scale(1)" }} ref={pdfRef} />
                 </Box>
-                <Box>
-                    <SettingsPDFEditor pdfData={pdfData} setPdfData={(value: PDFData) => setPdfData(value)} getFonts={doc.getFontList()} />
-                    <Button onClick={printPDF}>Tulosta PDF</Button>
-                </Box>
-
+                {
+                    chosenPDF !== ''
+                    &&
+                    <Box>
+                        <SettingsPDFEditor pdfData={pdfData} setPdfData={(value: PDFData) => setPdfData(value)} getFonts={doc.getFontList()} />
+                        <Button onClick={printPDF}>Tulosta PDF</Button>
+                    </Box>
+                }
             </Item>
+            <MenuDialog isOpen={isDeleteOpen} setIsOpen={(value: boolean) => setIsDeleteOpen(value)} result={() => deletePDF()} dialogTitle={'Haluatko poistaa tämän PDF tiedoston?'} actions={true}>
+                {`Haluatko varmasti tämän PDF tiedoston? Mikäli poistat sitä ei voida enää palauttaa.`}
+            </MenuDialog>
         </Box>
     )
 }
