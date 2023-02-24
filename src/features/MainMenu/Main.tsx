@@ -25,6 +25,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import './Main.css';
 import Printer from '../Printing/Printer';
 import MainRFID from './MainRFID';
+import OrderPrinter from '../Printing/OrderPrinter';
 
 interface OrderUpdate {
     orderId: string;
@@ -60,6 +61,8 @@ const Main = () => {
     const [editData, setEditData] = useState<Order | null>(null);
     const [stickers, setStickers] = useState<Stickers[]>([]);
     const [printerOpen, setPrinterOpen] = useState<boolean>(false);
+    const [orderPrinterOpen, setOrderPrinterOpen] = useState<boolean>(false);
+    const [orderPrint, setOrderPrint] = useState<Order | null>(null);
     const [statusOrder, setStatusOrder] = useState<Status[] | null>(null);
     const [statusMove, setStatusMove] = useState<string>('');
     const [statusMoveOrder, setStatusMoveOrder] = useState<string>('');
@@ -468,7 +471,7 @@ const Main = () => {
                                     <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none' }}>Muokkaa</Button>
                                     <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none' }}>Poista</Button>
                                     <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none' }}>Vie Exceliin</Button>
-                                    <Button variant="contained" size='small' color='warning' sx={{ fontSize: 15, textTransform: 'none' }}>Tulosta taulukko</Button>
+                                    <Button onClick={() => { setOrderPrint(order); setOrderPrinterOpen(true); }} variant="contained" size='small' color='warning' sx={{ fontSize: 15, textTransform: 'none' }}>Tulosta taulukko</Button>
                                 </Grid>
                             </Item>
                         </Grid>
@@ -482,57 +485,52 @@ const Main = () => {
             </Fab>
             {
                 searchWord.type !== ''
-                    ?
-                    <Chip sx={{ position: 'fixed', bottom: 16, right: 75 }} label={`Etsitään: ${searchWord.search}`} variant="outlined" onDelete={() => setSearchWord({ type: '', search: '' })} />
-                    :
-                    null
+                &&
+                <Chip sx={{ position: 'fixed', bottom: 16, right: 75 }} label={`Etsitään: ${searchWord.search}`} variant="outlined" onDelete={() => setSearchWord({ type: '', search: '' })} />
             }
             {
                 statusOpen
-                    ?
-                    <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => moveOrder()} dialogTitle={'Tilauksen siirto'} actions={true}>
-                        <>
-                            <div>
-                                {`Mihin haluat siirtää tämän tilauksen?`}
-                            </div>
-                            <div>
-                                <Select defaultValue={chosenStatus} value={statusMove} onChange={(e: any) => setStatusMove(e.target.value)}>
-                                    {
-                                        statusOrder?.map((status: Status) => (
-                                            <MenuItem key={status._id} value={status._id}>
-                                                {status.status}
-                                            </MenuItem>
-                                        ))
-                                    }
-                                </Select>
-                            </div>
-                        </>
-                    </MenuDialog>
-                    :
-                    null
+                &&
+                <MenuDialog isOpen={statusOpen} setIsOpen={(value: boolean) => setStatusOpen(value)} result={() => moveOrder()} dialogTitle={'Tilauksen siirto'} actions={true}>
+                    <>
+                        <div>
+                            {`Mihin haluat siirtää tämän tilauksen?`}
+                        </div>
+                        <div>
+                            <Select defaultValue={chosenStatus} value={statusMove} onChange={(e: any) => setStatusMove(e.target.value)}>
+                                {
+                                    statusOrder?.map((status: Status) => (
+                                        <MenuItem key={status._id} value={status._id}>
+                                            {status.status}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </Select>
+                        </div>
+                    </>
+                </MenuDialog>
             }
             {
                 menuOpen
-                    ?
-                    <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'} actions={true}>
-                        {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
-                    </MenuDialog>
-                    :
-                    null
+                &&
+                <MenuDialog isOpen={menuOpen} setIsOpen={(value: boolean) => setMenuOpen(value)} result={() => deleteOrder()} dialogTitle={'Haluatko poistaa tämän tilauksen?'} actions={true}>
+                    {`Haluatko varmasti poistaa tilauksen ${deleteOrderData?.store.name} (${deleteOrderData?._id})? Mikäli poistat tilauksen sitä ei voida palauttaa.`}
+                </MenuDialog>
             }
             {
                 printerOpen
-                    ?
-                    <Printer isOpen={printerOpen} setIsOpen={(value) => setPrinterOpen(value)} stickers={stickers} setStickers={(value) => setStickers(value)} resetCards={() => { setRFIDCards([]); setIsBlocked(true); }} />
-                    :
-                    null
+                &&
+                <Printer isOpen={printerOpen} setIsOpen={(value) => setPrinterOpen(value)} stickers={stickers} setStickers={(value) => setStickers(value)} resetCards={() => { setRFIDCards([]); setIsBlocked(true); }} />
+            }
+            {
+                orderPrinterOpen
+                &&
+                <OrderPrinter isOpen={orderPrinterOpen} setIsOpen={(value) => { setOrderPrint(null); setOrderPrinterOpen(value); }} orderPrint={orderPrint} setOrderPrint={(value) => setOrderPrint(value)} />
             }
             {
                 isOpen
-                    ?
-                    <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => updateSocket(id, isCreator, method, date, productId)} />
-                    :
-                    null
+                &&
+                <EditingMenu isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} editData={editData} setEditData={(value) => setEditData(value)} dataSaved={(id: string, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => updateSocket(id, isCreator, method, date, productId)} />
             }
             {
                 isBlocked
