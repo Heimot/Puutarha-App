@@ -60,7 +60,7 @@ const SettingsPDFTextCell: React.FC<Props> = ({ text, fonts, getFonts, removeTex
             <Td style={borderStyle}>
                 <Select fullWidth value={textData.Font.toString()} name='Font' onChange={(e) => { handleChange(e.target.value, e.target.name); setFontTypes(getFonts[e.target.value]); }}>
                     {
-                        fonts.map((font) => (
+                        fonts?.map((font) => (
                             <MenuItem key={font.name} value={font.name}>{font.name}</MenuItem>
                         ))
                     }
