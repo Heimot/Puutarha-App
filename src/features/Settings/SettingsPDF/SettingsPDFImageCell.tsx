@@ -78,7 +78,7 @@ const SettingsPDFImageCell: React.FC<Props> = ({ image, removeImageData, updateI
                 <SettingsPDFImageTable isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} chooseImage={(value: string) => setImageData((prevState) => { return { ...prevState, imageURL: value } })} />
             }
             <MenuDialog isOpen={isDeleteOpen} setIsOpen={(value: boolean) => setIsDeleteOpen(value)} result={() => removeImageData(imageData._id)} dialogTitle={'Haluatko poistaa tämän kuvan PDF tiedostosta?'} actions={true}>
-                {`Haluatko varmasti tämän kuvan PDF tiedostosta? Mikäli poistat sitä ei voida enää palauttaa.`}
+                {`Haluatko varmasti poistaa tämän kuvan PDF tiedostosta? Mikäli poistat sitä ei voida enää palauttaa.`}
             </MenuDialog>
         </Tr>
     )
