@@ -107,6 +107,30 @@ export interface PDFData {
     updatedAt: Date;
     PDFText: PDFText[];
     PDFImage: PDFImage[];
+    table: PDFTable;
+}
+
+export interface PDFTable {
+    [key: string]: any;
+    _id: string;
+    headers: TableHeaders[];
+    cells: TableCells[];
+    xPosition: number;
+    yPosition: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface TableHeaders {
+    [key: string]: any;
+    _id: string;
+    text: string;
+}
+
+export interface TableCells {
+    [key: string]: any;
+    _id: string;
+    text: string;
 }
 
 export interface PDFText {
