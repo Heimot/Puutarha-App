@@ -222,7 +222,7 @@ const SettingsPDF = () => {
                     {
                         chosenPDF !== ''
                         &&
-                        <Button onClick={() => setIsDeleteOpen(true)}>Poista PDF</Button>
+                        <Button  color='error' onClick={() => setIsDeleteOpen(true)}>Poista PDF</Button>
                     }
                 </Box>
                 <Box>
