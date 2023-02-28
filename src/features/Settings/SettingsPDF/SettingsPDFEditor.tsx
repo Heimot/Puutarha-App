@@ -3,12 +3,15 @@ import { TextField, Select, MenuItem, InputLabel, FormControl, Box, FormControlL
 import { styled } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
-import { PDFData, PDFText, PDFImage, Fonts, GetFonts } from '../../../Model'
+import { PDFData, PDFText, PDFImage, Fonts, GetFonts, TableCells, PDFTable, TableHeaders } from '../../../Model'
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table';
 import FetchData from '../../Components/Fetch';
 import SettingsPDFTextCell from './SettingsPDFTextCell';
 import SettingsPDFImageCell from './SettingsPDFImageCell';
 import Message from '../../Components/Message';
+import SettingsPDFTableHeader from './SettingsPDFTableHeader';
+import SettingsPDFTableCell from './SettingsPDFTableCell';
+import SettingsPDFTableData from './SettingsPDFTableData';
 
 interface Props {
     pdfData: PDFData | null;
@@ -131,20 +134,109 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         setPdfData({ ...pdfData, PDFImage: [...pdfData?.PDFImage, { _id: Date.now(), imageURL: "", height: 10, width: 10, xPosition: 0, yPosition: 0 }] })
     }
 
+    const addTableHeaderData = (text: string) => {
+        if (!pdfData) return;
+        setPdfData({ ...pdfData, table: { ...pdfData?.table, headers: [...pdfData?.table?.headers, { _id: null, text: text }] } });
+    }
+
+    const deleteTableHeader = async (_id: string) => {
+        let data = pdfData?.table?.headers?.filter((data) => {
+            return data._id !== _id;
+        });
+        setPdfData({ ...pdfData, table: { ...pdfData?.table, headers: data } });
+
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?.table?._id,
+            _id: _id
+        }
+        await FetchData({ urlHost: url, urlPath: '/pdftableheader/delete_pdf_table_header', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+    }
+
+    const updateTableHeader = (_id: string, value: string) => {
+        let updatedData = pdfData?.table?.headers?.map((header) => {
+            return header._id === _id
+                ?
+                { ...header, text: value }
+                :
+                header;
+        })
+        setPdfData((currentState: PDFData) => ({ ...currentState, table: { ...currentState?.table, headers: updatedData } }))
+    }
+
+    const addTableCellData = (text: string) => {
+        if (!pdfData) return;
+        setPdfData({ ...pdfData, table: { ...pdfData?.table, cells: [...pdfData?.table?.cells, { _id: null, text: text }] } });
+    }
+
+    const deleteTableCell = async (_id: string) => {
+        let data = pdfData?.table?.cells?.filter((data) => {
+            return data._id !== _id;
+        });
+        setPdfData({ ...pdfData, table: { ...pdfData?.table, cells: data } });
+
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?.table?._id,
+            _id: _id
+        }
+        await FetchData({ urlHost: url, urlPath: '/pdftablecell/delete_pdf_table_cell', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+    }
+
+    const updateTableCell = (_id: string, value: string) => {
+        let updatedData = pdfData?.table?.cells?.map((cell) => {
+            return cell._id === _id
+                ?
+                { ...cell, text: value }
+                :
+                cell;
+        })
+        setPdfData((currentState: PDFData) => ({ ...currentState, table: { ...currentState?.table, cells: updatedData } }))
+    }
+
+    const createTable = async (yPosition: number) => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?._id,
+            yPosition: yPosition
+        }
+        const newTable = await FetchData({ urlHost: url, urlPath: '/pdftable/add_table_to_pdf', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
+        if (!newTable?.result) return;
+        setPdfData((currentState: PDFData) => ({ ...currentState, table: newTable?.result }));
+    }
+
+    const deleteTable = async (_id: string) => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?._id,
+            _id: _id
+        }
+        await FetchData({ urlHost: url, urlPath: '/pdftable/delete_pdf_table', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+        setPdfData((currentState: PDFData) => ({ ...currentState, table: null }))
+    }
+
     const savePDF = async () => {
         if (pdfData === null) return;
         /*
             This will turn the array of objects to a object which we will be able to patch in a fetch request.
             Since there are arrays inside of the pdfData we need to also .map the pdfDatas arrays and do the same things for it as well. 
         */
-        let patchableData = await Object.keys(pdfData).reduce((acc: Acc[], curr) => {
+        let patchableData = Object.keys(pdfData).reduce((acc: Acc[], curr) => {
             if (curr !== "createdAt" && curr !== "updatedAt" && curr !== "data") {
                 const keyValue: keyof PDFData = curr;
                 if (curr === "PDFText" || curr === "PDFImage") {
                     let pdfTextData: PDFPropData[] = [];
                     let pdfImageData: PDFPropData[] = [];
-                    pdfData[keyValue].map(async (item: PDFText | PDFImage) => {
-                        let data = await Object.keys(item).reduce((accT: Acc[], curr) => {
+                    pdfData[keyValue].map((item: PDFText | PDFImage) => {
+                        let data = Object.keys(item).reduce((accT: Acc[], curr) => {
                             if (curr !== "createdAt" && curr !== "updatedAt" && curr !== "_id") {
                                 const keyValue: keyof PDFText | PDFImage = curr;
                                 accT.push({ "propName": keyValue, "value": item[keyValue] });
@@ -163,13 +255,43 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                         acc.push({ "propName": "PDFImage", "value": pdfImageData });
                     }
 
+                } else if (curr === "table") {
+                    if (pdfData?.table) {
+                        let data = Object.keys(pdfData?.table).reduce((accT: Acc[], curr) => {
+                            if (curr === 'headers' || curr === 'cells') {
+                                const keyValue: keyof PDFTable = curr;
+                                let pdfHeaderdata: PDFPropData[] = [];
+                                let pdfCellData: PDFPropData[] = [];
+                                pdfData?.table[keyValue]?.map((item: TableHeaders | TableCells) => {
+                                    let data = Object.keys(item).reduce((accT: Acc[], curr) => {
+                                        if (curr !== "createdAt" && curr !== "updatedAt" && curr !== "_id") {
+                                            const keyValue: keyof TableHeaders | TableCells = curr;
+                                            accT.push({ "propName": keyValue, "value": item[keyValue] });
+                                        }
+                                        return accT;
+                                    }, [])
+                                    if (keyValue === "headers") {
+                                        pdfHeaderdata.push({ "_id": item._id, "data": data })
+                                    } else if (keyValue === "cells") {
+                                        pdfCellData.push({ "_id": item._id, "data": data })
+                                    }
+                                })
+                                if (keyValue === "headers") {
+                                    accT.push({ "propName": keyValue, "value": pdfHeaderdata });
+                                } else if (keyValue === "cells") {
+                                    accT.push({ "propName": keyValue, "value": pdfCellData });
+                                }
+                            }
+                            return accT;
+                        }, [])
+                        acc.push({ "propName": "PDFTable", "value": { "_id": pdfData?.table?._id, "xPosition": pdfData?.table?.xPosition, "yPosition": pdfData?.table?.yPosition, "data": data } });
+                    }
                 } else {
                     acc.push({ "propName": keyValue, "value": pdfData[keyValue] });
                 }
             }
             return acc;
         }, []);
-
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
         const data = await FetchData({ urlHost: url, urlPath: '/pdf/edit_pdf', urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: patchableData, urlQuery: `?currentUserId=${userId}&currentPDFId=${pdfData._id}` });
@@ -233,7 +355,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {pdfData?.PDFText.map((text: any) => {
+                            {pdfData?.PDFText?.map((text: any) => {
                                 return (
                                     <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeTextData(_id)}
                                         updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
@@ -262,7 +384,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {pdfData?.PDFImage.map((image: any) => {
+                            {pdfData?.PDFImage?.map((image: any) => {
                                 return (
                                     <SettingsPDFImageCell key={image._id} image={image} removeImageData={(_id: string) => removeImageData(_id)}
                                         updateImageData={(_id: string, imageURL: string, height: number, width: number, xPosition: number, yPosition: number) => updateImageData(_id, imageURL, height, width, xPosition, yPosition)} />
@@ -274,6 +396,26 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                         <Button onClick={() => addImageData()}>Add new image</Button>
                     </TableFooter>
                 </Box>
+                <SettingsPDFTableData data={pdfData?.table}
+                    createTable={(yPosition: number) => createTable(yPosition)}
+                    deleteTable={(_id: string) => deleteTable(_id)}
+                    updateTable={(value: number) => setPdfData((currentState: PDFData) => ({ ...currentState, table: { ...currentState?.table, yPosition: Number(value) } }))}
+                />
+                {pdfData?.table
+                    &&
+                    <Box>
+                        <SettingsPDFTableHeader data={pdfData?.table}
+                            addTableHeader={(text: string) => addTableHeaderData(text)}
+                            deleteTableHeader={(_id: string) => deleteTableHeader(_id)}
+                            updateTableHeader={(_id: string, value: string) => updateTableHeader(_id, value)}
+                        />
+                        <SettingsPDFTableCell data={pdfData?.table}
+                            addTableCell={(text: string) => addTableCellData(text)}
+                            deleteTableCell={(_id: string) => deleteTableCell(_id)}
+                            updateTableCell={(_id: string, value: string) => updateTableCell(_id, value)}
+                        />
+                    </Box>
+                }
             </Grid>
             <Button variant='contained' onClick={() => savePDF()}>Save PDF</Button>
             {
@@ -283,7 +425,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                     PDF on päivitetty onnistuneesti.
                 </Message>
             }
-        </Grid>
+        </Grid >
     )
 }
 
