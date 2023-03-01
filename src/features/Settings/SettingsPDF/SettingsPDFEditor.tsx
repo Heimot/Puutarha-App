@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { TextField, Select, MenuItem, InputLabel, FormControl, Box, FormControlLabel, Switch, Button } from '@mui/material';
+import { TextField, Select, MenuItem, InputLabel, FormControl, Box, FormControlLabel, Switch, Button, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
-import { PDFData, PDFText, PDFImage, Fonts, GetFonts, TableCells, PDFTable, TableHeaders } from '../../../Model'
+import { PDFData, PDFText, PDFImage, Fonts, GetFonts, TableCells, PDFTable, TableHeaders, PDFHeader } from '../../../Model'
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table';
 import FetchData from '../../Components/Fetch';
 import SettingsPDFTextCell from './SettingsPDFTextCell';
@@ -66,6 +66,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
 
     useEffect(() => {
         if (pdfData === null) return;
+        console.log(pdfData)
         setPDFName(pdfData?.PDFName);
         setPDFWidth(pdfData?.width);
         setPDFHeight(pdfData?.height)
@@ -83,6 +84,13 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
             data._id === _id ? { ...data, text, font, fontType, fontSize, xPosition, yPosition } : data
         )
         setPdfData({ ...pdfData, PDFText: data });
+    }
+
+    const updateHeaderTextData = (_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => {
+        let data = pdfData?.header?.PDFText?.map((data) =>
+            data._id === _id ? { ...data, text, font, fontType, fontSize, xPosition, yPosition } : data
+        )
+        setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFText: data } });
     }
 
     const updateImageData = (_id: string, imageURL: string, height: number, width: number, xPosition: number, yPosition: number) => {
@@ -108,6 +116,22 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         await FetchData({ urlHost: url, urlPath: '/pdftext/delete_pdf_text', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
     }
 
+    const removeHeaderTextData = async (_id: string) => {
+        let data = pdfData?.header?.PDFText.filter((data) => {
+            return data._id !== _id;
+        });
+        setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFText: data } });
+
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?._id,
+            _id: _id
+        }
+        await FetchData({ urlHost: url, urlPath: '/pdftext/delete_pdf_header_text', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+    }
+
     const removeImageData = async (_id: string) => {
         let data = pdfData?.PDFImage.filter((data) => {
             return data._id !== _id;
@@ -129,6 +153,11 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         setPdfData({ ...pdfData, PDFText: [...pdfData?.PDFText, { _id: Date.now(), text: "", font: "helvetica", fontType: "normal", fontSize: 10, xPosition: 0, yPosition: 0 }] })
     }
 
+    const addHeaderTextData = () => {
+        if (!pdfData) return;
+        setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFText: [...pdfData?.header?.PDFText, { _id: Date.now(), text: "", font: "helvetica", fontType: "normal", fontSize: 10, xPosition: 0, yPosition: 0 }] } })
+    }
+
     const addImageData = () => {
         if (!pdfData) return;
         setPdfData({ ...pdfData, PDFImage: [...pdfData?.PDFImage, { _id: Date.now(), imageURL: "", height: 10, width: 10, xPosition: 0, yPosition: 0 }] })
@@ -136,7 +165,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
 
     const addTableHeaderData = (text: string) => {
         if (!pdfData) return;
-        setPdfData({ ...pdfData, table: { ...pdfData?.table, headers: [...pdfData?.table?.headers, { _id: null, text: text }] } });
+        setPdfData({ ...pdfData, table: { ...pdfData?.table, headers: [...pdfData?.table?.headers, { _id: Date.now().toString(), text: text }] } });
     }
 
     const deleteTableHeader = async (_id: string) => {
@@ -168,7 +197,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
 
     const addTableCellData = (text: string) => {
         if (!pdfData) return;
-        setPdfData({ ...pdfData, table: { ...pdfData?.table, cells: [...pdfData?.table?.cells, { _id: null, text: text }] } });
+        setPdfData({ ...pdfData, table: { ...pdfData?.table, cells: [...pdfData?.table?.cells, { _id: Date.now().toString(), text: text }] } });
     }
 
     const deleteTableCell = async (_id: string) => {
@@ -286,6 +315,37 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                         }, [])
                         acc.push({ "propName": "PDFTable", "value": { "_id": pdfData?.table?._id, "xPosition": pdfData?.table?.xPosition, "yPosition": pdfData?.table?.yPosition, "data": data } });
                     }
+                } else if (curr === "header") {
+                    if (pdfData?.header) {
+                        let data = Object.keys(pdfData?.header).reduce((accT: Acc[], curr) => {
+                            if (curr === 'PDFText' || curr === 'PDFImage') {
+                                const keyValue: keyof PDFHeader = curr;
+                                let pdfTextData: PDFPropData[] = [];
+                                let pdfImageData: PDFPropData[] = [];
+                                pdfData?.header[keyValue]?.map((item: PDFImage | PDFText) => {
+                                    let data = Object.keys(item).reduce((accT: Acc[], curr) => {
+                                        if (curr !== "createdAt" && curr !== "updatedAt" && curr !== "_id") {
+                                            const keyValue: keyof PDFImage | PDFText = curr;
+                                            accT.push({ "propName": keyValue, "value": item[keyValue] });
+                                        }
+                                        return accT;
+                                    }, [])
+                                    if (keyValue === "PDFText") {
+                                        pdfTextData.push({ "_id": item._id, "data": data })
+                                    } else if (keyValue === "PDFImage") {
+                                        pdfImageData.push({ "_id": item._id, "data": data })
+                                    }
+                                })
+                                if (keyValue === "PDFText") {
+                                    accT.push({ "propName": keyValue, "value": pdfTextData });
+                                } else if (keyValue === "PDFImage") {
+                                    accT.push({ "propName": keyValue, "value": pdfImageData });
+                                }
+                            }
+                            return accT;
+                        }, [])
+                        acc.push({ "propName": "PDFHeader", "value": { "_id": pdfData?.header?._id, "data": data } });
+                    }
                 } else {
                     acc.push({ "propName": keyValue, "value": pdfData[keyValue] });
                 }
@@ -395,6 +455,41 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                     <TableFooter>
                         <Button onClick={() => addImageData()}>Add new image</Button>
                     </TableFooter>
+                </Box>
+                <Box>
+                    <Typography variant='h6'>Ylätunniste</Typography>
+                    {pdfData?.header
+                        &&
+                        <Box>
+                            <Table style={{
+                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
+                                borderRadius: '5px 5px 0px 0px'
+                            }}>
+                                <Thead>
+                                    <Tr>
+                                        <Th>Teksti</Th>
+                                        <Th>Fontti</Th>
+                                        <Th>Fontin koko</Th>
+                                        <Th>Fontin tyyppi</Th>
+                                        <Th>X-Kohta</Th>
+                                        <Th>Y-Kohta</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {pdfData?.header?.PDFText?.map((text: any) => {
+                                        return (
+                                            <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeHeaderTextData(_id)}
+                                                updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateHeaderTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
+                                        )
+                                    })}
+                                </Tbody>
+                            </Table>
+                            <TableFooter>
+                                <Button onClick={() => addHeaderTextData()}>Lisää tekstiä</Button>
+                            </TableFooter>
+                        </Box>
+                    }
                 </Box>
                 <SettingsPDFTableData data={pdfData?.table}
                     createTable={(yPosition: number) => createTable(yPosition)}
