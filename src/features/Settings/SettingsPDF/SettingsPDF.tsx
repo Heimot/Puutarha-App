@@ -53,31 +53,17 @@ const SettingsPDF = () => {
             let layoutMode = pdfData?.pageLayout as 'p' | 'portrait' | 'l' | 'landscape' | undefined;
             doc = new jsPDF(layoutMode, 'mm', [pdfData?.height, pdfData?.width]);
             let imageRef: ImageData[] = [];
+            let images = [];
 
-            if (pdfData?.table) {
-                let tableHeader: string[] = [];
-                let result = [];
-
-                for (let i = 0; i < pdfData.table.cells.length; i++) {
-                    result.push(pdfData.table.cells[i].text)
-                }
-
-                for (let i = 0; i < pdfData.table.headers.length; i++) {
-                    tableHeader.push(pdfData.table.headers[i].text);
-                }
-
-                autoTable(doc, {
-                    head: [tableHeader],
-                    body: [result],
-                    margin: { horizontal: pdfData.table.xPosition, top: pdfData.table.yPosition },
-                    bodyStyles: { valign: 'top' },
-                    styles: { overflow: 'linebreak', cellWidth: 'wrap' },
-                    columnStyles: { text: { cellWidth: 'auto' } },
-                    //didDrawPage: header
-                });
+            if (pdfData?.PDFImage?.length > 0) {
+                images.push(...pdfData?.PDFImage);
             }
 
-            let baseImagePromises = pdfData?.PDFImage.map((image: PDFImage) => new Promise((resolve, reject) => {
+            if (pdfData?.header?.PDFImage?.length > 0) {
+                images.push(...pdfData?.header?.PDFImage)
+            }
+
+            let baseImagePromises = images.map((image: PDFImage) => new Promise((resolve, reject) => {
                 if (imageRef.length > 0) {
                     let exists = imageRef?.filter((item: ImageData) => {
                         return item.imageID === image.imageURL;
@@ -105,11 +91,53 @@ const SettingsPDF = () => {
                     });
                 }
             }))
+            let counter = 0;
             Promise.all(baseImagePromises)
                 .then((data: any) => {
                     imageRef.push(...data);
                 })
                 .then(async () => {
+                    if (pdfData?.table) {
+                        if (counter > 0) return;
+                        counter = counter + 1;
+                        let tableHeader: string[] = [];
+                        let result: any[] = [];
+
+                        for (let i = 0; i < pdfData.table.cells.length; i++) {
+                            result.push(pdfData.table.cells[i].text)
+                        }
+
+                        for (let i = 0; i < pdfData.table.headers.length; i++) {
+                            tableHeader.push(pdfData.table.headers[i].text);
+                        }
+
+                        const header = () => {
+                            pdfData?.header?.PDFText.map((text: any) => {
+                                doc.setFont(text.font, text.fontType);
+                                doc.setFontSize(text.fontSize);
+                                doc.text(text.text, text.xPosition, text.yPosition);
+                            })
+                            if (pdfData === null) return;
+                            pdfData?.header?.PDFImage.map((image: any) => {
+                                if (image.imageURL === "") return;
+                                let docImage = imageRef.filter((img) => {
+                                    return img.imageID === image.imageURL;
+                                })[0];
+                                if (!docImage?.image) return;
+                                doc.addImage(docImage.image, "", Number(image.xPosition), Number(image.yPosition), Number(image.width), Number(image.height));
+                            })
+                        }
+
+                        autoTable(doc, {
+                            head: [tableHeader],
+                            body: [result],
+                            margin: { horizontal: pdfData.table.xPosition, top: pdfData.table.yPosition },
+                            bodyStyles: { valign: 'top' },
+                            styles: { overflow: 'linebreak', cellWidth: 'wrap' },
+                            columnStyles: { text: { cellWidth: 'auto' } },
+                            didDrawPage: header
+                        });
+                    }
                     pdfData?.PDFText.map((text: any) => {
                         doc.setFont(text.font, text.fontType);
                         doc.setFontSize(text.fontSize);
@@ -222,7 +250,7 @@ const SettingsPDF = () => {
                     {
                         chosenPDF !== ''
                         &&
-                        <Button  color='error' onClick={() => setIsDeleteOpen(true)}>Poista PDF</Button>
+                        <Button color='error' onClick={() => setIsDeleteOpen(true)}>Poista PDF</Button>
                     }
                 </Box>
                 <Box>
