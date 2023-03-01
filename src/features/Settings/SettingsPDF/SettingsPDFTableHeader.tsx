@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Button, Box, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import { useTheme } from '@mui/material/styles';
 import { PDFTable } from '../../../Model';
@@ -33,7 +33,9 @@ const SettingsPDFTableHeader: React.FC<Props> = ({ data, addTableHeader, deleteT
             {data?.headers?.map((header) => (
               <Box key={header._id} sx={{ display: 'flex', width: '100%', flexDirection: 'row', borderBottom: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`, padding: '5px', alignItems: 'center' }}>
                 <TextField fullWidth value={header.text} onChange={(e: any) => updateTableHeader(header._id, e.target.value)} />
-                <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => { setIsDeleteOpen(true); setSelectedHeader(header._id); }}> <DeleteIcon fontSize='large' /></Button>
+                <Tooltip title='Poista'>
+                  <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => { setIsDeleteOpen(true); setSelectedHeader(header._id); }}> <DeleteIcon fontSize='large' /></Button>
+                </Tooltip>
               </Box>
             ))}
           </Box>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Button, Box, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import { useTheme } from '@mui/material/styles';
 import { PDFTable } from '../../../Model';
@@ -33,7 +33,9 @@ const SettingsPDFTableCell: React.FC<Props> = ({ data, addTableCell, deleteTable
                         {data?.cells?.map((cell) => (
                             <Box key={cell._id} sx={{ display: 'flex', width: '100%', flexDirection: 'row', borderBottom: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`, padding: '5px', alignItems: 'center' }}>
                                 <TextField fullWidth value={cell.text} onChange={(e: any) => updateTableCell(cell._id, e.target.value)} />
-                                <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => { setIsDeleteOpen(true); setSelected(cell._id); }}> <DeleteIcon fontSize='large' /></Button>
+                                <Tooltip title='Poista'>
+                                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => { setIsDeleteOpen(true); setSelected(cell._id); }}> <DeleteIcon fontSize='large' /></Button>
+                                </Tooltip>
                             </Box>
                         ))}
                     </Box>

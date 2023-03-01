@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Tr, Td } from 'react-super-responsive-table';
-import { TextField, Button, Select, MenuItem, Box } from '@mui/material';
+import { TextField, Button, Select, MenuItem, Box, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { PDFText, Fonts, GetFonts } from '../../../Model';
 
@@ -84,7 +84,9 @@ const SettingsPDFTextCell: React.FC<Props> = ({ text, fonts, getFonts, removeTex
             <Td style={borderStyle}>
                 <Box sx={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
                     <TextField fullWidth name='YPosition' value={textData.YPosition} onChange={(e) => handleChange(e.target.value, e.target.name)} />
-                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsOpen(true)}><DeleteIcon fontSize='large' /></Button>
+                    <Tooltip title='Poista'>
+                        <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsOpen(true)}><DeleteIcon fontSize='large' /></Button>
+                    </Tooltip>
                 </Box>
             </Td>
             <MenuDialog isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} result={() => removeTextData(textData._id)} dialogTitle={'Haluatko poistaa tämän tekstin?'} actions={true}>

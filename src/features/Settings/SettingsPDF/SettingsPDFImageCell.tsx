@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Tr, Td } from 'react-super-responsive-table';
-import { TextField, Button, Typography, Box } from '@mui/material';
+import { TextField, Button, Typography, Box, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { PDFImage } from '../../../Model';
 
@@ -69,7 +69,9 @@ const SettingsPDFImageCell: React.FC<Props> = ({ image, removeImageData, updateI
             <Td style={borderStyle}>
                 <Box sx={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
                     <TextField fullWidth name='yPosition' value={imageData.yPosition} onChange={(e) => handleChange(e.target.value, e.target.name)} />
-                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsDeleteOpen(true)}><DeleteIcon fontSize='large' /></Button>
+                    <Tooltip title='Poista'>
+                        <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsDeleteOpen(true)}><DeleteIcon fontSize='large' /></Button>
+                    </Tooltip>
                 </Box>
             </Td>
             {
