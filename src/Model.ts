@@ -108,6 +108,17 @@ export interface PDFData {
     PDFText: PDFText[];
     PDFImage: PDFImage[];
     table: PDFTable;
+    header: PDFHeader;
+}
+
+export interface PDFHeader {
+    [key: string]: any;
+    _id: string;
+    data: string[];
+    PDFText: PDFText[];
+    PDFImage: PDFImage[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface PDFTable {
