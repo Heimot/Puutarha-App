@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Typography, TextField, Box } from '@mui/material';
+import { Button, Typography, TextField, Box, Tooltip } from '@mui/material';
 import { Tr, Td } from 'react-super-responsive-table'
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Stickers } from '../../Model'
@@ -19,7 +19,7 @@ const PrinterData: React.FC<Props> = ({ sticker, deleteSticker, addStickers }) =
         borderLeft: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
         borderTop: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`
     }
-    
+
     return (
         <Tr style={{ textAlign: 'center' }}>
             <Td style={borderStyle}>
@@ -35,16 +35,14 @@ const PrinterData: React.FC<Props> = ({ sticker, deleteSticker, addStickers }) =
                 <Typography>{sticker.information}</Typography>
             </Td>
             <Td style={borderStyle}>
-      
-                  
-                        <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
-                            <TextField inputProps={{ style: { textAlign: 'center' } }} name='information' fullWidth value={amount} onChange={(e) => { setAmount(Number(e.target.value)); addStickers(sticker, Number(e.target.value)); }} />
-                            <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteSticker(sticker._id)} >
-                                <DeleteIcon fontSize='large' />
-                            </Button>
-                        </Box>
-                  
-               
+                <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
+                    <TextField inputProps={{ style: { textAlign: 'center' } }} name='information' fullWidth value={amount} onChange={(e) => { setAmount(Number(e.target.value)); addStickers(sticker, Number(e.target.value)); }} />
+                    <Tooltip title='Poista'>
+                        <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteSticker(sticker._id)} >
+                            <DeleteIcon fontSize='large' />
+                        </Button>
+                    </Tooltip>
+                </Box>
             </Td>
         </Tr>
     )

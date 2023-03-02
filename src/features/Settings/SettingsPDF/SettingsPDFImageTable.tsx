@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Typography, Button, Container } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Button, Container } from '@mui/material';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
@@ -128,29 +128,35 @@ const SettingsPDFImageTable: React.FC<Props> = ({ isOpen, setIsOpen, chooseImage
                                     subtitle={`${dayjs(item.uploadDate).format('DD-MM-YYYY')} ${dayjs(item.uploadDate).format('HH:MM:ss')}`}
                                     actionIcon={
                                         <Container sx={{ display: 'flex !important', justifyContent: 'flex-end !important', paddingRight: '0 !important', paddingLeft: '0 !important' }}>
-                                            <IconButton
-                                                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                aria-label={`Delete image ${item.filename}`}
-                                                component='label'
-                                                onClick={() => { setDeletionId(item._id); setIsDeleteOpen(true); }}
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
-                                            <IconButton
-                                                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                aria-label={`Download image ${item.filename}`}
-                                                component='label'
-                                                onClick={() => { downloadImage(item._id) }}
-                                            >
-                                                <DownloadForOfflineIcon />
-                                            </IconButton>
-                                            <IconButton
-                                                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                aria-label={`Choose image ${item.filename}`}
-                                                onClick={() => { chooseImage(item._id); handleClick(); }}
-                                            >
-                                                <CheckCircleIcon />
-                                            </IconButton>
+                                            <Tooltip title='Poista'>
+                                                <IconButton
+                                                    sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                    aria-label={`Delete image ${item.filename}`}
+                                                    component='label'
+                                                    onClick={() => { setDeletionId(item._id); setIsDeleteOpen(true); }}
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title='Lataa'>
+                                                <IconButton
+                                                    sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                    aria-label={`Download image ${item.filename}`}
+                                                    component='label'
+                                                    onClick={() => { downloadImage(item._id) }}
+                                                >
+                                                    <DownloadForOfflineIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title='Valitse'>
+                                                <IconButton
+                                                    sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                    aria-label={`Choose image ${item.filename}`}
+                                                    onClick={() => { chooseImage(item._id); handleClick(); }}
+                                                >
+                                                    <CheckCircleIcon />
+                                                </IconButton>
+                                            </Tooltip>
                                         </ Container>
                                     }
                                 />

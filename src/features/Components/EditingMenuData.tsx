@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Flower, Products } from '../../Model'
 import { Tr, Td } from 'react-super-responsive-table'
-import { Button, TextField, Select, MenuItem, Box, Autocomplete, CircularProgress } from '@mui/material';
+import { Button, TextField, Select, MenuItem, Box, Autocomplete, CircularProgress, Tooltip } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
 
@@ -159,13 +159,17 @@ const EditingMenuData: React.FC<Props> = ({ product, updateProducts, deleteProdu
                     {
                         isCreated
                         &&
-                        <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                            <ListAltIcon fontSize='large' />
-                        </Button>
+                        <Tooltip title='Logit'>
+                            <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                                <ListAltIcon fontSize='large' />
+                            </Button>
+                        </Tooltip>
                     }
-                    <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteProduct(product._id)}>
-                        <DeleteIcon fontSize='large' />
-                    </Button>
+                    <Tooltip title='Poista'>
+                        <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => deleteProduct(product._id)}>
+                            <DeleteIcon fontSize='large' />
+                        </Button>
+                    </Tooltip>
                 </Box>
             </Td>
             <AddAutofill isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} usedGroup='Flowers' updateText={(value) => updateProducts(value, 'flower', product._id)} />
