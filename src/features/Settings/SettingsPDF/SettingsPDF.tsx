@@ -24,6 +24,7 @@ interface pdfs {
 }
 
 let doc = new jsPDF();
+let counter = 0;
 
 const SettingsPDF = () => {
     const [pdfData, setPdfData] = useState<PDFData | null>(null);
@@ -50,6 +51,7 @@ const SettingsPDF = () => {
     useEffect(() => {
         try {
             if (pdfData === null) return;
+            counter = 0;
             let layoutMode = pdfData?.pageLayout as 'p' | 'portrait' | 'l' | 'landscape' | undefined;
             doc = new jsPDF(layoutMode, 'mm', [pdfData?.height, pdfData?.width]);
             let imageRef: ImageData[] = [];
@@ -91,7 +93,6 @@ const SettingsPDF = () => {
                     });
                 }
             }))
-            let counter = 0;
             Promise.all(baseImagePromises)
                 .then((data: any) => {
                     imageRef.push(...data);
@@ -131,7 +132,7 @@ const SettingsPDF = () => {
                         autoTable(doc, {
                             head: [tableHeader],
                             body: [result],
-                            margin: { horizontal: pdfData.table.xPosition, top: pdfData.table.yPosition },
+                            margin: { top: pdfData.table.yPosition },
                             bodyStyles: { valign: 'top' },
                             styles: { overflow: 'linebreak', cellWidth: 'wrap' },
                             columnStyles: { text: { cellWidth: 'auto' } },
@@ -254,7 +255,7 @@ const SettingsPDF = () => {
                     }
                 </Box>
                 <Box>
-                    <iframe style={{ "width": (pdfData !== null ? pdfData?.width * 3.7795275591 : 0), "height": (pdfData !== null ? pdfData?.height * 3.7795275591 : 0), "backgroundColor": 'white', border: "black 5px solid", transform: "scale(1)" }} ref={pdfRef} />
+                    <iframe title='PDFSCENE' style={{ "width": (pdfData !== null ? pdfData?.width * 3.7795275591 : 0), "height": (pdfData !== null ? pdfData?.height * 3.7795275591 : 0), "backgroundColor": 'white', border: "black 5px solid", transform: "scale(1)" }} ref={pdfRef} />
                 </Box>
                 {
                     chosenPDF !== ''

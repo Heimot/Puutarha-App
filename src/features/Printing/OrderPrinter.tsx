@@ -18,6 +18,8 @@ interface Props {
     setOrderPrint: (value: any) => void;
 }
 
+let counter = 0;
+
 const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrderPrint }) => {
     const [order, setOrder] = useState<Order | null>(null);
     const [chosenSticker, setChosenSticker] = useState<string>('');
@@ -60,70 +62,31 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
     }
 
     const print = async () => {
+        console.log(order)
         let doc = new jsPDF();
+        let page = 1;
+        counter = 0;
         let pdfData = pdfSettings.filter((pdf: PDFData) => {
             return pdf._id === chosenSticker;
         })[0];
         if (pdfData === null) return;
         doc = new jsPDF(pdfData?.pageLayout, 'mm', [pdfData?.height, pdfData?.width]);
         let imageRef: ImageData[] = [];
+        let images = [];
 
-        if (pdfData?.table) {
-            let tableHeader: string[] = [];
-            let defaultCell: string[] = [];
-            let resultCell: any = [];
+        if (pdfData?.PDFImage?.length > 0) {
+            images.push(...pdfData?.PDFImage);
+        }
 
-            for (let i = 0; i < pdfData.table.cells.length; i++) {
-                defaultCell.push(pdfData.table.cells[i].text);
-            }
-
-            order?.products.map((product) => {
-                let dCell = [];
-                for (let i = 0; i < defaultCell.length; i++) {
-                    switch (defaultCell[i]) {
-                        case '[[FLOWER]]':
-                            dCell.push(product.flower.name);
-                            break;
-                        case '[[AMOUNT]]':
-                            dCell.push(product.amount);
-                            break;
-                        case '[[PICKED]]':
-                            dCell.push(product.amountToDeliver);
-                            break;
-                        case '[[INFORMATION]]':
-                            dCell.push(product.information);
-                            break;
-                        case '[[L]]':
-                            dCell.push(product.location.location);
-                            break;
-                        case '[[TODAY]]':
-                            dCell.push(dayjs().format('DD/MM/YYYY').toString());
-                            break;
-                    }
-                }
-                resultCell.push(dCell);
-            })
-
-            for (let i = 0; i < pdfData.table.headers.length; i++) {
-                tableHeader.push(pdfData.table.headers[i].text);
-            }
-
-            autoTable(doc, {
-                head: [tableHeader],
-                body: resultCell,
-                margin: { horizontal: pdfData.table.xPosition, top: pdfData.table.yPosition },
-                bodyStyles: { valign: 'top' },
-                styles: { overflow: 'linebreak', cellWidth: 'wrap' },
-                columnStyles: { text: { cellWidth: 'auto' } },
-                //didDrawPage: header
-            });
+        if (pdfData?.header?.PDFImage?.length > 0) {
+            images.push(...pdfData?.header?.PDFImage)
         }
 
         /**
          * This is done so we dont need to get the image from the url each time we create a pdf.
          * It gets the images the pdf needs and re uses them. 
          */
-        let baseImagePromises = pdfData?.PDFImage.map((image: PDFImage) => new Promise((resolve, reject) => {
+        let baseImagePromises = images.map((image: PDFImage) => new Promise((resolve, reject) => {
             if (imageRef.length > 0) {
                 let exists = imageRef?.filter((item: ImageData) => {
                     return item.imageID === image.imageURL;
@@ -156,8 +119,113 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
                 imageRef.push(...data);
             })
             .then(async () => {
-                console.log(pdfData)
                 if (!order) return;
+                if (pdfData?.table) {
+                    let tableHeader: string[] = [];
+                    let defaultCell: string[] = [];
+                    let resultCell: any = [];
+
+                    for (let i = 0; i < pdfData.table.cells.length; i++) {
+                        defaultCell.push(pdfData.table.cells[i].text);
+                    }
+
+                    order?.products.map((product) => {
+                        let dCell = [];
+                        for (let i = 0; i < defaultCell.length; i++) {
+                            switch (defaultCell[i]) {
+                                case '[[FLOWER]]':
+                                    dCell.push(product.flower.name);
+                                    break;
+                                case '[[AMOUNT]]':
+                                    dCell.push(product.amount);
+                                    break;
+                                case '[[PICKED]]':
+                                    dCell.push(product.amountToDeliver);
+                                    break;
+                                case '[[INFORMATION]]':
+                                    dCell.push(product.information);
+                                    break;
+                                case '[[L]]':
+                                    dCell.push(product.location.location);
+                                    break;
+                                case '[[TODAY]]':
+                                    dCell.push(dayjs().format('DD/MM/YYYY').toString());
+                                    break;
+                                default:
+                                    dCell.push(defaultCell[i])
+                                    break;
+                            }
+                        }
+                        resultCell.push(dCell);
+                    })
+
+                    for (let i = 0; i < pdfData.table.headers.length; i++) {
+                        tableHeader.push(pdfData.table.headers[i].text);
+                    }
+
+                    const header = () => {
+                        pdfData?.header?.PDFText.map((text: any) => {
+                            doc.setFont(text.font, text.fontType);
+                            doc.setFontSize(text.fontSize);
+                            switch (text.text) {
+                                case '[[ID]]':
+                                    if (!order?._id) return;
+                                    doc.text(order?._id, text.xPosition, text.yPosition);
+                                    break;
+                                case '[[STORE]]':
+                                    if (!order?.store?.name) return;
+                                    doc.text(order?.store?.name, text.xPosition, text.yPosition);
+                                    break;
+                                case '[[PICKINGDATE]]':
+                                    if (!order?.pickingdate) return;
+                                    doc.text(dayjs(order?.pickingdate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    break;
+                                case '[[DELIVERYDATE]]':
+                                    if (!order?.deliverydate) return;
+                                    doc.text(dayjs(order?.deliverydate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    break;
+                                case '[[INFORMATION]]':
+                                    if (!order?.information) return;
+                                    doc.text(order?.information, text.xPosition, text.yPosition);
+                                    break;
+                                case '[[ORDERCODE]]':
+                                    if (!order?.ordercode) return;
+                                    doc.text(order?.ordercode, text.xPosition, text.yPosition);
+                                    break;
+                                case '[[PAGE]]':
+                                    doc.text(page.toString(), text.xPosition, text.yPosition);
+                                    break;
+                                case '[[TODAY]]':
+                                    doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    break;
+                                default:
+                                    doc.text(text.text, text.xPosition, text.yPosition);
+                                    break;
+                            }
+
+                        })
+                        if (pdfData === null) return;
+                        pdfData?.header?.PDFImage.map((image: any) => {
+                            if (image.imageURL === "") return;
+                            let docImage = imageRef.filter((img) => {
+                                return img.imageID === image.imageURL;
+                            })[0];
+                            if (!docImage?.image) return;
+                            doc.addImage(docImage.image, "", Number(image.xPosition), Number(image.yPosition), Number(image.width), Number(image.height));
+                        })
+                        page++;
+                    }
+
+                    autoTable(doc, {
+                        head: [tableHeader],
+                        body: resultCell,
+                        margin: { top: pdfData.table.yPosition },
+                        bodyStyles: { valign: 'top' },
+                        styles: { overflow: 'linebreak', cellWidth: 'wrap' },
+                        columnStyles: { text: { cellWidth: 'auto' } },
+                        didDrawPage: header
+                    });
+                }
                 for (let i = 0; order.length > i; i++) {
                     if (pdfData === null) return;
 
@@ -165,20 +233,32 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
                         doc.setFont(text.font, text.fontType);
                         doc.setFontSize(text.fontSize);
                         switch (text.text) {
-                            case '[[INFORMATION]]':
-                                doc.text(order?.information, text.xPosition, text.yPosition);
+                            case '[[ID]]':
+                                if (!order?._id) return;
+                                doc.text(order?._id, text.xPosition, text.yPosition);
                                 break;
                             case '[[STORE]]':
+                                if (!order?.store) return;
                                 doc.text(order?.store.name, text.xPosition, text.yPosition);
                                 break;
-                            case '[[TODAY]]':
-                                doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
-                                break;
-                            case '[[DATE]]':
+                            case '[[PICKINGDATE]]':
+                                if (!order?.pickingdate) return;
                                 doc.text(dayjs(order.pickingdate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
                                 break;
                             case '[[DELIVERYDATE]]':
+                                if (!order?.deliverydate) return;
                                 doc.text(dayjs(order.deliverydate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                break;
+                            case '[[INFORMATION]]':
+                                if (!order?.information) return;
+                                doc.text(order?.information, text.xPosition, text.yPosition);
+                                break;
+                            case '[[ORDERCODE]]':
+                                if (!order?.ordercode) return;
+                                doc.text(order?.ordercode, text.xPosition, text.yPosition);
+                                break;
+                            case '[[TODAY]]':
+                                doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
                                 break;
                             default:
                                 doc.text(text.text, text.xPosition, text.yPosition);
