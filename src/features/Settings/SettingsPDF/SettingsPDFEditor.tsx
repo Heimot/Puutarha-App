@@ -12,6 +12,7 @@ import Message from '../../Components/Message';
 import SettingsPDFTableHeader from './SettingsPDFTableHeader';
 import SettingsPDFTableCell from './SettingsPDFTableCell';
 import SettingsPDFTableData from './SettingsPDFTableData';
+import SettingsPDFHeader from './SettingsPDFHeader';
 
 interface Props {
     pdfData: PDFData | null;
@@ -66,7 +67,6 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
 
     useEffect(() => {
         if (pdfData === null) return;
-        console.log(pdfData)
         setPDFName(pdfData?.PDFName);
         setPDFWidth(pdfData?.width);
         setPDFHeight(pdfData?.height)
@@ -98,6 +98,13 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
             data._id === _id ? { ...data, imageURL, height, width, xPosition, yPosition } : data
         )
         setPdfData({ ...pdfData, PDFImage: data });
+    }
+
+    const updateHeaderImageData = (_id: string, imageURL: string, height: number, width: number, xPosition: number, yPosition: number) => {
+        let data = pdfData?.header?.PDFImage?.map((data) =>
+            data._id === _id ? { ...data, imageURL, height, width, xPosition, yPosition } : data
+        )
+        setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFImage: data } });
     }
 
     const removeTextData = async (_id: string) => {
@@ -148,6 +155,22 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         await FetchData({ urlHost: url, urlPath: '/pdfimage/delete_pdf_image', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
     }
 
+    const removeHeaderImageData = async (_id: string) => {
+        let data = pdfData?.header?.PDFImage.filter((data) => {
+            return data._id !== _id;
+        });
+        setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFImage: data } });
+
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?._id,
+            _id: _id
+        }
+        await FetchData({ urlHost: url, urlPath: '/pdfimage/delete_pdf_header_image', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+    }
+
     const addTextData = () => {
         if (!pdfData) return;
         setPdfData({ ...pdfData, PDFText: [...pdfData?.PDFText, { _id: Date.now(), text: "", font: "helvetica", fontType: "normal", fontSize: 10, xPosition: 0, yPosition: 0 }] })
@@ -161,6 +184,11 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
     const addImageData = () => {
         if (!pdfData) return;
         setPdfData({ ...pdfData, PDFImage: [...pdfData?.PDFImage, { _id: Date.now(), imageURL: "", height: 10, width: 10, xPosition: 0, yPosition: 0 }] })
+    }
+
+    const addHeaderImageData = () => {
+        if (!pdfData) return;
+        setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFImage: [...pdfData?.header?.PDFImage, { _id: Date.now(), imageURL: "", height: 10, width: 10, xPosition: 0, yPosition: 0 }] } })
     }
 
     const addTableHeaderData = (text: string) => {
@@ -240,6 +268,18 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         setPdfData((currentState: PDFData) => ({ ...currentState, table: newTable?.result }));
     }
 
+    const createHeader = async () => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?._id
+        }
+        const newTable = await FetchData({ urlHost: url, urlPath: '/pdfheader/add_header_to_pdf', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
+        if (!newTable?.result) return;
+        setPdfData((currentState: PDFData) => ({ ...currentState, header: { ...newTable?.result, PDFText: [], PDFImage: [] } }));
+    }
+
     const deleteTable = async (_id: string) => {
         let userId = localStorage.getItem('userId');
         let url = process.env.REACT_APP_API_URL;
@@ -250,6 +290,18 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         }
         await FetchData({ urlHost: url, urlPath: '/pdftable/delete_pdf_table', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
         setPdfData((currentState: PDFData) => ({ ...currentState, table: null }))
+    }
+
+    const deleteHeader = async (_id: string) => {
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let body = {
+            currentUserId: userId,
+            PDFId: pdfData?._id,
+            _id: _id
+        }
+        await FetchData({ urlHost: url, urlPath: '/pdfheader/delete_pdf_header', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
+        setPdfData((currentState: PDFData) => ({ ...currentState, header: null }))
     }
 
     const savePDF = async () => {
@@ -415,12 +467,10 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {pdfData?.PDFText?.map((text: any) => {
-                                return (
-                                    <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeTextData(_id)}
-                                        updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
-                                )
-                            })}
+                            {pdfData?.PDFText?.map((text: any) => (
+                                <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeTextData(_id)}
+                                    updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
+                            ))}
                         </Tbody>
                     </Table>
                     <TableFooter>
@@ -444,22 +494,23 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {pdfData?.PDFImage?.map((image: any) => {
-                                return (
-                                    <SettingsPDFImageCell key={image._id} image={image} removeImageData={(_id: string) => removeImageData(_id)}
-                                        updateImageData={(_id: string, imageURL: string, height: number, width: number, xPosition: number, yPosition: number) => updateImageData(_id, imageURL, height, width, xPosition, yPosition)} />
-                                )
-                            })}
+                            {pdfData?.PDFImage?.map((image: any) => (
+                                <SettingsPDFImageCell key={image._id} image={image} removeImageData={(_id: string) => removeImageData(_id)}
+                                    updateImageData={(_id: string, imageURL: string, height: number, width: number, xPosition: number, yPosition: number) => updateImageData(_id, imageURL, height, width, xPosition, yPosition)} />
+                            ))}
                         </Tbody>
                     </Table>
                     <TableFooter>
-                        <Button onClick={() => addImageData()}>Add new image</Button>
+                        <Button onClick={() => addImageData()}>Lisää kuva</Button>
                     </TableFooter>
                 </Box>
-                <Box>
-                    <Typography variant='h6'>Ylätunniste</Typography>
-                    {pdfData?.header
-                        &&
+                <SettingsPDFHeader data={pdfData?.header}
+                    createHeader={() => createHeader()}
+                    deleteHeader={(_id: string) => deleteHeader(_id)}
+                />
+                {pdfData?.header
+                    &&
+                    <Box>
                         <Box>
                             <Table style={{
                                 color: theme.palette.mode === 'dark' ? 'white' : 'black',
@@ -477,20 +528,44 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                                     </Tr>
                                 </Thead>
                                 <Tbody>
-                                    {pdfData?.header?.PDFText?.map((text: any) => {
-                                        return (
-                                            <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeHeaderTextData(_id)}
-                                                updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateHeaderTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
-                                        )
-                                    })}
+                                    {pdfData?.header?.PDFText?.map((text: any) => (
+                                        <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeHeaderTextData(_id)}
+                                            updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateHeaderTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
+                                    ))}
                                 </Tbody>
                             </Table>
                             <TableFooter>
-                                <Button onClick={() => addHeaderTextData()}>Lisää tekstiä</Button>
+                                <Button onClick={() => addHeaderTextData()}>Lisää tekstiä ylätunnisteeseen</Button>
                             </TableFooter>
                         </Box>
-                    }
-                </Box>
+                        <Box>
+                            <Table style={{
+                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
+                                borderRadius: '5px 5px 0px 0px'
+                            }}>
+                                <Thead>
+                                    <Tr>
+                                        <Th>Kuva</Th>
+                                        <Th>Korkeus</Th>
+                                        <Th>Leveys</Th>
+                                        <Th>X-Kohta</Th>
+                                        <Th>Y-Kohta</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {pdfData?.header?.PDFImage?.map((image: any) => (
+                                        <SettingsPDFImageCell key={image._id} image={image} removeImageData={(_id: string) => removeHeaderImageData(_id)}
+                                            updateImageData={(_id: string, imageURL: string, height: number, width: number, xPosition: number, yPosition: number) => updateHeaderImageData(_id, imageURL, height, width, xPosition, yPosition)} />
+                                    ))}
+                                </Tbody>
+                            </Table>
+                            <TableFooter>
+                                <Button onClick={() => addHeaderImageData()}>Lisää kuva ylätunnisteeseen</Button>
+                            </TableFooter>
+                        </Box>
+                    </Box>
+                }
                 <SettingsPDFTableData data={pdfData?.table}
                     createTable={(yPosition: number) => createTable(yPosition)}
                     deleteTable={(_id: string) => deleteTable(_id)}
