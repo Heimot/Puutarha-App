@@ -16,9 +16,11 @@ import { Order, Truck, TruckData } from '../../Model';
 import CalendarDialog from './CalendarDialog';
 import CalendarTruckDialog from './CalendarTruckDialog';
 import MenuDialog from '../Components/MenuDialog';
+import CalendarPrinter from '../Printing/CalendarPrinter';
 
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import EditIcon from '@mui/icons-material/Edit';
+
 
 dayjs.extend(weekday)
 
@@ -52,6 +54,8 @@ const Calendar = () => {
   const [trucks, setTrucks] = useState<Truck[] | null>(null);
   const [truckData, setTruckData] = useState<TruckData | null>(null);
   const [truckMessage, setTruckMessage] = useState<boolean>(false);
+  const [isPDFOpen, setIsPDFOpen] = useState<boolean>(false);
+  const [PDFData, setPDFData] = useState<Order[]>([]);
   const theme = useTheme();
 
   const borderStyle = {
@@ -179,7 +183,7 @@ const Calendar = () => {
                         mode === 'delivery'
                           ?
                           <Box
-                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setTruckMessage(true); } }}
+                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setPDFData(week[i].filter((order: Order) => order?.truck?.truckLicensePlate === item?.truck?.truckLicensePlate)); setTruckMessage(true); } }}
                             sx={
                               {
                                 color: "white",
@@ -436,11 +440,16 @@ const Calendar = () => {
           <MenuDialog isOpen={truckMessage} setIsOpen={(value) => setTruckMessage(value)} result={() => console.log('')} dialogTitle={'Kalenteri toiminnot'} actions={false}>
             <Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
               <Button variant='contained' startIcon={<EditIcon />} onClick={() => { setTruckMessage(false); setIsTruckOpen(true); }}>Muuta rekan lisätietoja</Button>
-              <Button sx={{ marginTop: '15px' }} variant='contained' startIcon={<PictureAsPdfIcon />} onClick={() => { setTruckMessage(false); }}>Tulosta PDF</Button>
+              <Button sx={{ marginTop: '15px' }} variant='contained' startIcon={<PictureAsPdfIcon />} onClick={() => { setTruckMessage(false); setIsPDFOpen(true); }}>Tulosta PDF</Button>
             </Grid>
           </MenuDialog>
           :
           null
+      }
+      {
+        isPDFOpen
+        &&
+        <CalendarPrinter isOpen={isPDFOpen} setIsOpen={(value) => { setPDFData([]); setIsPDFOpen(value); }} orderPrint={PDFData} setOrderPrint={(value) => setPDFData(value)} truckData={truckData} />
       }
       {
         isOpen
