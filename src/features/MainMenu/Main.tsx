@@ -69,7 +69,7 @@ const Main = () => {
     const [defaultStatus, setDefaultStatus] = useState<Status | null>(null);
     const [isBlocked, setIsBlocked] = useState<boolean>(true);
     const [RFIDCards, setRFIDCards] = useState<string[]>([]);
-    const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord, statusSettings, personalSettings } = useSelector((state: State) => state.data);
+    const { chosenStatus, chosenLocation, chosenDate, stateSettings, updatePacket, searchWord, statusSettings, personalSettings, userData } = useSelector((state: State) => state.data);
 
 
     const dispatch = useDispatch();
@@ -422,19 +422,19 @@ const Main = () => {
                                         </Grid>
                                     </Grid>
                                     <Grid xs={12} sm={6}>
-                                        {order.statusLocation.map((sLoc: any) => (
-                                            <Grid key={sLoc._id} sx={{ paddingLeft: 0, paddingTop: 0 }} xs={12}>
-                                                <Typography align='left'>{sLoc.location.location}: {sLoc.status.status}</Typography>
+                                        {
+                                            (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/statuslocation/create_status_location'))
+                                            &&
+                                            order.statusLocation.map((sLoc: any) => (
+                                                <Grid key={sLoc._id} sx={{ paddingLeft: 0, paddingTop: 0 }} xs={12}>
+                                                    <Typography align='left'>{sLoc.location.location}: {sLoc.status.status}</Typography>
 
-                                            </Grid>
-                                        ))}
+                                                </Grid>
+                                            ))
+                                        }
                                     </Grid>
                                     <Grid xs={12} sm={6}>
                                         <Typography align='right'>Rullakko: {order?.roller?.roller}</Typography>
-                                        <Typography align='right'>Maybe some buttons here</Typography>
-                                    </Grid>
-                                    <Grid xs={12}>
-                                        Amount done meters here mby?
                                     </Grid>
                                 </Grid>
                                 <Table style={{
@@ -467,11 +467,11 @@ const Main = () => {
                                     </Tbody>
                                 </Table>
                                 <Grid container xs={12}>
-                                    <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none' }} onClick={() => { if (order.products.length > 0) { setStatusMoveOrder(order._id); setStatusOpen(true); } }}>Valmis</Button>
-                                    <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none' }}>Muokkaa</Button>
-                                    <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none' }}>Poista</Button>
-                                    <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none' }}>Vie Exceliin</Button>
-                                    <Button onClick={() => { setOrderPrint(order); setOrderPrinterOpen(true); }} variant="contained" size='small' color='warning' sx={{ fontSize: 15, textTransform: 'none' }}>Tulosta taulukko</Button>
+                                    <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/statuslocation/create_status_location') ? 'flex' : 'none' }} onClick={() => { if (order.products.length > 0) { setStatusMoveOrder(order._id); setStatusOpen(true); } }}>Valmis</Button>
+                                    <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/edit_order') ? 'flex' : 'none' }}>Muokkaa</Button>
+                                    <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/delete_order') ? 'flex' : 'none' }}>Poista</Button>
+                                    <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/edit_order') ? 'flex' : 'none' }}>Vie Exceliin</Button>
+                                    <Button onClick={() => { setOrderPrint(order); setOrderPrinterOpen(true); }} variant="contained" size='small' color='warning' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/edit_order') ? 'flex' : 'none' }}>Tulosta taulukko</Button>
                                 </Grid>
                             </Item>
                         </Grid>
