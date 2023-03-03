@@ -93,6 +93,7 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
                     <Th>Sähköposti</Th>
                     <Th>Käyttäjänimi</Th>
                     <Th>Rooli</Th>
+                    <Th>Asetukset</Th>
                     <Th>Salasanan vaihto</Th>
                 </Tr>
             </Thead>
@@ -105,12 +106,10 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
             </Tbody>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Käyttäjä'>
-                        Käyttäjä on päivitetty.
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Käyttäjä'>
+                    Käyttäjä on päivitetty.
+                </Message>
             }
         </Table>
     )

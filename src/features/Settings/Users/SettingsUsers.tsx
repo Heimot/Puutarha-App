@@ -149,10 +149,8 @@ const SettingsUsers = () => {
                             {isOpen ? 'Piilota käyttäjät' : 'Näytä käyttäjät'}
                             {
                                 isOpen
-                                    ?
-                                    <SettingsUsersTable newUser={createdUser} />
-                                    :
-                                    null
+                                &&
+                                <SettingsUsersTable newUser={createdUser} />
                             }
                         </Item>
                     </Grid>
@@ -160,12 +158,10 @@ const SettingsUsers = () => {
             </Grid>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={message.title}>
-                        {message.message}
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={message.title}>
+                    {message.message}
+                </Message>
             }
         </Grid>
     )
