@@ -11,6 +11,7 @@ import SettingsStatus from './SettingsStatus/SettingsStatus';
 import SettingsNames from './SettingsNames/SettingsNames';
 import SettingsLocation from './SettingsLocations/SettingsLocation';
 import SettingsPDF from './SettingsPDF/SettingsPDF';
+import PersonalSettings from './PersonalSettings';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -18,6 +19,9 @@ const Settings = () => {
   const returnRender = () => {
     let render = null;
     switch (page) {
+      case 'personalsettings':
+        render = <PersonalSettings />;
+        break;
       case 'language':
 
         break;
@@ -28,22 +32,22 @@ const Settings = () => {
         render = <SettingsRoles />;
         break;
       case 'rfid':
-        render = <SettingsRFID />
+        render = <SettingsRFID />;
         break;
       case 'state':
-        render = <SettingsState />
+        render = <SettingsState />;
         break;
       case 'status':
-        render = <SettingsStatus />
+        render = <SettingsStatus />;
         break;
       case 'location':
-        render = <SettingsLocation />
+        render = <SettingsLocation />;
         break;
       case 'autofill':
-        render = <SettingsNames />
+        render = <SettingsNames />;
         break;
       case 'stickers':
-        render = <SettingsPDF />
+        render = <SettingsPDF />;
         break;
       case 'logs':
 
