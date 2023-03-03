@@ -50,7 +50,8 @@ const Roles: Role[] = [
         permissions: [
             { path: '/settings/get_settings', label: 'Voi hakea asetukset' },
             { path: '/settings/get_personal_settings', label: 'Voi hakea omat asetukset' },
-            { path: '/settings/edit_personal_settings', label: 'Voi muokata omia asetuksia' }
+            { path: '/settings/edit_personal_settings', label: 'Voi muokata omia asetuksia' },
+            { path: '/settings/edit_users_settings', label: 'Voi muokata toisen käyttäjän asetuksia' }
         ],
     },
     {
