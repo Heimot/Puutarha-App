@@ -175,6 +175,7 @@ export interface User {
     username: string;
     role: Role;
     lastSignInAt: Date;
+    personalSettings: Settings;
     currentSignInAt: Date;
     signInCount: number;
 }
@@ -236,4 +237,11 @@ export interface ImageData {
     _id: string;
     image: string;
     imageID: string;
+}
+
+export interface Settings {
+    _id: string;
+    showEmptyOrders: boolean;
+    disableRFIDScanning: boolean;
+    language: any;
 }
