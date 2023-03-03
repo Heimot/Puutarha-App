@@ -6,6 +6,8 @@ import Paper from '@mui/material/Paper';
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { useSelector } from 'react-redux';
+import { State } from '../../app/redux/store';
 
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import FetchData from '../Components/Fetch';
@@ -57,6 +59,8 @@ const Calendar = () => {
   const [isPDFOpen, setIsPDFOpen] = useState<boolean>(false);
   const [PDFData, setPDFData] = useState<Order[]>([]);
   const theme = useTheme();
+
+  const { userData } = useSelector((state: State) => state.data);
 
   const borderStyle = {
     borderLeft: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
@@ -174,7 +178,10 @@ const Calendar = () => {
             week !== null
               ?
               week[i].map((item: Order) => {
-                let filteredStatus = item.statusLocation.filter((statusLoc: any) => { return statusLoc.status.default !== true });
+                let filteredStatus = [];
+                if ((userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) {
+                  filteredStatus = item.statusLocation.filter((statusLoc: any) => { return statusLoc.status.default !== true });
+                }
                 if (currentTruck !== item?.truck?.truckLicensePlate) {
                   currentTruck = item?.truck?.truckLicensePlate;
                   return (
@@ -183,7 +190,7 @@ const Calendar = () => {
                         mode === 'delivery'
                           ?
                           <Box
-                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setPDFData(week[i].filter((order: Order) => order?.truck?.truckLicensePlate === item?.truck?.truckLicensePlate)); setTruckMessage(true); } }}
+                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setPDFData(week[i].filter((order: Order) => order?.truck?.truckLicensePlate === item?.truck?.truckLicensePlate)); setTruckMessage(true); } }}
                             sx={
                               {
                                 color: "white",
@@ -210,7 +217,7 @@ const Calendar = () => {
                             border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
                           }
                         }
-                        onClick={() => { if (mode === 'delivery') { setOrder(item); setIsOpen(true); } }}
+                        onClick={() => { if (mode === 'delivery' && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setOrder(item); setIsOpen(true); } }}
                       >
                         <Box sx={{ display: 'flex', position: 'relative', width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                           {
@@ -289,7 +296,7 @@ const Calendar = () => {
                         }
                       }
                       key={item._id}
-                      onClick={() => { if (mode === 'delivery') { setOrder(item); setIsOpen(true); } }}
+                      onClick={() => { if (mode === 'delivery' && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setOrder(item); setIsOpen(true); } }}
                     >
                       <Box sx={{ display: 'flex', position: 'relative', width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         {
@@ -381,7 +388,7 @@ const Calendar = () => {
             />
           </LocalizationProvider>
         </Box>
-        <Item sx={{ marginTop: '25px' }}>
+        <Item sx={{ marginTop: '25px', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks') ? 'display' : 'none' }}>
           <Typography sx={{ fontSize: '25px' }}>Toimitettavat kaupat</Typography>
           <Table style={{
             color: theme.palette.mode === 'dark' ? 'white' : 'black',
@@ -404,8 +411,8 @@ const Calendar = () => {
               </Tr>
             </Tbody>
           </Table>
-          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(-6).toDate())}>Last week</Button>
-          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(8).toDate())}>Next week</Button>
+          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(-6).toDate())}>Viime viikko</Button>
+          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(8).toDate())}>Seuraava viikko</Button>
         </ Item>
         <Item sx={{ marginTop: '25px' }}>
           <Typography sx={{ fontSize: '25px' }}>Kerättävät kaupat</Typography>
@@ -430,8 +437,8 @@ const Calendar = () => {
               </Tr>
             </Tbody>
           </Table>
-          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(-7).toDate())}>Last week</Button>
-          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(7).toDate())}>Next week</Button>
+          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(-7).toDate())}>Viime viikko</Button>
+          <Button onClick={() => setDate(prevState => dayjs(prevState).weekday(7).toDate())}>Seuraava viikko</Button>
         </ Item>
       </Grid>
       {

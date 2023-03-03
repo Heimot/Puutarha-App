@@ -19,7 +19,6 @@ const CalendarTruckDialog: React.FC<Props> = ({ isOpen, setIsOpen, truckData }) 
     const [exists, setExists] = useState<boolean>(false);
 
     useEffect(() => {
-
         const getInfo = async () => {
             if (!truckData) return;
             let userId = localStorage.getItem('userId');
