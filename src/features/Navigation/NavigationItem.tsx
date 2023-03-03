@@ -50,7 +50,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
     const [locationOrder, setLocationOrder] = useState<Location[] | null>(null);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate } = useSelector((state: State) => state.data);
+    const { statusSettings, locationSettings, chosenStatus, chosenLocation, chosenDate, userData } = useSelector((state: State) => state.data);
 
     const dispatch = useDispatch();
     const { setChosenStatus, setChosenLocation, setChosenDate, setUserData, setChosenMode } = bindActionCreators(actionCreators, dispatch);
@@ -174,7 +174,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                 {['Keräykseen', 'Kalenteri', 'Tilanne', 'Paikka', 'Päivä', 'Lisää'].map((text) => (
                     <ListItem key={text} disablePadding>
                         {text !== "Tilanne" && text !== "Paikka" && text !== "Päivä" ?
-                            <ListItemButton onClick={(e: any) => { goToPage(text); toggleDrawer(e); }} onKeyDown={toggleDrawer} disabled={text === 'Lisää' && window.location.pathname !== '/dashboard' ? true : false}>
+                            <ListItemButton sx={{ display: text === 'Lisää' ? (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/create_order_with_products') ? 'flex' : 'none') : 'flex' }} onClick={(e: any) => { goToPage(text); toggleDrawer(e); }} onKeyDown={toggleDrawer} disabled={text === 'Lisää' && window.location.pathname !== '/dashboard' ? true : false}>
                                 <ListItemIcon>
                                     {text === "Kalenteri" ? <CalendarMonthIcon /> : text === "Keräykseen" ? <WorkIcon /> : <AddIcon />}
                                 </ListItemIcon>
@@ -182,7 +182,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                             </ListItemButton>
                             :
                             text !== "Päivä" ?
-                                <ListItemButton disabled={window.location.pathname !== '/dashboard' ? true : false}>
+                                <ListItemButton disabled={window.location.pathname !== '/dashboard' ? true : text === 'Tilanne' && (!userData?.role?.rights.includes('*') && !userData?.role?.rights.includes('/statuslocation/create_status_location')) ? true : false}>
                                     <ListItemIcon>
                                         {text === "Paikka" ? <LocationOnIcon /> : <DoneIcon />}
                                     </ListItemIcon>
