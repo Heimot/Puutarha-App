@@ -71,7 +71,7 @@ const Login = () => {
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Sign in
+                        Kirjaudu sisään
                     </Typography>
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                         <TextField
@@ -79,7 +79,7 @@ const Login = () => {
                             required
                             fullWidth
                             id="email"
-                            label="Username"
+                            label="Käyttäjä"
                             name="email"
                             autoComplete="email"
                             autoFocus
@@ -89,13 +89,14 @@ const Login = () => {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="Salasana"
                             type="password"
                             id="password"
                             autoComplete="current-password"
                         />
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
+                            sx={{ opacity: 0, cursor: 'default' }}
+                            control={<Checkbox sx={{ cursor: 'default' }} value="remember" color="primary" />}
                             label="Remember me"
                         />
                         <Button
@@ -104,7 +105,7 @@ const Login = () => {
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                         >
-                            Sign In
+                            Kirjaudu sisään
                         </Button>
                         <Copyright sx={{ mt: 5 }} />
                     </Box>
