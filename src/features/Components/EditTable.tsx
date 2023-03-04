@@ -72,7 +72,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
                 break;
             case 'location':
                 data = locationSettings.filter((location: Location) => {
-                    return location._id === value;
+                    return location?._id === value;
                 })[0]
                 break;
             default:
@@ -83,7 +83,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
         if (orderData) {
             let newData = {
                 ...orderData, products: orderData.products.map((product: any) => {
-                    return product._id === productId
+                    return product?._id === productId
                         ?
                         { ...product, [name]: data }
                         :
@@ -98,7 +98,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
         if (!orderData) return;
         let newData = {
             ...orderData, products: orderData.products.filter((product: any) => {
-                return product._id !== productId
+                return product?._id !== productId
             })
         }
         updateData(newData);
@@ -108,18 +108,18 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
         let body = {
             currentUserId: userId,
             _id: productId,
-            orderId: orderData._id
+            orderId: orderData?._id
         }
         await FetchData({ urlHost: url, urlPath: '/products/delete_product', urlMethod: 'DELETE', urlHeaders: 'Auth', urlBody: body });
         if (isCreated) {
             if (!removeProduct) return;
-            removeProduct(orderData._id, false, 'DELETEPRODUCT', orderData.pickingdate, productId);
+            removeProduct(orderData?._id, false, 'DELETEPRODUCT', orderData.pickingdate, productId);
         }
     }
 
     const updateRoller = (e: any) => {
         const filteredRoller = rollerSettings?.filter((roller: Roller) => {
-            return roller._id === e.target.value;
+            return roller?._id === e.target.value;
         })
         setRoller(filteredRoller[0]);
     }
@@ -261,10 +261,10 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
                                 ?
                                 <FormControl fullWidth sx={{ maxWidth: 300 }}>
                                     <InputLabel id='roller-label'>Rullakko</InputLabel>
-                                    <Select labelId='roller-label' label='Rullakko' value={roller._id} onChange={(e) => updateRoller(e)}>
+                                    <Select labelId='roller-label' label='Rullakko' value={roller?._id} onChange={(e) => updateRoller(e)}>
                                         {
                                             rollerSettings?.map((roller: Roller) => (
-                                                <MenuItem key={roller._id} value={roller._id}>{roller.roller}</MenuItem>
+                                                <MenuItem key={roller?._id} value={roller?._id}>{roller.roller}</MenuItem>
                                             ))
                                         }
                                     </Select>
@@ -291,7 +291,7 @@ const EditTable: React.FC<Props> = ({ orderData, setOrderData, updateData, isCre
                 <Tbody>
                     {
                         orderData?.products.map((product: any) =>
-                            <EditingMenuData key={product._id} product={product} updateProducts={(value, name, productId) => updateProducts(value, name, productId)} deleteProduct={(productId) => deleteProduct(productId)} isCreated={isCreated} />
+                            <EditingMenuData key={product?._id} product={product} updateProducts={(value, name, productId) => updateProducts(value, name, productId)} deleteProduct={(productId) => deleteProduct(productId)} isCreated={isCreated} />
                         )
                     }
                 </Tbody>

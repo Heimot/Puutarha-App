@@ -86,7 +86,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
                     return status._id === nextId;
                 })[0];
                 statusSettingsOrder[i] = defaultStatus;
-                nextId = defaultStatus.nextStatus;
+                nextId = defaultStatus?.nextStatus;
             }
         }
         setStatusOrder(statusSettingsOrder);
