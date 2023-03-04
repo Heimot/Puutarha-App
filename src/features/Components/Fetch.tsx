@@ -41,6 +41,24 @@ const FetchData = async ({ urlHost, urlPath, urlQuery, urlMethod, urlHeaders, ur
         body
     })
 
+    if (!data.ok) {
+        const userId = localStorage.getItem('userId');
+        let authCheck = await fetch(`${process.env.REACT_APP_API_URL}/auth/get_my_user_data?currentUserId=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+        if (!authCheck.ok) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            window.location.href = '/'
+        }
+        return;
+    }
+
     return data.json();
 }
 
