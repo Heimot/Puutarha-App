@@ -176,6 +176,7 @@ const Roles: Role[] = [
         name: 'RFID kortti oikeudet',
         permissions: [
             { path: '/card/get_cards', label: 'Voi hakea RFID kortit' },
+            { path: '/card/get_card_by_card_number', label: 'Voi hakea kortin, kortin numerolla' },
             { path: '/card/add_card', label: 'Voi luoda RFID kortin' },
             { path: '/card/delete_card', label: 'Voi poistaa RFID kortin' },
             { path: '/card/update_card', label: 'Voi päivittää RFID korttia' }
