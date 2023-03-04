@@ -153,7 +153,6 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
             localStorage.removeItem('userId');
             setUserData(null);
             navigate('/');
-            console.log(data)
         } else if (value === "Asetukset") {
             navigate('/dashboard/settings');
         } else if (value === "Kalenteri") {

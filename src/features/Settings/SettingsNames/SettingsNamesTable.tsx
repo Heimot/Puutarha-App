@@ -81,7 +81,6 @@ const SettingsRFIDTable: React.FC<Props> = ({ newCard, group, passValue, resetVa
             })[0];
             value.name = name;
             value.group = groupData;
-            console.log(value)
             passValue(value);
         }
         if (newCards === null) return;

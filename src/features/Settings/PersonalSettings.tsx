@@ -38,7 +38,6 @@ const PersonalSettings = () => {
             let userId = localStorage.getItem('userId');
             let url = process.env.REACT_APP_API_URL;
             const fetchSettings = await FetchData({ urlHost: url, urlPath: '/settings/get_personal_settings', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}` });
-            console.log(fetchSettings?.result?.personalSettings)
             if (!fetchSettings?.result?.personalSettings) return;
             setSettings(fetchSettings?.result?.personalSettings);
             setEmpty(fetchSettings?.result?.personalSettings?.showEmptyOrders);
@@ -65,7 +64,6 @@ const PersonalSettings = () => {
             }
         ]
         const personal = await FetchData({ urlHost: url, urlPath: '/settings/edit_personal_settings', urlMethod: 'PATCH', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&currentSettingsId=${settings?._id}`, urlBody: body });
-        console.log(personal)
         setUserData({ ...userData, showEmptyOrders: empty, disableRFIDScanning: rfid });
         setMessageOpen(true);
     }

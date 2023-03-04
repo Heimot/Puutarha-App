@@ -95,7 +95,6 @@ const Calendar = () => {
       const calendarPicking = await FetchData({ urlHost: url, urlPath: '/orders/get_calendar_picking', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&firstDate=${dayjs(date).day(1).format('YYYY-MM-DD')}&lastDate=${dayjs(date).day(7).format('YYYY-MM-DD')}` });
       const calendarDelivery = await FetchData({ urlHost: url, urlPath: '/orders/get_calendar_delivery', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&firstDate=${dayjs(date).day(1).format('YYYY-MM-DD')}&lastDate=${dayjs(date).day(7).format('YYYY-MM-DD')}` });
 
-      console.log(calendarDelivery)
       // We need to do this for both calendars.
       // Here we do it for the picking calendar.
       if (calendarPicking?.result) {
@@ -444,7 +443,7 @@ const Calendar = () => {
       {
         truckMessage
           ?
-          <MenuDialog isOpen={truckMessage} setIsOpen={(value) => setTruckMessage(value)} result={() => console.log('')} dialogTitle={'Kalenteri toiminnot'} actions={false}>
+          <MenuDialog isOpen={truckMessage} setIsOpen={(value) => setTruckMessage(value)} result={() => { return; }} dialogTitle={'Kalenteri toiminnot'} actions={false}>
             <Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
               <Button variant='contained' startIcon={<EditIcon />} onClick={() => { setTruckMessage(false); setIsTruckOpen(true); }}>Muuta rekan lisätietoja</Button>
               <Button sx={{ marginTop: '15px' }} variant='contained' startIcon={<PictureAsPdfIcon />} onClick={() => { setTruckMessage(false); setIsPDFOpen(true); }}>Tulosta PDF</Button>

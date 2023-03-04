@@ -43,7 +43,6 @@ const SettingsStateCell: React.FC<Props> = ({ cell, select, saveCard, deleteCard
         setColor(cell?.fontcolor);
         setIsDefault(cell?.default);
         setSticker(cell?.stickerPoint);
-        console.log()
         if (typeof cell?.nextState === 'string') {
             setNextState(cell?.nextState)
         } else {

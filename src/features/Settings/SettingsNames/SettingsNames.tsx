@@ -40,7 +40,6 @@ const SettingsNames = () => {
         }
 
         const createRFID = await FetchData({ urlHost: url, urlPath: '/names/create_name', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
-        console.log(createRFID)
         setCreatedObject(createRFID.result);
         if (createRFID?.result) {
             setMessage({ title: 'Nimi lisätty.', message: 'Nimi on luotu onnistuneesti.' });

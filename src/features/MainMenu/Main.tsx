@@ -365,7 +365,6 @@ const Main = () => {
                         :
                         order;
                 })
-                console.log(data)
                 break;
             default:
                 console.log('No method chosen');

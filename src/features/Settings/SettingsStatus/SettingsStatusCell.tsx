@@ -41,7 +41,6 @@ const SettingsStatusCell: React.FC<Props> = ({ cell, select, saveCard, deleteCar
         setBGColor(cell?.color);
         setColor(cell?.fontcolor);
         setIsDefault(cell?.default);
-        console.log()
         if (typeof cell?.nextStatus === 'string') {
             setNextState(cell?.nextStatus)
         } else {

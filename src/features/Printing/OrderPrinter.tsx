@@ -62,7 +62,6 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
     }
 
     const print = async () => {
-        console.log(order)
         let doc = new jsPDF();
         let page = 1;
         counter = 0;
