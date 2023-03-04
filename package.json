@@ -1,6 +1,8 @@
 {
   "name": "puutarha-frontend",
-  "version": "0.1.0",
+  "version": "0.5.0",
+  "homepage": "https://beta.heimosenpuutarha.com/",
+  "author": "Joonas Heimonen",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",
