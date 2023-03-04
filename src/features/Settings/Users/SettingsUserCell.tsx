@@ -16,9 +16,10 @@ interface Props {
     roles: Role[];
     saveUser: (userId: string, roleId: string) => void;
     deleteUser: (userId: string) => void;
+    updateSettings: (userId: string, showEmpty: boolean, useRfid: boolean) => void;
 }
 
-const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser }) => {
+const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser, updateSettings }) => {
     const [role, setRole] = useState<string>('');
     const [settings, setSettings] = useState<Settings | null>(null);
     const [empty, setEmpty] = useState<boolean>(false);
@@ -71,6 +72,7 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser }
             }
         ]
         await FetchData({ urlHost: url, urlPath: '/settings/edit_users_settings', urlMethod: 'PATCH', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&currentSettingsId=${settings?._id}`, urlBody: body });
+        updateSettings(user?._id, empty, rfid);
         setMessageOpen(true);
     }
 

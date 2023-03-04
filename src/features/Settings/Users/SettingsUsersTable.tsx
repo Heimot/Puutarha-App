@@ -83,6 +83,17 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
         setUsers(newUsers);
     }
 
+    const updateSettings = async (userId: string, showEmpty: boolean, useRfid: boolean) => {
+        const newUsers = users.map((user) => {
+            return user._id === userId
+                ?
+                { ...user, personalSettings: { ...user.personalSettings, showEmptyOrders: showEmpty, disableRFIDScanning: useRfid } }
+                :
+                user;
+        });
+        setUsers(newUsers);
+    }
+
     return (
         <Table style={{
             color: theme.palette.mode === 'dark' ? 'white' : 'black',
@@ -100,7 +111,7 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
             <Tbody>
                 {
                     users.map((user) => (
-                        <SettingsUserCell key={user._id} user={user} roles={roles} saveUser={(userId, roleId) => saveUser(userId, roleId)} deleteUser={(userId) => deleteUser(userId)} />
+                        <SettingsUserCell key={user._id} user={user} roles={roles} saveUser={(userId, roleId) => saveUser(userId, roleId)} deleteUser={(userId) => deleteUser(userId)} updateSettings={(userId, showEmpty, useRfid) => updateSettings(userId, showEmpty, useRfid)} />
                     ))
                 }
             </Tbody>
