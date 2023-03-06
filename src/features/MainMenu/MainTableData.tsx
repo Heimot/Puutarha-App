@@ -71,13 +71,14 @@ const MainTableData: React.FC<Props> = ({ product, defaultStatus, rfidCards, upd
             <Td style={borderStyle}>{product?.flower.name}</Td>
             <Td style={borderStyle}>{product?.amount}</Td>
             <Td style={borderStyle}>{product?.location.location}</Td>
-            <Td style={borderStyle}>{product?.information}</Td>
+            <Td style={{ ...borderStyle, height: product?.information === '' && '20px' }}>{product?.information}</Td>
             <Td style={{ padding: '5px', ...borderStyle }}>
                 <Button
+                    fullWidth
                     variant="contained"
                     size='small'
                     sx={{ fontSize: 15, whiteSpace: 'wrap', textTransform: 'none' }}
-                    style={{ maxWidth: '150px', minWidth: '150px', backgroundColor: product?.state?.color, color: product?.state?.fontcolor }}
+                    style={{ backgroundColor: product?.state?.color, color: product?.state?.fontcolor }}
                     onClick={() => nextState()}
                 >
                     {product?.state?.state}
