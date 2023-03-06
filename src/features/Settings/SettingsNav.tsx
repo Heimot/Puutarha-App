@@ -18,6 +18,8 @@ import RememberMeIcon from '@mui/icons-material/RememberMe';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import CallToActionIcon from '@mui/icons-material/CallToAction';
 import { State } from '../../app/redux/store';
 import { useSelector } from 'react-redux';
 
@@ -34,6 +36,8 @@ const adminData = [
     { icon: <PrecisionManufacturingIcon />, label: 'Muokkaa tilauksen tiloja', id: 'status', hidden: '/status/create_status' },
     { icon: <ExploreIcon />, label: 'Muokkaa keräyspaikkoja', id: 'location', hidden: '/location/create_location' },
     { icon: <SearchIcon />, label: 'Muokkaa kauppoja ja kukkia', id: 'autofill', hidden: '/names/create_name' },
+    { icon: <LocalShippingIcon />, label: 'Muokkaa rekkoja', id: 'trucks', hidden: '/trucks/create_truck' },
+    { icon: <CallToActionIcon />, label: 'Muokkaa rullakkoja', id: 'rollers', hidden: '/rollers/create_roller' },
     { icon: <LabelIcon />, label: 'Muokkaa tarroja', id: 'stickers', hidden: '/pdf/create_pdf' },
     { icon: <ListAltIcon />, label: 'Logit', id: 'logs', hidden: '/log/get_logs' },
 ];

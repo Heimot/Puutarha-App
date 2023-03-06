@@ -12,6 +12,8 @@ import SettingsNames from './SettingsNames/SettingsNames';
 import SettingsLocation from './SettingsLocations/SettingsLocation';
 import SettingsPDF from './SettingsPDF/SettingsPDF';
 import PersonalSettings from './PersonalSettings';
+import SettingsTrucks from './SettingsTrucks/SettingsTrucks';
+import SettingsRoller from './SettingsRoller/SettingsRoller';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -45,6 +47,12 @@ const Settings = () => {
         break;
       case 'autofill':
         render = <SettingsNames />;
+        break;
+      case 'trucks':
+        render = <SettingsTrucks />
+        break;
+      case 'rollers':
+        render = <SettingsRoller />
         break;
       case 'stickers':
         render = <SettingsPDF />;
