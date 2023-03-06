@@ -30,7 +30,6 @@ const SettingsStatus = () => {
     const [bgcolor, setBGColor] = useState<string>('#FFFFFF');
     const [color, setColor] = useState<string>('#000000');
     const [isDefault, setIsDefault] = useState<boolean>(false);
-    const [sticker, setSticker] = useState<boolean>(false);
     const [settings, setSettings] = useState<Status | undefined>();
     const [message, setMessage] = useState<ModelMessage>({ title: '', message: '' });
     const [bgIsOpen, setBGIsOpen] = useState<boolean>(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { TextField, Button, Typography, Select, MenuItem, InputLabel, FormControl, FormControlLabel, Switch } from '@mui/material';
+import { Button, FormControlLabel, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
@@ -63,7 +63,7 @@ const PersonalSettings = () => {
                 value: rfid
             }
         ]
-        const personal = await FetchData({ urlHost: url, urlPath: '/settings/edit_personal_settings', urlMethod: 'PATCH', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&currentSettingsId=${settings?._id}`, urlBody: body });
+        await FetchData({ urlHost: url, urlPath: '/settings/edit_personal_settings', urlMethod: 'PATCH', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&currentSettingsId=${settings?._id}`, urlBody: body });
         setUserData({ ...userData, showEmptyOrders: empty, disableRFIDScanning: rfid });
         setMessageOpen(true);
     }

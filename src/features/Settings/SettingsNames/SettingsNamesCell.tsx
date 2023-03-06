@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Tr, Td } from 'react-super-responsive-table';
-import { TextField, Select, MenuItem, Typography, Box, Button } from '@mui/material';
+import { TextField, Select, MenuItem, Box, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Card, Flower, Store, User } from '../../../Model';
+import { Flower, Store } from '../../../Model';
 import MenuDialog from '../../Components/MenuDialog';
 
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,7 +15,6 @@ interface Props {
 }
 
 const SettingsNamesCell: React.FC<Props> = ({ card, saveCard, deleteCard }) => {
-    const [user, setUser] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [name, setName] = useState<string>('');
     const [group, setGroup] = useState<string>('');
@@ -30,14 +29,6 @@ const SettingsNamesCell: React.FC<Props> = ({ card, saveCard, deleteCard }) => {
     useEffect(() => {
         setName(card?.name);
         setGroup(card?.group);
-        /*if (typeof card?.cardAccount === 'string') {
-            setUser(card?.cardAccount)
-        } else {
-            if (card?.cardAccount === '') {
-                if (!card?.cardAccount) return;
-                setUser(card?.cardAccount)
-            }
-        }*/
     }, [card])
 
     return (

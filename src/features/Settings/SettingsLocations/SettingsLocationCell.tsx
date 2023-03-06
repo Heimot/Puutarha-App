@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Tr, Td } from 'react-super-responsive-table';
-import { TextField, Select, MenuItem, Typography, Box, Button, FormControlLabel, Switch } from '@mui/material';
+import { TextField, Select, MenuItem, Box, Button, Switch } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Card, Location, User } from '../../../Model';
+import { Location } from '../../../Model';
 import MenuDialog from '../../Components/MenuDialog';
 
 import DeleteIcon from '@mui/icons-material/Delete';

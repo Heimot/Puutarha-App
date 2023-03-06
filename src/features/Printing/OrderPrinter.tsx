@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Select, MenuItem, Box, Typography, TextField, FormControl, InputLabel } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useSelector } from 'react-redux';
@@ -37,17 +37,17 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
     }, [orderPrint])
 
     const imageToBase64 = (imgUrl: string, callback: Function) => {
-        var img = new Image();
+        let img = new Image();
 
         // onload fires when the image is fully loadded, and has width and height
         img.onload = function () {
-            var canvas = document.createElement("canvas");
+            let canvas = document.createElement("canvas");
             canvas.width = img.width;
             canvas.height = img.height;
-            var ctx = canvas.getContext("2d");
+            let ctx = canvas.getContext("2d");
             ctx?.drawImage(img, 0, 0);
-            var dataURL = canvas.toDataURL("image/png"),
-                dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+            let dataURL = canvas.toDataURL("image/png");
+            dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
             callback(dataURL); // the base64 string
         };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { TextField, Button, Typography, Select, MenuItem, FormControl, InputLabel, Box, FormGroup, FormControlLabel, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 
 import { Role } from '../../../Model';

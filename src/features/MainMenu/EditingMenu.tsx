@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';

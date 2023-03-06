@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import FetchData from '../../Components/Fetch';
-import { Card, Location, Message as ModelMessage, User } from '../../../Model';
+import { Location, Message as ModelMessage } from '../../../Model';
 import Message from '../../Components/Message';
 
 
@@ -74,7 +74,7 @@ const SettingsLocation = () => {
                 <Item sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
                     <Grid sx={{ display: 'flex', flexDirection: 'column', padding: '10px 0 10px 0', maxWidth: '500px', alignItems: 'center' }}>
                         <Typography>
-                            Lisää keräyspaikkoja käyttäjä
+                            Lisää keräyspaikkoja
                         </Typography>
                         <TextField value={location} onChange={(e) => setLocation(e.target.value)} sx={{ margin: '10px 0 5px 0' }} label='Sijainti' />
                         <FormControl fullWidth sx={{ margin: '5px 0 5px 0' }}>

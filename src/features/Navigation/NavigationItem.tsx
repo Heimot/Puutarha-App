@@ -148,7 +148,7 @@ const NavigationItem: React.FC<Props> = ({ toggleDrawer }) => {
         if (value === "Kirjaudu ulos") {
             let url = process.env.REACT_APP_API_URL;
             socket?.close()
-            let data = await FetchData({ urlHost: url, urlPath: '/auth/log_out', urlMethod: 'DELETE', urlHeaders: 'Auth' });
+            await FetchData({ urlHost: url, urlPath: '/auth/log_out', urlMethod: 'DELETE', urlHeaders: 'Auth' });
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
             setUserData(null);

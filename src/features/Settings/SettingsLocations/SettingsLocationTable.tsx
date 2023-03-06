@@ -3,7 +3,7 @@ import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import { useTheme } from '@mui/material/styles';
 import FetchData from '../../Components/Fetch';
 import SettingsLocationCell from './SettingsLocationCell';
-import { User, Card, Location } from '../../../Model';
+import { Location } from '../../../Model';
 import Message from '../../Components/Message';
 
 

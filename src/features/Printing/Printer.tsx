@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Select, MenuItem, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Select, MenuItem } from '@mui/material';
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import jsPDF from 'jspdf';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { State } from '../../app/redux/store';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -40,18 +40,18 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
     }, [stickers])
 
     const imageToBase64 = (imgUrl: string, callback: Function) => {
-        var img = new Image();
+        let img = new Image();
 
         // onload fires when the image is fully loadded, and has width and height
 
         img.onload = function () {
-            var canvas = document.createElement("canvas");
+            let canvas = document.createElement("canvas");
             canvas.width = img.width;
             canvas.height = img.height;
-            var ctx = canvas.getContext("2d");
+            let ctx = canvas.getContext("2d");
             ctx?.drawImage(img, 0, 0);
-            var dataURL = canvas.toDataURL("image/png"),
-                dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+            let dataURL = canvas.toDataURL("image/png");
+            dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
             callback(dataURL); // the base64 string
         };
 

@@ -171,130 +171,48 @@ const Calendar = () => {
     let items = [];
     for (let i = 0; 7 > i; i++) {
       let currentTruck: any = undefined;
+      if (!week) return;
       items.push(
-        <Td key={i} style={{ ...borderStyle, padding: 0, height: '100%', verticalAlign: 'top', }} >
+        <Td key={i} style={{ ...borderStyle, padding: 0, verticalAlign: 'top', height: week[i]?.length === 0 ? '30px' : '100%' }} >
           {
-            week !== null
-              ?
-              week[i].map((item: Order) => {
-                let filteredStatus = [];
-                if ((userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) {
-                  filteredStatus = item.statusLocation.filter((statusLoc: any) => { return statusLoc.status.default !== true });
-                }
-                if (currentTruck !== item?.truck?.truckLicensePlate) {
-                  currentTruck = item?.truck?.truckLicensePlate;
-                  return (
-                    <Box key={item._id}>
-                      {
-                        mode === 'delivery'
-                          ?
-                          <Box
-                            onClick={() => { if (item?.truck?.truckLicensePlate !== undefined && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setPDFData(week[i].filter((order: Order) => order?.truck?.truckLicensePlate === item?.truck?.truckLicensePlate)); setTruckMessage(true); } }}
-                            sx={
-                              {
-                                color: "white",
-                                fontWeight: "bold",
-                                bgcolor: "black",
-                                border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
-                                padding: '10px',
-                                '&:hover': {
-                                  bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
-                                }
-                              }
-                            }
-                          >
-                            <Typography>
-                              Rekka: {item?.truck?.truckLicensePlate === undefined ? 'EI VALITTU' : item?.truck?.truckLicensePlate}
-                            </Typography>
-                          </Box>
-                          :
-                          null
-                      }
+            week[i].map((item: Order) => {
+              let filteredStatus = [];
+              if ((userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) {
+                filteredStatus = item.statusLocation.filter((statusLoc: any) => { return statusLoc.status.default !== true });
+              }
+              if (currentTruck !== item?.truck?.truckLicensePlate) {
+                currentTruck = item?.truck?.truckLicensePlate;
+                return (
+                  <Box key={item._id}>
+                    {
+                      mode === 'delivery'
+                      &&
                       <Box
+                        onClick={() => { if (item?.truck?.truckLicensePlate !== undefined && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setTruckData({ deliverydate: dayjs(date).day(i + 1).format('MM-DD-YYYY'), truck: item.truck }); setPDFData(week[i].filter((order: Order) => order?.truck?.truckLicensePlate === item?.truck?.truckLicensePlate)); setTruckMessage(true); } }}
                         sx={
                           {
+                            color: "white",
+                            fontWeight: "bold",
+                            bgcolor: "black",
                             border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
-                          }
-                        }
-                        onClick={() => { if (mode === 'delivery' && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setOrder(item); setIsOpen(true); } }}
-                      >
-                        <Box sx={{ display: 'flex', position: 'relative', width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                          {
-                            filteredStatus.map((statusLoc: any, index: number) => {
-                              const width = 100 / filteredStatus.length;
-                              return (
-                                <Box key={index} sx={
-                                  {
-                                    display: 'flex',
-                                    bgcolor: statusLoc.status.color,
-                                    width: `${width}%`,
-                                    minHeight: '42.02px'
-                                  }
-                                }
-                                >
-                                </Box>
-                              )
-                            })
-                          }
-                          {
-                            filteredStatus.length > 0
-                              ?
-                              <Box sx={
-                                {
-                                  display: 'flex',
-                                  position: 'absolute',
-                                  padding: item.statusLocation.length <= 0 ? '10px' : 0,
-                                  width: '100%',
-                                  height: '100%',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  '&:hover': {
-                                    bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.black, 0.3) : alpha(theme.palette.common.white, 0.3)
-                                  }
-                                }
-                              }>
-                                <Typography>
-                                  {item.store.name}
-                                </Typography>
-                              </Box>
-                              :
-                              null
-                          }
-                        </Box>
-                        {
-                          filteredStatus.length <= 0
-                            ?
-                            <Typography sx={
-                              {
-                                padding: filteredStatus.length <= 0 ? '10px' : 0,
-                                '&:hover': {
-                                  bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
-                                }
-                              }
+                            padding: '10px',
+                            '&:hover': {
+                              bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
                             }
-                            >
-                              {item.store.name}
-                            </Typography>
-                            :
-                            null
+                          }
                         }
-
+                      >
+                        <Typography>
+                          Rekka: {item?.truck?.truckLicensePlate === undefined ? 'EI VALITTU' : item?.truck?.truckLicensePlate}
+                        </Typography>
                       </Box>
-                    </Box>
-                  )
-                } else {
-                  currentTruck = item?.truck?.truckLicensePlate;
-                  return (
+                    }
                     <Box
                       sx={
                         {
                           border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
-                          '&:hover': {
-                            bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
-                          }
                         }
                       }
-                      key={item._id}
                       onClick={() => { if (mode === 'delivery' && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setOrder(item); setIsOpen(true); } }}
                     >
                       <Box sx={{ display: 'flex', position: 'relative', width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -317,52 +235,121 @@ const Calendar = () => {
                         }
                         {
                           filteredStatus.length > 0
-                            ?
-                            <Box sx={
-                              {
-                                display: 'flex',
-                                position: 'absolute',
-                                padding: item.statusLocation.length <= 0 ? '10px' : 0,
-                                width: '100%',
-                                height: '100%',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                '&:hover': {
-                                  bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.black, 0.3) : alpha(theme.palette.common.white, 0.3)
-                                }
+                          &&
+                          <Box sx={
+                            {
+                              display: 'flex',
+                              position: 'absolute',
+                              padding: item.statusLocation.length <= 0 ? '10px' : 0,
+                              width: '100%',
+                              height: '100%',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              '&:hover': {
+                                bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.black, 0.3) : alpha(theme.palette.common.white, 0.3)
                               }
-                            }>
-                              <Typography>
-                                {item.store.name}
-                              </Typography>
-                            </Box>
-                            :
-                            null
+                            }
+                          }>
+                            <Typography>
+                              {item.store.name}
+                            </Typography>
+                          </Box>
                         }
                       </Box>
                       {
                         filteredStatus.length <= 0
-                          ?
-                          <Typography sx={
-                            {
-                              padding: filteredStatus.length <= 0 ? '10px' : 0,
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
-                              }
+                        &&
+                        <Typography sx={
+                          {
+                            padding: filteredStatus.length <= 0 ? '10px' : 0,
+                            '&:hover': {
+                              bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
                             }
                           }
-                          >
+                        }
+                        >
+                          {item.store.name}
+                        </Typography>
+                      }
+
+                    </Box>
+                  </Box>
+                )
+              } else {
+                currentTruck = item?.truck?.truckLicensePlate;
+                return (
+                  <Box
+                    sx={
+                      {
+                        border: `solid ${theme.palette.mode === 'dark' ? 'white' : 'black'} 1px`,
+                        '&:hover': {
+                          bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
+                        }
+                      }
+                    }
+                    key={item._id}
+                    onClick={() => { if (mode === 'delivery' && (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/trucks/get_trucks'))) { setOrder(item); setIsOpen(true); } }}
+                  >
+                    <Box sx={{ display: 'flex', position: 'relative', width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                      {
+                        filteredStatus.map((statusLoc: any, index: number) => {
+                          const width = 100 / filteredStatus.length;
+                          return (
+                            <Box key={index} sx={
+                              {
+                                display: 'flex',
+                                bgcolor: statusLoc.status.color,
+                                width: `${width}%`,
+                                minHeight: '42.02px'
+                              }
+                            }
+                            >
+                            </Box>
+                          )
+                        })
+                      }
+                      {
+                        filteredStatus.length > 0
+                        &&
+                        <Box sx={
+                          {
+                            display: 'flex',
+                            position: 'absolute',
+                            padding: item.statusLocation.length <= 0 ? '10px' : 0,
+                            width: '100%',
+                            height: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            '&:hover': {
+                              bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.black, 0.3) : alpha(theme.palette.common.white, 0.3)
+                            }
+                          }
+                        }>
+                          <Typography>
                             {item.store.name}
                           </Typography>
-                          :
-                          null
+                        </Box>
                       }
                     </Box>
-                  )
-                }
-              })
-              :
-              null
+                    {
+                      filteredStatus.length <= 0
+                      &&
+                      <Typography sx={
+                        {
+                          padding: filteredStatus.length <= 0 ? '10px' : 0,
+                          '&:hover': {
+                            bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.1)
+                          }
+                        }
+                      }
+                      >
+                        {item.store.name}
+                      </Typography>
+                    }
+                  </Box>
+                )
+              }
+            })
           }
         </Td >
       )

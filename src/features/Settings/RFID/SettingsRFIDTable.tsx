@@ -62,7 +62,7 @@ const SettingsRFIDTable: React.FC<Props> = ({ newCard }) => {
             }
         ]
 
-        const updateCard = await FetchData({ urlHost: url, urlPath: '/card/update_card', urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: body, urlQuery: `?currentUserId=${usrId}&currentCardId=${cardId}` });
+        await FetchData({ urlHost: url, urlPath: '/card/update_card', urlMethod: 'PATCH', urlHeaders: 'Auth', urlBody: body, urlQuery: `?currentUserId=${usrId}&currentCardId=${cardId}` });
 
         const newCards = cards?.map((card) => {
             return card._id === cardId
