@@ -245,3 +245,10 @@ export interface Settings {
     disableRFIDScanning: boolean;
     language: any;
 }
+
+export interface pdfs {
+    _id: string;
+    PDFName: string;
+    stickerDefault: boolean;
+    orderDefault: boolean;
+}
