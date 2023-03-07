@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Select, MenuItem } from '@mui/material';
 import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
 import jsPDF from 'jspdf';
-import { useSelector } from 'react-redux';
-import { State } from '../../app/redux/store';
 
 import CloseIcon from '@mui/icons-material/Close';
 import PrintIcon from '@mui/icons-material/Print';
 
-import { Stickers, PDFData, PDFImage, PDFText, ImageData } from '../../Model';
+import { Stickers, pdfs, PDFImage, PDFText, ImageData } from '../../Model';
 import { useTheme } from '@mui/material/styles';
 import PrinterData from './PrinterData';
 import dayjs from 'dayjs';
+import FetchData from '../Components/Fetch';
 
 interface Props {
     isOpen: boolean;
@@ -24,15 +23,28 @@ interface Props {
 const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, resetCards }) => {
     const [printableStickers, setPrintableStickers] = useState<Stickers[]>([]);
     const [chosenSticker, setChosenSticker] = useState<string>('');
-    const { pdfSettings } = useSelector((state: State) => state.data);
+    const [pdfs, setPdfs] = useState<pdfs[]>([]);
 
     const theme = useTheme();
 
     useEffect(() => {
-        const chosen = pdfSettings.filter((pdf: any) => {
-            return pdf.stickerDefault
-        })
-        setChosenSticker(chosen[0]._id);
+        const getNames = async () => {
+            let userId = localStorage.getItem('userId');
+            let url = process.env.REACT_APP_API_URL;
+            const pdfNames = await FetchData({ urlHost: url, urlPath: '/pdf/get_pdf_names', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}` });
+            setPdfs(pdfNames.result);
+            const chosen = pdfNames?.result?.filter((pdf: any) => {
+                return pdf.stickerDefault;
+            })[0];
+            if (!chosen) return;
+            setChosenSticker(chosen?._id);
+        }
+
+        getNames();
+        return () => {
+            setPdfs([]);
+            setChosenSticker('');
+        }
     }, [])
 
     useEffect(() => {
@@ -67,10 +79,11 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
 
     const print = async () => {
         let doc = new jsPDF();
-        let pdfData = pdfSettings.filter((pdf: PDFData) => {
-            return pdf._id === chosenSticker;
-        })[0];
+        let userId = localStorage.getItem('userId');
+        let url = process.env.REACT_APP_API_URL;
+        let pdfData = await FetchData({ urlHost: url, urlPath: '/pdf/get_pdf_by_id', urlMethod: 'GET', urlHeaders: 'Auth', urlQuery: `?currentUserId=${userId}&currentPDFId=${chosenSticker}` });
         if (pdfData === null) return;
+        pdfData = pdfData?.result;
         doc = new jsPDF(pdfData?.pageLayout, 'mm', [pdfData?.height, pdfData?.width]);
         let imageRef: ImageData[] = [];
 
@@ -253,7 +266,7 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
                         ?
                         <Select style={{ marginRight: 'auto' }} value={chosenSticker} onChange={(e) => setChosenSticker(e.target.value)}>
                             {
-                                pdfSettings.map((pdf: PDFData) => (
+                                pdfs.map((pdf: pdfs) => (
                                     <MenuItem value={pdf._id} key={pdf._id}>{pdf.PDFName}</MenuItem>
                                 ))
                             }
