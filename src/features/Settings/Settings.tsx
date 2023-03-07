@@ -6,14 +6,15 @@ import SettingsUsers from './Users/SettingsUsers';
 import SettingsRoles from './Roles/SettingsRoles';
 import { useTheme } from '@emotion/react';
 import SettingsRFID from './RFID/SettingsRFID';
-import SettingsState from './SettingsState/SettingsState';
-import SettingsStatus from './SettingsStatus/SettingsStatus';
-import SettingsNames from './SettingsNames/SettingsNames';
-import SettingsLocation from './SettingsLocations/SettingsLocation';
-import SettingsPDF from './SettingsPDF/SettingsPDF';
+import SettingsState from './State/SettingsState';
+import SettingsStatus from './Status/SettingsStatus';
+import SettingsNames from './Names/SettingsNames';
+import SettingsLocation from './Location/SettingsLocation';
+import SettingsPDF from './PDF/SettingsPDF';
 import PersonalSettings from './PersonalSettings';
-import SettingsTrucks from './SettingsTrucks/SettingsTrucks';
-import SettingsRoller from './SettingsRoller/SettingsRoller';
+import SettingsTrucks from './Trucks/SettingsTrucks';
+import SettingsRoller from './Roller/SettingsRoller';
+import Import from './Excel/Import';
 
 const Settings = () => {
   const [page, setPage] = useState<string>('');
@@ -56,6 +57,9 @@ const Settings = () => {
         break;
       case 'stickers':
         render = <SettingsPDF />;
+        break;
+      case 'excel':
+        render = <Import />
         break;
       case 'logs':
 

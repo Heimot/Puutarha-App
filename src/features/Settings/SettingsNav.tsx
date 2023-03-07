@@ -20,6 +20,7 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import SettingsIcon from '@mui/icons-material/Settings';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CallToActionIcon from '@mui/icons-material/CallToAction';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
 import { State } from '../../app/redux/store';
 import { useSelector } from 'react-redux';
 
@@ -39,6 +40,7 @@ const adminData = [
     { icon: <LocalShippingIcon />, label: 'Muokkaa rekkoja', id: 'trucks', hidden: '/trucks/create_truck' },
     { icon: <CallToActionIcon />, label: 'Muokkaa rullakkoja', id: 'rollers', hidden: '/rollers/create_roller' },
     { icon: <LabelIcon />, label: 'Muokkaa tarroja', id: 'stickers', hidden: '/pdf/create_pdf' },
+    { icon: <ImportExportIcon />, label: 'Excel tuonti', id: 'excel', hidden: '/pdf/create_pdf' },
     { icon: <ListAltIcon />, label: 'Logit', id: 'logs', hidden: '/log/get_logs' },
 ];
 
