@@ -7,7 +7,7 @@ import { State } from '../../app/redux/store';
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table'
+import { Table, Thead, Tbody, Tr, Th } from 'react-super-responsive-table';
 
 import AddIcon from '@mui/icons-material/Add';
 import dayjs from 'dayjs';
