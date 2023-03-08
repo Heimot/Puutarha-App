@@ -11,7 +11,7 @@ interface Props {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     usedGroup: 'Flowers' | 'Stores';
-    updateText: (value: Flower | Store) => void;
+    updateText?: (value: Flower | Store) => void;
 }
 
 const GridStyles = {
@@ -35,9 +35,7 @@ const AddAutofill: React.FC<Props> = ({ isOpen, setIsOpen, usedGroup, updateText
 
         const data = await FetchData({ urlHost: url, urlPath: '/names/create_name', urlMethod: 'POST', urlHeaders: 'Auth', urlBody: body });
         if (!data?.result) return;
-        if (group === 'Flowers') {
-            updateText(data.result);
-        } else {
+        if (updateText) {
             updateText(data.result);
         }
         setName('');
