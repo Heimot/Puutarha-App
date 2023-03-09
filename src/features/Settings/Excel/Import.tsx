@@ -10,10 +10,11 @@ import UploadIcon from '@mui/icons-material/Upload';
 import ExcelAuto from './ExcelAuto';
 import { useSelector } from 'react-redux';
 import { State } from '../../../app/redux/store';
-import { Location } from '../../../Model';
+import { Location, Message as ModelMessage } from '../../../Model';
 import dayjs from 'dayjs';
 import FetchData from '../../Components/Fetch';
 import MenuDialog from '../../Components/MenuDialog';
+import Message from '../../Components/Message';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -27,6 +28,8 @@ const Item = styled(Paper)(({ theme }) => ({
 const Import = () => {
   const [orders, setOrders] = useState<any>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<ModelMessage>({ title: '', message: '' });
+  const [messageOpen, setMessageOpen] = useState<boolean>(false);
 
   const { locationSettings } = useSelector((state: State) => state.data);
 
@@ -89,6 +92,14 @@ const Import = () => {
     let userId = localStorage.getItem('userId');
     let url = process.env.REACT_APP_API_URL;
     const data = await FetchData({ urlHost: url, urlPath: '/orders/excel_import', urlQuery: `?currentUserId=${userId}`, urlMethod: 'POST', urlHeaders: 'Auth', urlBody: ordersToCreate });
+    if (data?.success) {
+      setMessage({ title: 'Excel', message: 'Excel on tuotu onnistuneesti!' });
+      setMessageOpen(true);
+      setOrders([]);
+    } else {
+      setMessage({ title: 'Excel error', message: 'Excel vienti ei toiminut. Onko tiedosto varmasti oikeassa muodossa?' });
+      setMessageOpen(true);
+    }
   }
 
   const restCells = () => {
@@ -200,6 +211,13 @@ const Import = () => {
         JOS ET OLE VALINNUT KAIKKIA KAUPPOJA, KUKKIA JA SIJAINTEJA. OSA TIEDOISTA EI TULE SOVELLUKSEEN, VARMISTA ETTÄ KAIKKI ON VARMASTI OK! HUOMIOI MYÖS ETTÄ TIEDOSTO ON OIKEASSA MUODOSSA JA ETTÄ
         PÄIVÄMÄÄRÄ ON MUODOSSA (PÄIVÄ/KUUKAUSI/VUOSI) ESIM. 20/01/2023!
       </MenuDialog>
+      {
+        messageOpen
+        &&
+        <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={message.title}>
+          {message.message}
+        </Message>
+      }
     </Grid>
   )
 }
