@@ -313,7 +313,6 @@ const Main = () => {
 
     const updateOrder = async (id: string | undefined, isCreator: boolean, method: 'DELETE' | 'POST' | 'PATCH' | 'DELETEPRODUCT', date: Date, productId: string | undefined) => {
         if (!id) return;
-        if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) return;
         let userId = localStorage.getItem('userId');
         let locations = localStorage.getItem('location');
         if (locations === null) {
@@ -338,33 +337,48 @@ const Main = () => {
         // Switch case for all methods.
         switch (method) {
             case 'DELETE':
-                data = orders.filter((order) => {
-                    return order._id !== id;
-                })
+                if (dayjs(date).format('YYYY-MM-DD') === dayjs(chosenDate).format('YYYY-MM-DD')) {
+                    data = orders.filter((order) => {
+                        return order._id !== id;
+                    })
+                }
                 break;
             case 'POST':
-                data = [...orders, newData.result];
+                if (dayjs(date).format('YYYY-MM-DD') === dayjs(chosenDate).format('YYYY-MM-DD')) {
+                    data = [...orders, newData.result];
+                };
                 break;
             case 'PATCH':
-                data = orders.map((order) => {
-                    return order._id === id
-                        ? newData.result
-                        : order;
-                })
+                const orderExists = orders.filter((order) => order._id === id)
+                if (dayjs(date).format('YYYY-MM-DD') !== dayjs(chosenDate).format('YYYY-MM-DD')) {
+                    data = orders.filter((order) => {
+                        return order._id !== id;
+                    })
+                } else if (orderExists.length > 0) {
+                    data = orders.map((order) => {
+                        return order._id === id
+                            ? newData.result
+                            : order;
+                    })
+                } else {
+                    data = [...orders, newData.result];
+                }
                 break;
             case 'DELETEPRODUCT':
-                data = orders.map((order) => {
-                    return order._id === id
-                        ?
-                        {
-                            ...order,
-                            products: order.products.filter((product) => {
-                                return product._id !== productId
-                            })
-                        }
-                        :
-                        order;
-                })
+                if (dayjs(date).format('YYYY-MM-DD') === dayjs(chosenDate).format('YYYY-MM-DD')) {
+                    data = orders.map((order) => {
+                        return order._id === id
+                            ?
+                            {
+                                ...order,
+                                products: order.products.filter((product) => {
+                                    return product._id !== productId
+                                })
+                            }
+                            :
+                            order;
+                    })
+                }
                 break;
             default:
                 console.log('No method chosen');
@@ -399,34 +413,34 @@ const Main = () => {
         <Box sx={{ flexGrow: 1, padding: 3, paddingTop: 9, height: '100%', minHeight: '100vh' }}>
             <Grid container spacing={{ xs: 2, md: 3 }}>
                 {orders.map((order) => {
-                    if (!personalSettings.showEmptyOrders && order.products.length <= 0) {
+                    if (!personalSettings?.showEmptyOrders && order?.products?.length <= 0) {
                         return (undefined)
                     }
                     return (
-                        <Grid xs={12} sm={12} md={6} lg={4} xl={3} key={order._id}>
+                        <Grid xs={12} sm={12} md={6} lg={4} xl={3} key={order?._id}>
                             <Item>
                                 <Grid container xs={12}>
                                     <Grid xs={12} sm={6}>
-                                        <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Keräyspäivämäärä: {dayjs(order.pickingdate).format('DD-MM-YYYY')}</Typography>
-                                        <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Toimituspäivämäärä: {dayjs(order.deliverydate).format('DD-MM-YYYY')}</Typography>
-                                        <Typography sx={{ fontSize: 20, paddingTop: 1, paddingBottom: 1 }} align="left" variant='h1'>{order.store.name}</Typography>
-                                        <Typography sx={{ fontSize: 15 }} align="left" variant='h1'>{order._id}</Typography>
+                                        <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Keräyspäivämäärä: {dayjs(order?.pickingdate).format('DD-MM-YYYY')}</Typography>
+                                        <Typography sx={{ fontSize: 20 }} align="left" variant='h1'>Toimituspäivämäärä: {dayjs(order?.deliverydate).format('DD-MM-YYYY')}</Typography>
+                                        <Typography sx={{ fontSize: 20, paddingTop: 1, paddingBottom: 1 }} align="left" variant='h1'>{order?.store?.name}</Typography>
+                                        <Typography sx={{ fontSize: 15 }} align="left" variant='h1'>{order?._id}</Typography>
                                     </Grid>
                                     <Grid xs={12} sm={6} sx={{ padding: 0 }}>
                                         <Grid xs={12} >
-                                            <Typography align='right'>{order.information}</Typography>
+                                            <Typography align='right'>{order?.information}</Typography>
                                         </Grid>
                                         <Grid xs={12}>
-                                            <Typography align='right'>{order.ordercode}</Typography>
+                                            <Typography align='right'>{order?.ordercode}</Typography>
                                         </Grid>
                                     </Grid>
                                     <Grid xs={12} sm={6}>
                                         {
                                             (userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/statuslocation/create_status_location'))
                                             &&
-                                            order.statusLocation.map((sLoc: any) => (
-                                                <Grid key={sLoc._id} sx={{ paddingLeft: 0, paddingTop: 0 }} xs={12}>
-                                                    <Typography align='left'>{sLoc.location.location}: {sLoc.status.status}</Typography>
+                                            order?.statusLocation?.map((sLoc: any) => (
+                                                <Grid key={sLoc?._id} sx={{ paddingLeft: 0, paddingTop: 0 }} xs={12}>
+                                                    <Typography align='left'>{sLoc?.location?.location}: {sLoc?.status?.status}</Typography>
 
                                                 </Grid>
                                             ))
@@ -454,7 +468,7 @@ const Main = () => {
                                         {
                                             order?.products.map((product) => (
                                                 <MainTableData
-                                                    key={product._id}
+                                                    key={product?._id}
                                                     product={product}
                                                     defaultStatus={defaultStatus}
                                                     rfidCards={RFIDCards}
@@ -466,7 +480,7 @@ const Main = () => {
                                     </Tbody>
                                 </Table>
                                 <Grid container xs={12}>
-                                    <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/statuslocation/create_status_location') ? 'flex' : 'none' }} onClick={() => { if (order.products.length > 0) { setStatusMoveOrder(order._id); setStatusOpen(true); } }}>Valmis</Button>
+                                    <Button variant="contained" size='small' color='success' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/statuslocation/create_status_location') ? 'flex' : 'none' }} onClick={() => { if (order?.products?.length > 0) { setStatusMoveOrder(order?._id); setStatusOpen(true); } }}>Valmis</Button>
                                     <Button onClick={() => { setEditData(order); setIsOpen(prevState => !prevState); }} variant="contained" size='small' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/edit_order') ? 'flex' : 'none' }}>Muokkaa</Button>
                                     <Button onClick={() => { setMenuOpen(true); setDeleteOrderData(order); }} variant="contained" size='small' color='error' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/delete_order') ? 'flex' : 'none' }}>Poista</Button>
                                     <Button variant="contained" size='small' color='info' sx={{ fontSize: 15, textTransform: 'none', display: userData?.role?.rights.includes('*') || userData?.role?.rights.includes('/orders/edit_order') ? 'flex' : 'none' }}>Vie Exceliin</Button>
@@ -499,8 +513,8 @@ const Main = () => {
                             <Select defaultValue={chosenStatus} value={statusMove} onChange={(e: any) => setStatusMove(e.target.value)}>
                                 {
                                     statusOrder?.map((status: Status) => (
-                                        <MenuItem key={status._id} value={status._id}>
-                                            {status.status}
+                                        <MenuItem key={status?._id} value={status?._id}>
+                                            {status?.status}
                                         </MenuItem>
                                     ))
                                 }
