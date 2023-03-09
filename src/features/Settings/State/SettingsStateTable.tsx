@@ -147,12 +147,10 @@ const SettingsStateTable: React.FC<Props> = ({ newCard }) => {
             </Tbody>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Tuotteen tila'>
-                        Tuotteen tila on päivitetty.
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Tuotteen tila'>
+                    Tuotteen tila on päivitetty.
+                </Message>
             }
         </Table>
     )

@@ -112,12 +112,10 @@ const SettingsRFIDTable: React.FC<Props> = ({ newCard }) => {
             </Tbody>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='RFID kortti'>
-                        Kortti on päivitetty.
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='RFID kortti'>
+                    Kortti on päivitetty.
+                </Message>
             }
         </Table>
     )

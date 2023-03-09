@@ -104,12 +104,10 @@ const SettingsRollerTable: React.FC<Props> = ({ newCard }) => {
             </Tbody>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Rullakko'>
-                        Rullakko on päivitetty.
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Rullakko'>
+                    Rullakko on päivitetty.
+                </Message>
             }
         </Table>
     )

@@ -203,12 +203,10 @@ const SettingsRoles = () => {
             </Grid>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={'Rooli'}>
-                        Rooli on luotu/päivitetty onnistuneesti.
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle={'Rooli'}>
+                    Rooli on luotu/päivitetty onnistuneesti.
+                </Message>
             }
             <MenuDialog isOpen={isOpen} setIsOpen={(value: boolean) => setIsOpen(value)} result={() => deleteRole()} dialogTitle={'Haluatko poistaa tämän roolin?'} actions={true}>
                 {`Haluatko varmasti poistaa roolin ${newRole?.current?.value} (${role})? Mikäli poistat roolin sitä ei voida enää palauttaa ja käyttäjät joilla rooli oli, ei ole enää oikeuksia.`}

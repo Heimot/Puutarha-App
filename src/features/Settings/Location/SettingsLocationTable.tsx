@@ -112,12 +112,10 @@ const SettingsLocationTable: React.FC<Props> = ({ newCard }) => {
             </Tbody>
             {
                 messageOpen
-                    ?
-                    <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Sijainti'>
-                        Sijainti on päivitetty.
-                    </Message>
-                    :
-                    null
+                &&
+                <Message setIsOpen={(value) => setMessageOpen(value)} isOpen={messageOpen} dialogTitle='Sijainti'>
+                    Sijainti on päivitetty.
+                </Message>
             }
         </Table>
     )
