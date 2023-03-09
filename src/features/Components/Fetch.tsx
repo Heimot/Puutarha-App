@@ -41,7 +41,7 @@ const FetchData = async ({ urlHost, urlPath, urlQuery, urlMethod, urlHeaders, ur
         body
     })
 
-    if (!data.ok) {
+    if (!data.ok && urlPath !== '/auth/login') {
         const userId = localStorage.getItem('userId');
         let authCheck = await fetch(`${process.env.REACT_APP_API_URL}/auth/get_my_user_data?currentUserId=${userId}`, {
             method: 'GET',
