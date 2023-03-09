@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link as MUILink, Paper, Box, Grid, Typography } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import BackgroundImg from '../../img/Puutarha.jpg'
@@ -23,6 +23,7 @@ function Copyright(props: any) {
 
 
 const Login = () => {
+    const [fail, setFail] = useState<boolean>(false);
     const dispatch = useDispatch();
     const { setUserData } = bindActionCreators(actionCreators, dispatch);
 
@@ -32,7 +33,7 @@ const Login = () => {
         const data = new FormData(event.currentTarget);
         let url = process.env.REACT_APP_API_URL;
         let response = await FetchData({ urlHost: url, urlPath: '/auth/login', urlMethod: 'POST', urlHeaders: 'NoAuth', urlBody: { email: data.get('email'), password: data.get('password') } })
-        if (!response.accessToken) return;
+        if (!response.accessToken) return setFail(true);
         localStorage.setItem('token', response.accessToken);
         localStorage.setItem('userId', response.user._id);
         setUserData(response.user);
@@ -74,6 +75,11 @@ const Login = () => {
                         Kirjaudu sisään
                     </Typography>
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                        {
+                            fail
+                            &&
+                            <Typography color={'red'} textAlign={'center'}>Kirjautuminen epäonnistui, tarkista käyttäjänimi ja salasana.</Typography>
+                        }
                         <TextField
                             margin="normal"
                             required
