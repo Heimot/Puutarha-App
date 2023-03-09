@@ -183,24 +183,24 @@ const CalendarPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOr
                             doc.setFontSize(text.fontSize);
                             switch (text.text) {
                                 case '[[PAGE]]':
-                                    doc.text(page.toString(), text.xPosition, text.yPosition);
+                                    multiLine(doc, text, page.toString());
                                     break;
                                 case '[[TODAY]]':
-                                    doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    multiLine(doc, text, dayjs().format('DD/MM/YYYY').toString());
+
                                     break;
                                 case '[[LICENSEPLATE]]':
                                     if (!truckData?.truck?.truckLicensePlate) return;
-                                    doc.text(truckData?.truck?.truckLicensePlate, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, truckData?.truck?.truckLicensePlate);
                                     break;
                                 case '[[INFORMATION]]':
                                     if (!cInfo?.result?.info) return;
-                                    doc.text(cInfo?.result?.info, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, cInfo?.result?.info);
                                     break;
                                 default:
-                                    doc.text(text.text, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, text.text);
                                     break;
                             }
-
                         })
                         if (pdfData === null) return;
                         pdfData?.header?.PDFImage.map((image: any) => {
@@ -230,10 +230,10 @@ const CalendarPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOr
                     doc.setFontSize(text.fontSize);
                     switch (text.text) {
                         case '[[TODAY]]':
-                            doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                            multiLine(doc, text, dayjs().format('DD/MM/YYYY').toString());
                             break;
                         default:
-                            doc.text(text.text, text.xPosition, text.yPosition);
+                            multiLine(doc, text, text.text);
                             break;
                     }
                 })
@@ -254,6 +254,15 @@ const CalendarPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOr
                 setOrderPrint(null);
                 setIsOpen(false);
             })
+    }
+
+    const multiLine = (doc: jsPDF, text: any, value: any) => {
+        if (text?.multiline && text?.multiline !== 0) {
+            const multiline = doc.splitTextToSize(value, text.multiline)
+            return doc.text(multiline, text.xPosition, text.yPosition);
+        } else {
+            return doc.text(value, text.xPosition, text.yPosition);
+        }
     }
 
     return (

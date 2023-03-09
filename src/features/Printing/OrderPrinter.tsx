@@ -179,36 +179,36 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
                             switch (text.text) {
                                 case '[[ID]]':
                                     if (!order?._id) return;
-                                    doc.text(order?._id, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, order?._id);
                                     break;
                                 case '[[STORE]]':
                                     if (!order?.store?.name) return;
-                                    doc.text(order?.store?.name, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, order?.store?.name);
                                     break;
                                 case '[[PICKINGDATE]]':
                                     if (!order?.pickingdate) return;
-                                    doc.text(dayjs(order?.pickingdate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    multiLine(doc, text, dayjs(order?.pickingdate).format('DD/MM/YYYY').toString());
                                     break;
                                 case '[[DELIVERYDATE]]':
                                     if (!order?.deliverydate) return;
-                                    doc.text(dayjs(order?.deliverydate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    multiLine(doc, text, dayjs(order?.deliverydate).format('DD/MM/YYYY').toString());
                                     break;
                                 case '[[INFORMATION]]':
                                     if (!order?.information) return;
-                                    doc.text(order?.information, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, order?.information);
                                     break;
                                 case '[[ORDERCODE]]':
                                     if (!order?.ordercode) return;
-                                    doc.text(order?.ordercode, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, order?.ordercode);
                                     break;
                                 case '[[PAGE]]':
-                                    doc.text(page.toString(), text.xPosition, text.yPosition);
+                                    multiLine(doc, text, page.toString());
                                     break;
                                 case '[[TODAY]]':
-                                    doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                    multiLine(doc, text, dayjs().format('DD/MM/YYYY').toString());
                                     break;
                                 default:
-                                    doc.text(text.text, text.xPosition, text.yPosition);
+                                    multiLine(doc, text, text.text);
                                     break;
                             }
 
@@ -243,38 +243,36 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
                     switch (text.text) {
                         case '[[ID]]':
                             if (!order?._id) return;
-                            doc.text(order?._id, text.xPosition, text.yPosition);
+                            multiLine(doc, text, order?._id);
                             break;
                         case '[[STORE]]':
                             if (!order?.store) return;
-                            doc.text(order?.store.name, text.xPosition, text.yPosition);
+                            multiLine(doc, text, order?.store.name);
                             break;
                         case '[[PICKINGDATE]]':
                             if (!order?.pickingdate) return;
-                            doc.text(dayjs(order.pickingdate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                            multiLine(doc, text, dayjs(order.pickingdate).format('DD/MM/YYYY').toString());
                             break;
                         case '[[DELIVERYDATE]]':
                             if (!order?.deliverydate) return;
-                            doc.text(dayjs(order.deliverydate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                            multiLine(doc, text, dayjs(order.deliverydate).format('DD/MM/YYYY').toString());
                             break;
                         case '[[INFORMATION]]':
                             if (!order?.information) return;
-                            doc.text(order?.information, text.xPosition, text.yPosition);
+                            multiLine(doc, text, order?.information);
                             break;
                         case '[[ORDERCODE]]':
                             if (!order?.ordercode) return;
-                            doc.text(order?.ordercode, text.xPosition, text.yPosition);
+                            multiLine(doc, text, order?.ordercode);
                             break;
                         case '[[TODAY]]':
-                            doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                            multiLine(doc, text, dayjs().format('DD/MM/YYYY').toString());
                             break;
                         default:
-                            doc.text(text.text, text.xPosition, text.yPosition);
+                            multiLine(doc, text, text.text);
                             break;
                     }
                 })
-
-
 
                 pdfData?.PDFImage?.map((image: any) => {
                     if (image.imageURL === "") return;
@@ -293,6 +291,15 @@ const OrderPrinter: React.FC<Props> = ({ isOpen, setIsOpen, orderPrint, setOrder
                 setOrderPrint(null);
                 setIsOpen(false);
             })
+    }
+
+    const multiLine = (doc: jsPDF, text: any, value: any) => {
+        if (text?.multiline && text?.multiline !== 0) {
+            const multiline = doc.splitTextToSize(value, text.multiline)
+            return doc.text(multiline, text.xPosition, text.yPosition);
+        } else {
+            return doc.text(value, text.xPosition, text.yPosition);
+        }
     }
 
     return (

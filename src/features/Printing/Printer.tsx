@@ -134,34 +134,34 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
                         switch (text.text) {
                             case '[[FLOWER]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text(printableStickers[i]?.flower.name, text.xPosition, text.yPosition);
+                                multiLine(doc, text, printableStickers[i]?.flower.name);
                                 break;
                             case '[[AMOUNT]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text((printableStickers[i]?.amount).toString(), text.xPosition, text.yPosition);
+                                multiLine(doc, text, (printableStickers[i]?.amount).toString());
                                 break;
                             case '[[INFORMATION]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text(printableStickers[i]?.information, text.xPosition, text.yPosition);
+                                multiLine(doc, text, printableStickers[i]?.information);
                                 break;
                             case '[[STORE]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text(printableStickers[i]?.store.name, text.xPosition, text.yPosition);
+                                multiLine(doc, text, printableStickers[i]?.store.name);
                                 break;
                             case '[[TODAY]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text(dayjs().format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                multiLine(doc, text, dayjs().format('DD/MM/YYYY').toString());
                                 break;
                             case '[[DATE]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text(dayjs(printableStickers[i]?.pickingdate).format('DD/MM/YYYY').toString(), text.xPosition, text.yPosition);
+                                multiLine(doc, text, dayjs(printableStickers[i]?.pickingdate).format('DD/MM/YYYY').toString());
                                 break;
                             case '[[L]]':
                                 if (printableStickers[i] === undefined) return;
-                                doc.text(printableStickers[i].location.location, text.xPosition, text.yPosition);
+                                multiLine(doc, text, printableStickers[i].location.location);
                                 break;
                             default:
-                                doc.text(text.text, text.xPosition, text.yPosition);
+                                multiLine(doc, text, text.text);
                                 break;
                         }
                     })
@@ -188,6 +188,15 @@ const Printer: React.FC<Props> = ({ isOpen, setIsOpen, stickers, setStickers, re
                 resetCards();
                 setIsOpen(false);
             })
+    }
+
+    const multiLine = (doc: jsPDF, text: any, value: any) => {
+        if (text?.multiline && text?.multiline !== 0) {
+            const multiline = doc.splitTextToSize(value, text.multiline)
+            return doc.text(multiline, text.xPosition, text.yPosition);
+        } else {
+            return doc.text(value, text.xPosition, text.yPosition);
+        }
     }
 
     const deleteSticker = (id: string) => {
