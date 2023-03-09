@@ -79,16 +79,16 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
         setPdfData((prevState: PDFData[]) => ({ ...prevState, [name]: value }))
     }
 
-    const updateTextData = (_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => {
+    const updateTextData = (_id: string, text: string, font: string, multiline: number, fontType: string, fontSize: number, xPosition: number, yPosition: number) => {
         let data = pdfData?.PDFText?.map((data) =>
-            data._id === _id ? { ...data, text, font, fontType, fontSize, xPosition, yPosition } : data
+            data._id === _id ? { ...data, text, font, multiline, fontType, fontSize, xPosition, yPosition } : data
         )
         setPdfData({ ...pdfData, PDFText: data });
     }
 
-    const updateHeaderTextData = (_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => {
+    const updateHeaderTextData = (_id: string, text: string, font: string, multiline: number, fontType: string, fontSize: number, xPosition: number, yPosition: number) => {
         let data = pdfData?.header?.PDFText?.map((data) =>
-            data._id === _id ? { ...data, text, font, fontType, fontSize, xPosition, yPosition } : data
+            data._id === _id ? { ...data, text, font, multiline, fontType, fontSize, xPosition, yPosition } : data
         )
         setPdfData({ ...pdfData, header: { ...pdfData?.header, PDFText: data } });
     }
@@ -460,6 +460,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                             <Tr>
                                 <Th>Teksti</Th>
                                 <Th>Fontti</Th>
+                                <Th>Monirivinen</Th>
                                 <Th>Fontin koko</Th>
                                 <Th>Fontin tyyppi</Th>
                                 <Th>X-Kohta</Th>
@@ -469,7 +470,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                         <Tbody>
                             {pdfData?.PDFText?.map((text: any) => (
                                 <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeTextData(_id)}
-                                    updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
+                                    updateTextData={(_id: string, text: string, font: string, multiline: number, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateTextData(_id, text, font, multiline, fontType, fontSize, xPosition, yPosition)} />
                             ))}
                         </Tbody>
                     </Table>
@@ -521,6 +522,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                                     <Tr>
                                         <Th>Teksti</Th>
                                         <Th>Fontti</Th>
+                                        <Th>Monirivinen</Th>
                                         <Th>Fontin koko</Th>
                                         <Th>Fontin tyyppi</Th>
                                         <Th>X-Kohta</Th>
@@ -530,7 +532,7 @@ const SettingsPDFEditor: React.FC<Props> = ({ pdfData, setPdfData, getFonts }) =
                                 <Tbody>
                                     {pdfData?.header?.PDFText?.map((text: any) => (
                                         <SettingsPDFTextCell key={text._id} text={text} fonts={fonts} getFonts={getFonts} removeTextData={(_id: string) => removeHeaderTextData(_id)}
-                                            updateTextData={(_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateHeaderTextData(_id, text, font, fontType, fontSize, xPosition, yPosition)} />
+                                            updateTextData={(_id: string, text: string, font: string, multiline: number, fontType: string, fontSize: number, xPosition: number, yPosition: number) => updateHeaderTextData(_id, text, font, multiline, fontType, fontSize, xPosition, yPosition)} />
                                     ))}
                                 </Tbody>
                             </Table>

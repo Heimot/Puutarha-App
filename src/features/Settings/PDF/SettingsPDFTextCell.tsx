@@ -12,13 +12,14 @@ interface Props {
     fonts: Fonts[];
     getFonts: GetFonts;
     removeTextData: (_id: string) => void;
-    updateTextData: (_id: string, text: string, font: string, fontType: string, fontSize: number, xPosition: number, yPosition: number) => void;
+    updateTextData: (_id: string, text: string, font: string, multiline: number, fontType: string, fontSize: number, xPosition: number, yPosition: number) => void;
 }
 
 interface TextArr {
     _id: string;
     text: string;
     Font: string;
+    MultiLine: number;
     FontType: string;
     FontSize: number;
     XPosition: number;
@@ -26,7 +27,7 @@ interface TextArr {
 }
 
 const SettingsPDFTextCell: React.FC<Props> = ({ text, fonts, getFonts, removeTextData, updateTextData }) => {
-    const [textData, setTextData] = useState<TextArr>({ _id: text._id, text: text.text, Font: text.font, FontType: text.fontType, FontSize: text.fontSize, XPosition: text.xPosition, YPosition: text.yPosition })
+    const [textData, setTextData] = useState<TextArr>({ _id: text._id, text: text.text, Font: text.font, MultiLine: text.multiline, FontType: text.fontType, FontSize: text.fontSize, XPosition: text.xPosition, YPosition: text.yPosition })
     const [fontTypes, setFontTypes] = useState<string[]>()
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -39,7 +40,7 @@ const SettingsPDFTextCell: React.FC<Props> = ({ text, fonts, getFonts, removeTex
 
     useEffect(() => {
         if (textData._id === null) return;
-        updateTextData(textData._id, textData.text, textData.Font, textData.FontType, textData.FontSize, textData.XPosition, textData.YPosition)
+        updateTextData(textData._id, textData.text, textData.Font, textData.MultiLine, textData.FontType, textData.FontSize, textData.XPosition, textData.YPosition)
         setFontTypes(getFonts[textData.Font])
     }, [textData])
 
@@ -65,6 +66,9 @@ const SettingsPDFTextCell: React.FC<Props> = ({ text, fonts, getFonts, removeTex
                         ))
                     }
                 </Select>
+            </Td>
+            <Td style={borderStyle}>
+                <TextField name='MultiLine' fullWidth value={textData.MultiLine} onChange={(e) => handleChange(e.target.value, e.target.name)} />
             </Td>
             <Td style={borderStyle}>
                 <TextField name='FontSize' fullWidth value={textData.FontSize} onChange={(e) => handleChange(e.target.value, e.target.name)} />

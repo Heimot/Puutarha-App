@@ -116,7 +116,12 @@ const SettingsPDF = () => {
                             pdfData?.header?.PDFText.map((text: any) => {
                                 doc.setFont(text.font, text.fontType);
                                 doc.setFontSize(text.fontSize);
-                                doc.text(text.text, text.xPosition, text.yPosition);
+                                if (text?.multiline && text?.multiline !== 0) {
+                                    const multiline = doc.splitTextToSize(text.text, text.multiline)
+                                    doc.text(multiline, text.xPosition, text.yPosition);
+                                } else {
+                                    doc.text(text.text, text.xPosition, text.yPosition);
+                                }
                             })
                             if (pdfData === null) return;
                             pdfData?.header?.PDFImage.map((image: any) => {
@@ -142,7 +147,12 @@ const SettingsPDF = () => {
                     pdfData?.PDFText.map((text: any) => {
                         doc.setFont(text.font, text.fontType);
                         doc.setFontSize(text.fontSize);
-                        doc.text(text.text, text.xPosition, text.yPosition);
+                        if (text?.multiline && text?.multiline !== 0) {
+                            const multiline = doc.splitTextToSize(text.text, text.multiline)
+                            doc.text(multiline, text.xPosition, text.yPosition);
+                        } else {
+                            doc.text(text.text, text.xPosition, text.yPosition);
+                        }
                     })
                     if (pdfData === null) return;
                     pdfData?.PDFImage.map((image: any) => {
