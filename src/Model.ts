@@ -149,6 +149,7 @@ export interface PDFText {
     _id: string;
     text: string;
     font: string;
+    multiline: number;
     fontSize: number;
     fontType: string;
     xPosition: number;
