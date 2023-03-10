@@ -22,9 +22,10 @@ import CalendarPrinter from '../Printing/CalendarPrinter';
 
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import EditIcon from '@mui/icons-material/Edit';
+import CalendarOrder from './CalendarOrder';
 
 
-dayjs.extend(weekday)
+dayjs.extend(weekday);
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -58,6 +59,7 @@ const Calendar = () => {
   const [truckMessage, setTruckMessage] = useState<boolean>(false);
   const [isPDFOpen, setIsPDFOpen] = useState<boolean>(false);
   const [PDFData, setPDFData] = useState<Order[]>([]);
+  const [isOrderOpen, setIsOrderOpen] = useState<boolean>(false);
   const theme = useTheme();
 
   const { userData } = useSelector((state: State) => state.data);
@@ -429,15 +431,13 @@ const Calendar = () => {
       </Grid>
       {
         truckMessage
-          ?
-          <MenuDialog isOpen={truckMessage} setIsOpen={(value) => setTruckMessage(value)} result={() => { return; }} dialogTitle={'Kalenteri toiminnot'} actions={false}>
-            <Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
-              <Button variant='contained' startIcon={<EditIcon />} onClick={() => { setTruckMessage(false); setIsTruckOpen(true); }}>Muuta rekan lisätietoja</Button>
-              <Button sx={{ marginTop: '15px' }} variant='contained' startIcon={<PictureAsPdfIcon />} onClick={() => { setTruckMessage(false); setIsPDFOpen(true); }}>Tulosta PDF</Button>
-            </Grid>
-          </MenuDialog>
-          :
-          null
+        &&
+        <MenuDialog isOpen={truckMessage} setIsOpen={(value) => setTruckMessage(value)} result={() => { return; }} dialogTitle={'Kalenteri toiminnot'} actions={false}>
+          <Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
+            <Button variant='contained' startIcon={<EditIcon />} onClick={() => { setTruckMessage(false); setIsTruckOpen(true); }}>Muuta rekan lisätietoja</Button>
+            <Button sx={{ marginTop: '15px' }} variant='contained' startIcon={<PictureAsPdfIcon />} onClick={() => { setTruckMessage(false); setIsPDFOpen(true); }}>Tulosta PDF</Button>
+          </Grid>
+        </MenuDialog>
       }
       {
         isPDFOpen
@@ -446,17 +446,18 @@ const Calendar = () => {
       }
       {
         isOpen
-          ?
-          <CalendarDialog isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} order={order} trucks={trucks} updateCalendar={(order, truckData, calendarPosition) => updateCalendar(order, truckData, calendarPosition)} />
-          :
-          null
+        &&
+        <CalendarDialog isOpen={isOpen} setIsOpen={(value) => setIsOpen(value)} order={order} trucks={trucks} updateCalendar={(order, truckData, calendarPosition) => updateCalendar(order, truckData, calendarPosition)} openOrder={(value) => setIsOrderOpen(value)} />
       }
       {
         isTruckOpen
-          ?
-          <CalendarTruckDialog isOpen={isTruckOpen} setIsOpen={(value) => setIsTruckOpen(value)} truckData={truckData} />
-          :
-          null
+        &&
+        <CalendarTruckDialog isOpen={isTruckOpen} setIsOpen={(value) => setIsTruckOpen(value)} truckData={truckData} />
+      }
+      {
+        isOrderOpen
+        &&
+        <CalendarOrder isOpen={isOrderOpen} setIsOpen={(value) => setIsOrderOpen(value)} id={order?._id} />
       }
     </Box>
   )

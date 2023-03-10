@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
-
+import { Order, Truck } from '../../Model';
+import FetchData from '../Components/Fetch';
 import dayjs from 'dayjs';
 
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import { Order, Truck } from '../../Model';
-import FetchData from '../Components/Fetch';
 
 interface Props {
     isOpen: boolean;
@@ -14,9 +13,10 @@ interface Props {
     order: Order;
     trucks: Truck[] | null;
     updateCalendar: (order: Order, truck: Truck, position: Number | string) => void;
+    openOrder: (value: boolean) => void;
 }
 
-const CalendarDialog: React.FC<Props> = ({ isOpen, setIsOpen, order, trucks, updateCalendar }) => {
+const CalendarDialog: React.FC<Props> = ({ isOpen, setIsOpen, order, trucks, updateCalendar, openOrder }) => {
     const [chosenTruck, setChosenTruck] = useState<string>('');
     const [calendarPosition, setCalendarPosition] = useState<Number | string>(0);
 
@@ -94,28 +94,27 @@ const CalendarDialog: React.FC<Props> = ({ isOpen, setIsOpen, order, trucks, upd
                 <Box sx={{ marginTop: '15px' }}>
                     {
                         trucks !== null
-                            ?
-                            <FormControl fullWidth>
-                                <InputLabel id='truck-label'>Rekka</InputLabel>
-                                <Select label='Rekka' labelId='truck-label' value={chosenTruck} onChange={(e) => setChosenTruck(e.target.value)}>
-                                    {
-                                        trucks?.map((truck: any) => {
-                                            return (
-                                                <MenuItem value={truck?._id} key={truck._id}>
-                                                    {truck.truckLicensePlate}
-                                                </MenuItem>
-                                            )
-                                        })
-                                    }
-                                </Select>
-                                <TextField type="number" label='Järjestys numero' sx={{ marginTop: '10px' }} value={calendarPosition} onBlur={isEmpty} onChange={(e) => setCalendarPosition(e.target.value)} />
-                            </FormControl>
-                            :
-                            null
+                        &&
+                        <FormControl fullWidth>
+                            <InputLabel id='truck-label'>Rekka</InputLabel>
+                            <Select label='Rekka' labelId='truck-label' value={chosenTruck} onChange={(e) => setChosenTruck(e.target.value)}>
+                                {
+                                    trucks?.map((truck: any) => {
+                                        return (
+                                            <MenuItem value={truck?._id} key={truck._id}>
+                                                {truck.truckLicensePlate}
+                                            </MenuItem>
+                                        )
+                                    })
+                                }
+                            </Select>
+                            <TextField type="number" label='Järjestys numero' sx={{ marginTop: '10px' }} value={calendarPosition} onBlur={isEmpty} onChange={(e) => setCalendarPosition(e.target.value)} />
+                        </FormControl>
                     }
                 </Box>
             </DialogContent>
             <DialogActions>
+                <Button sx={{ marginRight: 'auto' }} onClick={() => openOrder(true)}>Tilaus</Button>
                 <Button variant='contained' autoFocus startIcon={<SaveIcon />} onClick={() => updateOrder()} >
                     Tallenna
                 </Button>
@@ -124,4 +123,4 @@ const CalendarDialog: React.FC<Props> = ({ isOpen, setIsOpen, order, trucks, upd
     )
 }
 
-export default CalendarDialog
+export default CalendarDialog;
