@@ -105,7 +105,6 @@ const SettingsUsersTable: React.FC<Props> = ({ newUser }) => {
                     <Th>Käyttäjänimi</Th>
                     <Th>Rooli</Th>
                     <Th>Asetukset</Th>
-                    <Th>Salasanan vaihto</Th>
                 </Tr>
             </Thead>
             <Tbody>

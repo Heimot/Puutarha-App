@@ -86,7 +86,6 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser, 
                 <Typography>{user?.username}</Typography>
             </Td>
             <Td style={borderStyle}>
-
                 <Select value={role} onChange={(e: any) => setRole(e.target.value)} fullWidth>
                     {
                         roles.map((role) => (
@@ -94,16 +93,10 @@ const SettingsUserCell: React.FC<Props> = ({ user, roles, saveUser, deleteUser, 
                         ))
                     }
                 </Select>
-
             </Td>
             <Td style={borderStyle}>
-                <Button onClick={() => setIsSettingsOpen(true)}>Muuta</Button>
-            </Td>
-            <Td style={borderStyle}>
-
                 <Box style={{ display: 'flex', width: '100%', flexDirection: 'row' }}>
-
-                    <TextField fullWidth value={'WIP PASSWORD CHANGE SYSTEM'}></TextField>
+                    <Button fullWidth onClick={() => setIsSettingsOpen(true)}>Muuta</Button>
                     <Button style={{ minHeight: "auto", minWidth: "auto", padding: 0 }} onClick={() => saveUser(user._id, role)}>
                         <SaveIcon fontSize='large' />
                     </Button>
